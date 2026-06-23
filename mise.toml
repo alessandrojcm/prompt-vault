@@ -37,6 +37,11 @@ run = "./gradlew :apps:api:bootRun"
 description = "Run the TanStack Start web app"
 run = "pnpm --filter @prompt-vault/web dev"
 
+[tasks.dev]
+description = "Run the Spring Boot API and TanStack Start web app"
+depends = ["db:up"]
+run = [{ tasks = ["dev:api", "dev:web"] }]
+
 [tasks.build]
 description = "Build the monorepo"
 depends = ["generate"]

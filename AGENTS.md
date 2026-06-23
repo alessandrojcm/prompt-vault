@@ -14,7 +14,7 @@ Managed by [mise](https://mise.jdx.dev/) via `mise.toml`. Run `mise install` to 
 - Gradle 9.6.0
 
 Gradle is available via mise and a repo-checked-in wrapper is present. Prefer `./gradlew` for repo tasks unless mise-specific behavior is needed.
-Use `mise run` as the standard command surface: `mise run install`, `mise run generate`, `mise run check`, `mise run dev:api`, `mise run dev:web`, and `mise run db:up` / `mise run db:down`.
+Use `mise run` as the standard command surface: `mise run install`, `mise run generate`, `mise run check`, `mise run dev`, `mise run dev:api`, `mise run dev:web`, and `mise run db:up` / `mise run db:down`.
 - `mise run check` includes the web app's `oxlint` and `oxfmt --check` steps.
 
 ## Planned architecture
@@ -23,12 +23,21 @@ Use `mise run` as the standard command surface: `mise run install`, `mise run ge
 - Use an OpenAPI-first contract at `openapi/api.yaml` as the shared API source of truth.
 - Generate Spring Boot interfaces/models with OpenAPI Generator; do not commit generated backend code.
 - Generate a TypeScript API client in the pnpm workspace package with Hey API; generated client output lives under `packages/api-client/src/generated` and must not be committed.
+- Keep `packages/api-client/src/index.ts` as a thin re-export surface for Hey API generated SDK, types, and TanStack Query helpers; put UI-specific response mapping in the consuming app.
+- Do not configure Hey API runtime client defaults in `packages/api-client`; consuming apps own client configuration so SSR can use an absolute API URL while browser calls can stay same-origin.
+- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: browser calls stay same-origin (`/`), while SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback.
 - The TanStack Start web app uses `oxlint` and `oxfmt`; ignore generated assets under `apps/web/dist/**` and the generated route tree file `apps/web/src/routeTree.gen.ts` in those checks.
+- Use TanStack Form for app forms so signup/login/future forms share form state and submit handling conventions; put field validators on `form.Field`, use `validators.onSubmitAsync` for submit-time server validation, and render errors from TanStack Form state instead of parallel React state or helper view models.
+- Use Hey API's generated TanStack Query mutation/query helpers where they fit; if generated query helpers throw for expected control-flow responses such as `401`, call the generated SDK directly in the consuming app so the route can branch on `response.status`.
 - Use MySQL via Docker Compose, Flyway migrations/seed data, and Spring Data JPA for persistence mapping.
 - Keep the shared `docker-compose.yml` compatible with Testcontainers Compose-based tests; do not set `container_name` on services used by automated tests.
 - The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
 - Use Spring Security session-cookie authentication for the initial auth slice; CSRF hardening is deferred to later OWASP-focused work.
 - The current tracer is `GET /api/user`: the backend returns `401` when unauthenticated, and the web app calls it through the same-origin `/api` dev proxy.
+- The web root `/` is an auth gate: it calls `GET /api/user`, stays on `/` for authenticated `204`, and redirects unauthenticated `401` users to `/signup`.
+- Signup is now `POST /api/signup`: it trims username/email address, preserves password spaces, creates `USER` + `ENABLED`, and returns `400` with `ValidationErrorResponse.fieldErrors[]` for form-friendly validation failures.
+- Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
+- Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
 - API integration tests should prefer real MySQL coverage via Testcontainers; the current-user security tracer test boots the app against the repo `docker-compose.yml` MySQL service instead of excluding datasource/Flyway/JPA auto-configuration.
 
 ## Agent skills

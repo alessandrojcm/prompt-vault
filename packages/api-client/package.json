@@ -9,6 +9,7 @@
     "generate": "openapi-ts"
   },
   "dependencies": {
+    "ky": "^1.14.0",
     "@tanstack/react-query": "^5.101.1"
   },
   "devDependencies": {
