@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info:
+  title: Prompt Vault API
+  version: 0.1.0
+  description: Shared contract for the Prompt Vault auth slice.
+servers:
+  - url: /
+paths:
+  /api/user:
+    get:
+      tags:
+        - CurrentUser
+      operationId: getCurrentUser
+      summary: Get the current user session
+      description: Returns the current user when a session is present.
+      responses:
+        '204':
+          description: An authenticated session exists.
+        '401':
+          description: No authenticated session is present.
