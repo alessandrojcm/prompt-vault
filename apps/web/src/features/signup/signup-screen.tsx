@@ -1,4 +1,4 @@
-import { signupMutation, vSignupRequest } from "@prompt-vault/api-client";
+import { SignupError, signupMutation, vSignupRequest } from "@prompt-vault/api-client";
 import {
   Alert,
   Anchor,
@@ -37,9 +37,19 @@ export function SignupScreen() {
     validators: {
       onSubmit: vSignupRequest,
       onSubmitAsync: async ({ value, formApi }) => {
-        await signup.mutateAsync({ body: value });
-        await formApi.reset();
-        await navigate({ to: "/signup/success" });
+        try {
+          await signup.mutateAsync({ body: value });
+          await formApi.reset();
+          await navigate({ to: "/signup/success" });
+        } catch (error) {
+          return {
+            form: (error as SignupError)?.message,
+            fields: (error as SignupError).fieldErrors.reduce(
+              (curr, prv) => ({ ...curr, [prv.field]: prv.message }),
+              {},
+            ),
+          };
+        }
       },
     },
   });
@@ -137,7 +147,7 @@ export function SignupScreen() {
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   if (field.state.meta.isTouched && !field.state.meta.isValid) {
-    return field.state.meta.errors.map((error) => String(error.message)).join(", ");
+    return field.state.meta.errors.map((error) => error?.message ?? error).join(", ");
   }
 
   if (field.state.meta.isValidating) {
