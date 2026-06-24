@@ -15,6 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,13 @@ public class LoginService {
 
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
+    private final SessionRegistry sessionRegistry;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
-    public LoginService(AuthenticationManager authenticationManager, SecurityContextRepository securityContextRepository) {
+    public LoginService(AuthenticationManager authenticationManager, SecurityContextRepository securityContextRepository, SessionRegistry sessionRegistry) {
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
+        this.sessionRegistry = sessionRegistry;
     }
 
     public UserSummary login(LoginRequest request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -39,6 +42,7 @@ public class LoginService {
             context.setAuthentication(authentication);
             securityContextHolderStrategy.setContext(context);
             securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
+            sessionRegistry.registerNewSession(httpServletRequest.getSession().getId(), authentication.getPrincipal());
             return UserSummaryMapper.toSummary(userFrom(authentication));
         } catch (DisabledException exception) {
             throw new DisabledAccountException();

@@ -2,6 +2,7 @@ package com.promptvault.api.auth;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import com.promptvault.api.user.AccountStatus;
 import com.promptvault.api.user.UserEntity;
@@ -39,5 +40,23 @@ public class PromptVaultUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.getAccountStatus() == AccountStatus.ENABLED;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof PromptVaultUserDetails that)) {
+            return false;
+        }
+
+        return Objects.equals(user.getId(), that.user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId());
     }
 }
