@@ -58,6 +58,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthenticationErrorResponse'
+  /api/logout:
+    post:
+      tags:
+        - Auth
+      operationId: logout
+      summary: Log out the current user
+      description: Invalidates the authenticated user's server session.
+      responses:
+        '204':
+          description: Logout succeeded and the session was invalidated.
+        '401':
+          description: No authenticated session is present.
   /api/user:
     get:
       tags:

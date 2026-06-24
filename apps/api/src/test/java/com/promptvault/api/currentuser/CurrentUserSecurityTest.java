@@ -103,6 +103,29 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
         assertSafeUserSummary(adminCurrentUserResponse.body(), adminUser, Role.ADMIN);
     }
 
+    @Test
+    void logoutRequiresAnAuthenticatedSession() throws Exception {
+        HttpResponse<Void> response = logout(httpClient);
+
+        assertThat(response.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void logoutInvalidatesTheSessionAndCurrentUserBecomesUnauthorized() throws Exception {
+        String username = uniqueUsername("logoutUser");
+        String password = "password123";
+        saveUser(username, password, Role.USER);
+
+        HttpResponse<String> loginResponse = login(username, password, httpClient);
+        assertThat(loginResponse.statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(httpClient).statusCode()).isEqualTo(200);
+
+        HttpResponse<Void> logoutResponse = logout(httpClient);
+
+        assertThat(logoutResponse.statusCode()).isEqualTo(204);
+        assertThat(getCurrentUser(httpClient).statusCode()).isEqualTo(401);
+    }
+
     private HttpResponse<String> login(String username, String password, HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
             .header("Content-Type", "application/json")
@@ -121,6 +144,13 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
             .GET()
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<Void> logout(HttpClient client) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/logout"))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.discarding());
     }
 
     private UserEntity saveUser(String username, String password, Role role) {
