@@ -12,11 +12,9 @@ function SignupSuccessPage() {
         Prompt Vault
       </Text>
       <Title order={2}>Signup complete</Title>
-      <Text mt="md">
-        Your user has been created. You can log in once the login flow is available.
-      </Text>
-      <Anchor component={Link} mt="md" to="/signup">
-        Back to signup
+      <Text mt="md">Your user has been created. You can now log in.</Text>
+      <Anchor component={Link} mt="md" to="/login">
+        Log in
       </Anchor>
     </Card>
   );
