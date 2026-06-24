@@ -1,61 +1,119 @@
-import { getCurrentUserQueryKey, logoutMutation } from "@prompt-vault/api-client";
-import { Alert, Button, Card, Stack, Text, Title } from "@mantine/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import type { UserSummary } from "@prompt-vault/api-client";
+import { getCurrentUserOptions } from "@prompt-vault/api-client";
+import { AppShell, Container, Group, NavLink, Stack, Text, Title } from "@mantine/core";
+import type { QueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 
 import { requireCurrentUser } from "../features/auth/current-user";
 
+type AppNavigationLink = {
+  label: string;
+  to: "/dashboard" | "/dashboard/admin/users";
+  roles: Array<UserSummary["role"]>;
+};
+
+const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
+  { label: "Dashboard", roles: ["ADMIN", "USER"], to: "/dashboard" },
+  { label: "User management", roles: ["ADMIN"], to: "/dashboard/admin/users" },
+];
+
+type DashboardLoaderData = {
+  navigationLinks: Array<Pick<AppNavigationLink, "label" | "to">>;
+};
+
+type DashboardRouteLoaderContext = {
+  context: {
+    queryClient: QueryClient;
+  };
+  abortController: AbortController;
+};
+
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: requireCurrentUser,
-  component: DashboardPage,
+  loader: loadDashboardShell,
+  component: DashboardLayout,
 });
 
-function DashboardPage() {
-  const navigate = useNavigate();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const logout = useMutation(logoutMutation());
+async function loadDashboardShell({ context, abortController }: DashboardRouteLoaderContext) {
+  const currentUser = (await context.queryClient.ensureQueryData(
+    getCurrentUserOptions({ signal: abortController.signal }),
+  )) as UserSummary;
 
-  async function handleLogout() {
-    logout.mutate(
-      {},
-      {
-        onSuccess: async () => {
-          queryClient.removeQueries({ queryKey: getCurrentUserQueryKey() });
-          await router.invalidate();
-          await navigate({ to: "/login" });
-        },
-      },
-    );
-  }
+  return {
+    navigationLinks: navigationLinksFor(currentUser),
+  } satisfies DashboardLoaderData;
+}
+
+function navigationLinksFor(currentUser: UserSummary) {
+  return APP_NAVIGATION_LINKS.filter((link) => link.roles.includes(currentUser.role)).map(
+    ({ label, to }) => ({ label, to }),
+  );
+}
+
+function DashboardLayout() {
+  const { navigationLinks } = Route.useLoaderData();
 
   return (
-    <Card
-      aria-label="Authenticated dashboard"
-      mih={240}
-      mx="auto"
-      padding="xl"
-      radius="md"
-      shadow="sm"
-      withBorder
+    <AppShell
+      header={{ height: 72 }}
+      navbar={{
+        breakpoint: "sm",
+        collapsed: { desktop: false, mobile: true },
+        width: 260,
+      }}
+      padding="md"
     >
-      <Stack align="flex-start" gap="md">
-        <div>
-          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-            Dashboard
-          </Text>
-          <Title order={2}>Your prompt vault is ready.</Title>
-        </div>
-        <Text c="dimmed">Log out when you're finished using this session.</Text>
-        {logout.isError ? (
-          <Alert color="red" title="Could not log out" variant="light">
-            Try again before closing this browser tab.
-          </Alert>
-        ) : null}
-        <Button loading={logout.isPending} onClick={handleLogout}>
-          Log out
-        </Button>
-      </Stack>
-    </Card>
+      <AppShell.Header>
+        <Container h="100%" size="md">
+          <Group align="center" h="100%" justify="space-between">
+            <div>
+              <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                Prompt Vault
+              </Text>
+              <Title order={1} size="h3">
+                Prompt Vault
+              </Title>
+            </div>
+          </Group>
+        </Container>
+      </AppShell.Header>
+      <PromptVaultSidebar navigationLinks={navigationLinks} />
+      <AppShell.Main>
+        <Container py="xl" size="md">
+          <Outlet />
+        </Container>
+      </AppShell.Main>
+    </AppShell>
   );
+}
+
+function PromptVaultSidebar({
+  navigationLinks,
+}: {
+  navigationLinks: DashboardLoaderData["navigationLinks"];
+}) {
+  const location = useLocation();
+
+  return (
+    <AppShell.Navbar p="md">
+      <Stack gap="xs">
+        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+          Sections
+        </Text>
+        {navigationLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            active={isActiveNavigationLink(location.pathname, link.to)}
+            component={Link}
+            label={link.label}
+            to={link.to}
+          />
+        ))}
+      </Stack>
+    </AppShell.Navbar>
+  );
+}
+
+function isActiveNavigationLink(pathname: string, linkPathname: string) {
+  return pathname === linkPathname || pathname.startsWith(`${linkPathname}/`);
 }

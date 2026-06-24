@@ -3,10 +3,10 @@ import { Alert, Loader, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { requireAdminUser } from "../../features/auth/current-user";
-import { UserManagementTable } from "../../features/admin/user-management";
+import { UserManagementTable } from "../../../features/admin/user-management";
+import { requireAdminUser } from "../../../features/auth/current-user";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/dashboard/admin/users")({
   beforeLoad: requireAdminUser,
   component: UserManagementPage,
 });

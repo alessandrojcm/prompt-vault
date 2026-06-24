@@ -15,7 +15,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 ## Web app patterns
 
 - The web app is TanStack Start with file-based routing under `apps/web/src/routes`.
-- The root route layout is `apps/web/src/routes/__root.tsx`; it imports `@mantine/core/styles.css`, wraps the app in `MantineProvider`, and uses Mantine `AppShell` for the app-wide shell.
+- The root route layout is `apps/web/src/routes/__root.tsx`; it imports `@mantine/core/styles.css` and wraps the app in `MantineProvider`. The authenticated app shell/sidebar lives in the `/dashboard` layout at `apps/web/src/routes/dashboard.tsx` so login/signup/root auth routes do not render it.
 - Use Mantine form/display primitives over custom inline-styled controls.
 - Use TanStack Router `beforeLoad` for auth guards and throw `redirect({ to, replace: true })` for auth redirects.
 - The web root `/` is an auth gate only: unauthenticated users redirect to `/login`; authenticated users redirect to `/dashboard`.
@@ -58,10 +58,10 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
 - Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
 - The seeded local/dev admin user is `admin` with password `admin-password123`; keep the migration comment and login coverage updated if changing it.
-- User Management lives at `/admin/users` and is admin-only; the route guard redirects unauthenticated visitors through the auth gate/login flow and authenticated normal users to `/dashboard`.
+- User Management lives at `/dashboard/admin/users` under the authenticated dashboard layout and is admin-only; the route guard redirects unauthenticated visitors through the auth gate/login flow and authenticated normal users to `/dashboard`.
 - Admin User Management uses `GET /api/admin/users` with an optional `role` enum query parameter (`USER` / `ADMIN`).
 - Admin User Management updates account state with `PATCH /api/admin/users/{userId}/status` and a desired `accountStatus`; the endpoint is idempotent, returns the updated user, returns `404` for missing users, and returns `403` when targeting admins or the current user.
-- The `/admin/users` UI initially requests `role=USER`, hides internal IDs and the role column, shows username/email address/account status/actions, labels enum values for humans, confirms disable actions with a small popover, enables immediately, updates rows in place, and shows toasts.
+- The `/dashboard/admin/users` UI initially requests `role=USER`, hides internal IDs and the role column, shows username/email address/account status/actions, labels enum values for humans, confirms disable actions with a small popover, enables immediately, updates rows in place, and shows toasts.
 - Disabling a normal user preserves their data and identity reservations, revokes existing sessions so subsequent current-user checks behave unauthenticated, and does not create audit records in the initial slice.
 
 ## Testing patterns
