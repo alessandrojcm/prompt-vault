@@ -1,4 +1,4 @@
-import { signupMutation, type SignupError, vSignupRequest } from "@prompt-vault/api-client";
+import { signupMutation, vSignupRequest } from "@prompt-vault/api-client";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
