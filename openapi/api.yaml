@@ -124,6 +124,45 @@ paths:
           description: No authenticated session is present.
         '403':
           description: The authenticated user is not an administrator.
+  /api/admin/users/{userId}/status:
+    patch:
+      tags:
+        - AdminUsers
+      operationId: updateAdminUserStatus
+      summary: Set a normal user's account status
+      description: Updates the desired account status for a normal user. The operation is idempotent.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserStatusUpdateRequest'
+      responses:
+        '200':
+          description: The user with the requested account status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSummary'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The target cannot be managed by this operation.
+        '404':
+          description: The target user does not exist.
 components:
   schemas:
     LoginRequest:
@@ -177,6 +216,14 @@ components:
       enum:
         - ENABLED
         - DISABLED
+    AdminUserStatusUpdateRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - accountStatus
+      properties:
+        accountStatus:
+          $ref: '#/components/schemas/AccountStatus'
     UserSummary:
       type: object
       additionalProperties: false

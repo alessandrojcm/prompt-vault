@@ -1,8 +1,10 @@
 /// <reference types="vite/client" />
 
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
@@ -37,6 +39,7 @@ function RootComponent() {
       </head>
       <body>
         <MantineProvider>
+          <Notifications />
           <Outlet />
           <PromptVaultDevtools />
         </MantineProvider>
