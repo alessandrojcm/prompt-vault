@@ -1,4 +1,4 @@
-import { signupMutation, type SignupError } from "@prompt-vault/api-client";
+import { signupMutation, type SignupError, vSignupRequest } from "@prompt-vault/api-client";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
@@ -23,28 +23,11 @@ export function SignupScreen() {
   const form = useForm({
     defaultValues: initialFormState,
     validators: {
-      onSubmitAsync: async ({ value }) => {
-        try {
-          await signup.mutateAsync({ body: value });
-          await navigate({ to: "/signup/success" });
-
-          return undefined;
-        } catch (error) {
-          const signupError = error as SignupError;
-// TODO: prettys ure we can avoid this
-          if (isSignupValidationError(signupError)) {
-            return {
-              form: signupError.message,
-              fields: Object.fromEntries(
-                signupError.fieldErrors.map((fieldError) => [fieldError.field, fieldError.message]),
-              ),
-            };
-          }
-
-          return {
-            form: "Signup failed unexpectedly.",
-          };
-        }
+      onChange: vSignupRequest,
+      onSubmitAsync: async ({ value, formApi }) => {
+        await signup.mutateAsync({ body: value });
+        await formApi.reset();
+        await navigate({ to: "/signup/success" });
       },
     },
   });
@@ -70,25 +53,6 @@ export function SignupScreen() {
       >
         <form.Field
           name="username"
-          validators={{
-            onChange: ({ value }) => {
-              const username = value.trim();
-
-              if (!username) {
-                return "Username is required.";
-              }
-
-              if (username.length < 3 || username.length > 30) {
-                return "Username must be 3 to 30 characters long.";
-              }
-
-              if (!/^[A-Za-z0-9._-]+$/.test(username)) {
-                return "Username may only contain letters, numbers, dots, hyphens, and underscores.";
-              }
-
-              return undefined;
-            },
-          }}
           children={(field) => (
             <label style={{ display: "grid", gap: "0.35rem" }}>
               <span>Username</span>
@@ -105,21 +69,6 @@ export function SignupScreen() {
 
         <form.Field
           name="emailAddress"
-          validators={{
-            onChange: ({ value }) => {
-              const emailAddress = value.trim();
-
-              if (!emailAddress) {
-                return "Email Address is required.";
-              }
-
-              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
-                return "Email Address must be valid.";
-              }
-
-              return undefined;
-            },
-          }}
           children={(field) => (
             <label style={{ display: "grid", gap: "0.35rem" }}>
               <span>Email Address</span>
@@ -137,19 +86,6 @@ export function SignupScreen() {
 
         <form.Field
           name="password"
-          validators={{
-            onChange: ({ value }) => {
-              if (!value || !value.trim()) {
-                return "Password is required.";
-              }
-
-              if (value.length < 8) {
-                return "Password must be at least 8 characters long.";
-              }
-
-              return undefined;
-            },
-          }}
           children={(field) => (
             <label style={{ display: "grid", gap: "0.35rem" }}>
               <span>Password</span>
@@ -195,14 +131,4 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
   }
 
   return null;
-}
-
-function isSignupValidationError(error: SignupError | unknown): error is SignupError {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "message" in error &&
-    "fieldErrors" in error &&
-    Array.isArray((error as SignupError).fieldErrors)
-  );
 }

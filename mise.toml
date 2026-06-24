@@ -55,6 +55,10 @@ run = "pnpm --filter @prompt-vault/web lint"
 description = "Check frontend formatting"
 run = "pnpm --filter @prompt-vault/web format:check"
 
+[tasks."format"]
+description = "Check frontend formatting"
+run = ["pnpm --filter @prompt-vault/api-client format", "pnpm --filter @prompt-vault/web format"]
+
 [tasks.check]
 description = "Run automated verification"
 depends = ["generate"]

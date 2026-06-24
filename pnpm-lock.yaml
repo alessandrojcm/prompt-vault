@@ -77,6 +77,9 @@ importers:
       ky:
         specifier: ^1.14.0
         version: 1.14.3
+      valibot:
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: ^0.99.0
@@ -1993,6 +1996,14 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  valibot@1.4.1:
+    resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vite-node@3.2.4:
     resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -3854,6 +3865,10 @@ snapshots:
   use-sync-external-store@1.6.0(react@19.2.7):
     dependencies:
       react: 19.2.7
+
+  valibot@1.4.1(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
 
   vite-node@3.2.4(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0):
     dependencies:

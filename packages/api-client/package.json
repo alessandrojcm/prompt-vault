@@ -6,11 +6,14 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "generate": "openapi-ts"
+    "generate": "openapi-ts",
+    "format": "oxfmt",
+    "lint": "oxlint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.1",
     "ky": "^1.14.0",
-    "@tanstack/react-query": "^5.101.1"
+    "valibot": "^1.4.1"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",

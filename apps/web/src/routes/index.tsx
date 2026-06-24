@@ -1,18 +1,13 @@
-import { getCurrentUser } from "@prompt-vault/api-client";
+import { getCurrentUserOptions } from "@prompt-vault/api-client";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    // TODO: USE TANSTACK QUERY
-    const result = await getCurrentUser();
-    const status = result.response?.status;
-
-    if (status === 401) {
+  loader: async ({ context }) => {
+    try {
+      return await context.queryClient.ensureQueryData(getCurrentUserOptions());
+    } catch (e) {
+      console.error("Error getting session, redirecting to signin");
       throw redirect({ to: "/signup" });
-    }
-
-    if (status !== 204) {
-      throw new Error(`Unexpected current user response: ${status ?? "unknown"}`);
     }
   },
   component: HomePage,
