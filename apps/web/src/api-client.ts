@@ -9,8 +9,8 @@ export function configureApiClient() {
 
 function getApiBaseUrl() {
   if (import.meta.env.SSR) {
-    return import.meta.env.PROMPT_VAULT_API_BASE_URL ?? "http://localhost:8080/api";
+    return process.env.PROMPT_VAULT_API_BASE_URL;
   }
 
-  return "/";
+  return import.meta.env.VITE_API_URL;
 }

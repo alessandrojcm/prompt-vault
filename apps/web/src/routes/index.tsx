@@ -1,11 +1,16 @@
 import { getCurrentUserOptions } from "@prompt-vault/api-client";
+import { Card, Text, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  loader: async ({ context }) => {
+  beforeLoad: async ({ context, abortController }) => {
     try {
-      return await context.queryClient.ensureQueryData(getCurrentUserOptions());
-    } catch (e) {
+      return await context.queryClient.ensureQueryData(
+        getCurrentUserOptions({
+          signal: abortController.signal,
+        }),
+      );
+    } catch {
       console.error("Error getting session, redirecting to signin");
       throw redirect({ to: "/signup" });
     }
@@ -15,12 +20,12 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <main
-      style={{ fontFamily: "sans-serif", margin: "0 auto", maxWidth: 720, padding: "4rem 1.5rem" }}
-    >
-      <p style={{ letterSpacing: "0.08em", textTransform: "uppercase" }}>Prompt Vault</p>
-      <h1>Prompt Vault</h1>
-      <p>Authenticated session detected.</p>
-    </main>
+    <Card maw={520} mx="auto" padding="xl" radius="md" shadow="sm" withBorder>
+      <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+        Prompt Vault
+      </Text>
+      <Title order={2}>Prompt Vault</Title>
+      <Text mt="md">Authenticated session detected.</Text>
+    </Card>
   );
 }

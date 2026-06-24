@@ -1,3 +1,4 @@
+import { Anchor, Card, Text, Title } from "@mantine/core";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/signup/success")({
@@ -6,13 +7,17 @@ export const Route = createFileRoute("/signup/success")({
 
 function SignupSuccessPage() {
   return (
-    <main
-      style={{ fontFamily: "sans-serif", margin: "0 auto", maxWidth: 720, padding: "4rem 1.5rem" }}
-    >
-      <p style={{ letterSpacing: "0.08em", textTransform: "uppercase" }}>Prompt Vault</p>
-      <h1>Signup complete</h1>
-      <p>Your user has been created. You can log in once the login flow is available.</p>
-      <Link to="/signup">Back to signup</Link>
-    </main>
+    <Card maw={520} mx="auto" padding="xl" radius="md" shadow="sm" withBorder>
+      <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+        Prompt Vault
+      </Text>
+      <Title order={2}>Signup complete</Title>
+      <Text mt="md">
+        Your user has been created. You can log in once the login flow is available.
+      </Text>
+      <Anchor component={Link} mt="md" to="/signup">
+        Back to signup
+      </Anchor>
+    </Card>
   );
 }

@@ -1,4 +1,15 @@
 import { signupMutation, vSignupRequest } from "@prompt-vault/api-client";
+import {
+  Alert,
+  Button,
+  Card,
+  Fieldset,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
@@ -23,7 +34,7 @@ export function SignupScreen() {
   const form = useForm({
     defaultValues: initialFormState,
     validators: {
-      onChange: vSignupRequest,
+      onSubmit: vSignupRequest,
       onSubmitAsync: async ({ value, formApi }) => {
         await signup.mutateAsync({ body: value });
         await formApi.reset();
@@ -33,101 +44,98 @@ export function SignupScreen() {
   });
 
   return (
-    <main
-      style={{ fontFamily: "sans-serif", margin: "0 auto", maxWidth: 720, padding: "4rem 1.5rem" }}
-    >
-      <p style={{ letterSpacing: "0.08em", textTransform: "uppercase" }}>Prompt Vault</p>
-      <h1>Sign up</h1>
-      <p>
-        Create your Prompt Vault user. Signup creates an enabled normal user and does not log you
-        in.
-      </p>
-      <form
-        noValidate
-        onSubmit={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          form.handleSubmit();
-        }}
-        style={{ display: "grid", gap: "1rem" }}
-      >
-        <form.Field
-          name="username"
-          children={(field) => (
-            <label style={{ display: "grid", gap: "0.35rem" }}>
-              <span>Username</span>
-              <input
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
+    <Card maw={520} mx="auto" padding="xl" radius="md" shadow="sm" withBorder>
+      <Stack gap="lg">
+        <div>
+          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+            Prompt Vault
+          </Text>
+          <Title order={2}>Sign up</Title>
+        </div>
+        <Text c="dimmed">
+          Create your Prompt Vault user. Signup creates an enabled normal user and does not log you
+          in.
+        </Text>
+        {signup.isError ? (
+          <Alert color="red" title="Could not create account" variant="light">
+            {signup.error instanceof Error ? signup.error.message : "Please check your details."}
+          </Alert>
+        ) : null}
+        <form
+          noValidate
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <Fieldset>
+            <Stack gap="md">
+              <form.Field
+                name="username"
+                children={(field) => (
+                  <TextInput
+                    error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
+                    label="Username"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                  />
+                )}
               />
-              <FieldInfo field={field} />
-            </label>
-          )}
-        />
 
-        <form.Field
-          name="emailAddress"
-          children={(field) => (
-            <label style={{ display: "grid", gap: "0.35rem" }}>
-              <span>Email Address</span>
-              <input
-                name={field.name}
-                type="email"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
+              <form.Field
+                name="emailAddress"
+                children={(field) => (
+                  <TextInput
+                    error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
+                    label="Email address"
+                    name={field.name}
+                    type="email"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                  />
+                )}
               />
-              <FieldInfo field={field} />
-            </label>
-          )}
-        />
 
-        <form.Field
-          name="password"
-          children={(field) => (
-            <label style={{ display: "grid", gap: "0.35rem" }}>
-              <span>Password</span>
-              <input
-                name={field.name}
-                type="password"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
+              <form.Field
+                name="password"
+                children={(field) => (
+                  <PasswordInput
+                    error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
+                    label="Password"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                  />
+                )}
               />
-              <FieldInfo field={field} />
-            </label>
-          )}
-        />
 
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <>
-              <button disabled={!canSubmit || isSubmitting || signup.isPending} type="submit">
-                {isSubmitting || signup.isPending ? "Creating user..." : "Create account"}
-              </button>
-            </>
-          )}
-        </form.Subscribe>
-      </form>
-    </main>
+              <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                {([canSubmit, isSubmitting]) => (
+                  <Button disabled={!canSubmit || isSubmitting || signup.isPending} type="submit">
+                    {isSubmitting || signup.isPending ? "Creating user..." : "Create account"}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </Stack>
+          </Fieldset>
+        </form>
+      </Stack>
+    </Card>
   );
 }
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   if (field.state.meta.isTouched && !field.state.meta.isValid) {
-    return (
-      <ul style={{ color: "crimson", margin: 0, paddingInlineStart: "1.25rem" }}>
-        {field.state.meta.errors.map((error) => (
-          <li key={String(error)}>{String(error)}</li>
-        ))}
-      </ul>
-    );
+    return field.state.meta.errors.map((error) => String(error.message)).join(", ");
   }
 
   if (field.state.meta.isValidating) {
-    return <span>Validating...</span>;
+    return "Validating...";
   }
 
   return null;
