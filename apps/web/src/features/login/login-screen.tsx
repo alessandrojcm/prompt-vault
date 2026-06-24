@@ -19,7 +19,7 @@ import {
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 
 type LoginFormState = {
   username: string;
@@ -33,6 +33,7 @@ const initialFormState: LoginFormState = {
 
 export function LoginScreen() {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const login = useMutation(loginMutation());
 
@@ -43,6 +44,7 @@ export function LoginScreen() {
       onSubmitAsync: async ({ value }) => {
         const currentUser = await login.mutateAsync({ body: value });
         queryClient.setQueryData(getCurrentUserQueryKey(), currentUser);
+        await router.invalidate();
         await navigate({ to: "/dashboard" });
       },
     },

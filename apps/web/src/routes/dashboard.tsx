@@ -1,7 +1,7 @@
 import { getCurrentUserQueryKey, logoutMutation } from "@prompt-vault/api-client";
 import { Alert, Button, Card, Stack, Text, Title } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 
 import { requireCurrentUser } from "../features/auth/current-user";
 
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const logout = useMutation(logoutMutation());
 
@@ -19,9 +20,10 @@ function DashboardPage() {
     logout.mutate(
       {},
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           queryClient.removeQueries({ queryKey: getCurrentUserQueryKey() });
-          navigate({ to: "/login" });
+          await router.invalidate();
+          await navigate({ to: "/login" });
         },
       },
     );

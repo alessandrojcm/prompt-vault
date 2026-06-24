@@ -58,7 +58,7 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
 
         assertThat(loginResponse.statusCode()).isEqualTo(200);
         assertThat(loginResponse.headers().allValues("set-cookie"))
-            .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID"));
+            .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID", "Lax"));;
         assertSafeUserSummary(loginResponse.body(), user, Role.USER);
 
         HttpResponse<String> currentUserResponse = getCurrentUser(httpClient);

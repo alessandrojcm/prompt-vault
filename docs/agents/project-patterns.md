@@ -10,7 +10,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Generate the TypeScript API client with Hey API in `packages/api-client`; generated output lives under `packages/api-client/src/generated` and must not be committed.
 - Keep `packages/api-client/src/index.ts` as a thin re-export surface for Hey API generated SDK, types, TanStack Query helpers, and Valibot schemas.
 - Put UI-specific response mapping and client configuration in consuming apps, not `packages/api-client`.
-- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: browser calls stay same-origin (`/`), while SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback.
+- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: use `credentials: "include"` so browser calls send the session cookie when the API runs on a different origin; SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback and must forward the incoming request's `Cookie` header through a TanStack Start `createIsomorphicFn` server implementation.
 
 ## Web app patterns
 
