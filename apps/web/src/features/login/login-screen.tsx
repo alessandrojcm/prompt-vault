@@ -43,7 +43,7 @@ export function LoginScreen() {
       onSubmitAsync: async ({ value }) => {
         const currentUser = await login.mutateAsync({ body: value });
         queryClient.setQueryData(getCurrentUserQueryKey(), currentUser);
-        await navigate({ to: "/" });
+        await navigate({ to: "/dashboard" });
       },
     },
   });
