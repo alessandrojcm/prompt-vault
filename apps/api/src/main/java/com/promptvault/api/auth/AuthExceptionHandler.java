@@ -15,4 +15,11 @@ public class AuthExceptionHandler {
         response.setMessage("Invalid username or password.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+    @ExceptionHandler(DisabledAccountException.class)
+    ResponseEntity<AuthenticationErrorResponse> handleDisabledAccountException() {
+        AuthenticationErrorResponse response = new AuthenticationErrorResponse();
+        response.setMessage("Your account is disabled. Contact an administrator.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
 }

@@ -58,6 +58,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthenticationErrorResponse'
+        '403':
+          description: Account is disabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationErrorResponse'
   /api/logout:
     post:
       tags:

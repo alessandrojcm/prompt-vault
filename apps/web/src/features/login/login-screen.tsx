@@ -1,4 +1,9 @@
-import { getCurrentUserQueryKey, loginMutation, vLoginRequest } from "@prompt-vault/api-client";
+import {
+  getCurrentUserQueryKey,
+  LoginError,
+  loginMutation,
+  vLoginRequest,
+} from "@prompt-vault/api-client";
 import {
   Alert,
   Anchor,
@@ -54,7 +59,7 @@ export function LoginScreen() {
         </div>
         {login.isError ? (
           <Alert color="red" title="Could not log in" variant="light">
-            Invalid username or password.
+            {loginErrorMessage(login.error)}
           </Alert>
         ) : null}
         <form
@@ -114,6 +119,10 @@ export function LoginScreen() {
       </Stack>
     </Card>
   );
+}
+
+export function loginErrorMessage(error: unknown) {
+  return (error as LoginError)?.message ?? "Invalid username or password.";
 }
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {

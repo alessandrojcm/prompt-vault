@@ -80,6 +80,21 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void disabledUsersCannotLoginAndDoNotReceiveASessionCookie() throws Exception {
+        String username = uniqueUsername("disabledLogin");
+        String password = "password123";
+        saveUser(username, password, Role.USER, AccountStatus.DISABLED);
+
+        HttpResponse<String> response = login(username, password, httpClient);
+
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(readJson(response.body()))
+            .containsEntry("message", "Your account is disabled. Contact an administrator.");
+        assertThat(response.headers().allValues("set-cookie")).noneSatisfy(cookie -> assertThat(cookie).contains("JSESSIONID"));
+        assertThat(getCurrentUser(httpClient).statusCode()).isEqualTo(401);
+    }
+
+    @Test
     void adminsAndNormalUsersUseTheSameLoginAndCurrentUserFlow() throws Exception {
         String userPassword = "user-password123";
         String adminPassword = "admin-password123";
@@ -154,6 +169,10 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
     }
 
     private UserEntity saveUser(String username, String password, Role role) {
+        return saveUser(username, password, role, AccountStatus.ENABLED);
+    }
+
+    private UserEntity saveUser(String username, String password, Role role, AccountStatus accountStatus) {
         UserEntity user = new UserEntity();
         user.setUsername(username);
         user.setUsernameNormalized(username.toLowerCase(java.util.Locale.ROOT));
@@ -161,7 +180,7 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
         user.setEmailAddressNormalized(username.toLowerCase(java.util.Locale.ROOT) + "@example.com");
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setRole(role);
-        user.setAccountStatus(AccountStatus.ENABLED);
+        user.setAccountStatus(accountStatus);
         return userRepository.save(user);
     }
 

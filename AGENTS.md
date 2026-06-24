@@ -37,6 +37,7 @@ Use `mise run` as the standard command surface: `mise run install`, `mise run ge
 - The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
 - Use Spring Security session-cookie authentication for the initial auth slice; CSRF hardening is deferred to later OWASP-focused work.
 - Login is `POST /api/login`: it authenticates case-insensitive usernames with Spring Security, saves the `SecurityContext` through `HttpSessionSecurityContextRepository`, returns a safe `UserSummary`, and returns `401` with `AuthenticationErrorResponse.message` for invalid credentials.
+- Disabled users are rejected during `POST /api/login` through Spring Security's `UserDetails.isEnabled()` / `DisabledException` path; map them to `403` with `AuthenticationErrorResponse.message` (`Your account is disabled. Contact an administrator.`), do not save a `SecurityContext`, and do not establish a new session cookie.
 - Current User is `GET /api/user`: it returns `401` when unauthenticated and returns the safe `UserSummary` from the session principal when authenticated.
 - Logout is `POST /api/logout`: it requires an authenticated session, invalidates the server session via Spring Security logout handling, and the web UI clears the current-user query before navigating to `/login`.
 - The web root `/` is an auth gate: it calls `GET /api/user`, stays on `/` for authenticated sessions, and redirects unauthenticated `401` users to `/login`.
