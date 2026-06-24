@@ -41,9 +41,10 @@ Use `mise run` as the standard command surface: `mise run install`, `mise run ge
 - Logout is `POST /api/logout`: it requires an authenticated session, invalidates the server session via Spring Security logout handling, and the web UI clears the current-user query before navigating to `/login`.
 - The web root `/` is an auth gate: it calls `GET /api/user`, stays on `/` for authenticated sessions, and redirects unauthenticated `401` users to `/login`.
 - Signup is now `POST /api/signup`: it trims username/email address, preserves password spaces, creates `USER` + `ENABLED`, and returns `400` with `ValidationErrorResponse.fieldErrors[]` for form-friendly validation failures.
+- Keep `SignupRequest.emailAddress` free of OpenAPI `format: email`; signup intentionally trims before service-level email validation, and generated backend `@Email` validation would reject whitespace-padded but valid addresses before trimming.
 - Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
 - Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
-- API integration tests should prefer real MySQL coverage via Testcontainers; the current-user security tracer test boots the app against the repo `docker-compose.yml` MySQL service instead of excluding datasource/Flyway/JPA auto-configuration.
+- API integration tests should prefer real MySQL coverage via Testcontainers; the shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
 
 ## Agent skills
 

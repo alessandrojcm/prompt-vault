@@ -8,22 +8,22 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 public abstract class AbstractMySqlIntegrationTest {
 
     protected static final String MYSQL_SERVICE = "mysql-1";
     protected static final int MYSQL_PORT = 3306;
 
-    @Container
     static final ComposeContainer environment = new ComposeContainer(resolveComposeFile())
         .withExposedService(
             MYSQL_SERVICE,
             MYSQL_PORT,
             Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3))
         );
+
+    static {
+        environment.start();
+    }
 
     @DynamicPropertySource
     static void registerDatabaseProperties(DynamicPropertyRegistry registry) {

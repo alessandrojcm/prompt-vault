@@ -123,7 +123,6 @@ components:
           minLength: 1
           maxLength: 255
           description: Email addresses are trimmed before validation and persistence.
-          format: email
         password:
           type: string
           minLength: 1
