@@ -19,3 +19,5 @@ node_modules
 # Ignore generated OpenAPI outputs
 packages/api-client/src/generated
 apps/web/src/routeTree.gen.ts
+
+.env

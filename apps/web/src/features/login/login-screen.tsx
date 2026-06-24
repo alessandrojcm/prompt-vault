@@ -1,6 +1,7 @@
 import { getCurrentUserQueryKey, loginMutation, vLoginRequest } from "@prompt-vault/api-client";
 import {
-  Alert, Anchor,
+  Alert,
+  Anchor,
   Button,
   Card,
   Fieldset,
@@ -9,11 +10,11 @@ import {
   Text,
   TextInput,
   Title,
-} from '@mantine/core';
+} from "@mantine/core";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from "@tanstack/react-router";
 
 type LoginFormState = {
   username: string;

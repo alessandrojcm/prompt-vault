@@ -1,4 +1,6 @@
 package com.promptvault.api.signup;
 
-record FieldValidationError(String field, String message) {
+import com.promptvault.api.validation.ContractFieldValidationError;
+
+record FieldValidationError(String field, String message) implements ContractFieldValidationError {
 }
