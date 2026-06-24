@@ -9,7 +9,7 @@ The single authenticated identity in Prompt Vault. A user has exactly one role, 
 _Avoid_: Account, member
 
 **Admin**:
-A user whose role grants administrative capabilities. Admins are predefined by seeding them into the system rather than being created through signup.
+A user whose role grants administrative capabilities. Admins are predefined by seeding them into the system rather than being created through signup, and can manage the account status of normal users but not admins.
 _Avoid_: Administrator account
 
 **Normal User**:
@@ -29,9 +29,13 @@ The unique contact address associated with a user.
 _Avoid_: Email, contact email
 
 **Account Status**:
-Whether a user is allowed to authenticate. Enabled users can log in; disabled users cannot log in.
+Whether a user is allowed to authenticate. Enabled users can log in; disabled users cannot log in or continue using an existing authenticated session.
 _Avoid_: State, active/inactive
 
 **Current User**:
 The user associated with the active authenticated session.
 _Avoid_: Profile, me
+
+**User Management**:
+The admin capability for viewing registered users and managing the account status of normal users.
+_Avoid_: User admin, account management
