@@ -1,4 +1,56 @@
 [tools]
 java = "26.0.1"
 node = "26.3.1"
+pnpm = "11.8.0"
 gradle = "9.6.0"
+
+[tasks.install]
+description = "Install workspace dependencies"
+run = "pnpm install"
+
+[tasks."db:up"]
+description = "Start the local MySQL database"
+run = "docker compose up -d mysql"
+
+[tasks."db:down"]
+description = "Stop the local MySQL database"
+run = "docker compose down"
+
+[tasks."generate:backend"]
+description = "Generate Spring interfaces from OpenAPI"
+run = "./gradlew :apps:api:openApiGenerate"
+
+[tasks."generate:client"]
+description = "Generate the TypeScript API client"
+run = "pnpm --filter @prompt-vault/api-client generate"
+
+[tasks.generate]
+description = "Generate backend and frontend API artifacts"
+depends = ["generate:backend", "generate:client"]
+run = "true"
+
+[tasks."dev:api"]
+description = "Run the Spring Boot API"
+run = "./gradlew :apps:api:bootRun"
+
+[tasks."dev:web"]
+description = "Run the TanStack Start web app"
+run = "pnpm --filter @prompt-vault/web dev"
+
+[tasks.build]
+description = "Build the monorepo"
+depends = ["generate"]
+run = ["./gradlew :apps:api:build", "pnpm --filter @prompt-vault/web build"]
+
+[tasks.lint]
+description = "Run frontend linting"
+run = "pnpm --filter @prompt-vault/web lint"
+
+[tasks."format:check"]
+description = "Check frontend formatting"
+run = "pnpm --filter @prompt-vault/web format:check"
+
+[tasks.check]
+description = "Run automated verification"
+depends = ["generate"]
+run = ["./gradlew :apps:api:test", "pnpm --filter @prompt-vault/web lint", "pnpm --filter @prompt-vault/web format:check", "pnpm --filter @prompt-vault/web test", "pnpm --filter @prompt-vault/web build"]

@@ -4,5 +4,18 @@
 # Ignore Gradle build output directory
 build
 
+# Ignore app-local build output directories
+apps/**/build
+
 # Ignore Kotlin plugin data
 .kotlin
+
+# Ignore local IDE files
+.idea
+
+# Ignore Node and pnpm artifacts
+node_modules
+
+# Ignore generated OpenAPI outputs
+packages/api-client/src/generated
+apps/web/src/routeTree.gen.ts

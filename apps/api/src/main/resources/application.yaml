@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: prompt-vault-api
+  datasource:
+    url: jdbc:mysql://${PROMPT_VAULT_DB_HOST:localhost}:${PROMPT_VAULT_DB_PORT:3306}/${PROMPT_VAULT_DB_NAME:prompt_vault}
+    username: ${PROMPT_VAULT_DB_USERNAME:prompt_vault}
+    password: ${PROMPT_VAULT_DB_PASSWORD:prompt_vault}
+  flyway:
+    enabled: true
+    default-schema: ${PROMPT_VAULT_DB_NAME:prompt_vault}
+    schemas:
+      - ${PROMPT_VAULT_DB_NAME:prompt_vault}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+server:
+  port: ${PORT:8080}

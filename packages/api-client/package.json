@@ -1,0 +1,25 @@
+{
+  "name": "@prompt-vault/api-client",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "openapi-ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.1"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.99.0",
+    "lint-staged": "^17.0.8",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": "npm run lint",
+    "*": "oxfmt --no-error-on-unmatched-pattern"
+  }
+}
