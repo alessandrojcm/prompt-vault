@@ -1,4 +1,5 @@
-import { defineConfig } from "vite";
+import { playwright } from "@vitest/browser-playwright";
+import { defineConfig } from "vitest/config";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 
@@ -28,9 +29,13 @@ export default defineConfig({
     },
   },
   test: {
-    environment: "jsdom",
+    browser: {
+      enabled: true,
+      headless: true,
+      instances: [{ browser: "chromium" }],
+      provider: playwright(),
+    },
     globals: true,
-    setupFiles: ["./src/test/setup.ts"],
   },
   plugins: [tanstackStart(), react()],
 });

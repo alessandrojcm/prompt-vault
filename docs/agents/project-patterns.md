@@ -57,6 +57,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
 - Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
 - Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
+- The seeded local/dev admin user is `admin` with password `admin-password123`; keep the migration comment and login coverage updated if changing it.
 - User Management lives at `/admin/users` and is admin-only; the route guard redirects unauthenticated visitors through the auth gate/login flow and authenticated normal users to `/dashboard`.
 - Admin User Management uses `GET /api/admin/users` with an optional `role` enum query parameter (`USER` / `ADMIN`).
 - Admin User Management updates account state with `PATCH /api/admin/users/{userId}/status` and a desired `accountStatus`; the endpoint is idempotent, returns the updated user, returns `404` for missing users, and returns `403` when targeting admins or the current user.
@@ -69,3 +70,5 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - API integration tests should prefer real MySQL coverage via Testcontainers.
 - The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
 - Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
+- Web tests use Vitest 4 Browser Mode with the Playwright Chromium provider; prefer `vitest-browser-react` locators/assertions for component tests instead of jsdom or Testing Library shims.
+- Use TanStack Table for web data tables that need client-side table behavior such as filtering; render the headless table model with Mantine table primitives.

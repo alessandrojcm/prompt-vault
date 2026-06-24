@@ -40,6 +40,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/actuator/health", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/signup", "/api/login").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)

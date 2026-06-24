@@ -1,3 +1,6 @@
+-- Local/dev seeded administrator credentials:
+-- username: admin
+-- password: admin-password123
 INSERT INTO users (
     username,
     username_normalized,
@@ -11,7 +14,7 @@ INSERT INTO users (
     'admin',
     'admin@promptvault.local',
     'admin@promptvault.local',
-    '{bcrypt}$2a$10$bbzFzEunHjXRM2AQx3.3QeeBMdDT6vKrrfE0Yv7FpC18JNpDutZ8W',
+    '{bcrypt}$2y$10$dTvriZjxawrRb7nIezibcuHzs8oPb5vpnrBJYvTkBp7nv8Cwz7Z9u',
     'ADMIN',
     'ENABLED'
 );

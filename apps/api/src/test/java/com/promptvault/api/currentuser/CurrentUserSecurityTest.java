@@ -119,6 +119,19 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void seededAdminCanLoginWithDocumentedDevPassword() throws Exception {
+        UserEntity seededAdmin = userRepository.findByUsernameNormalized("admin").orElseThrow();
+        HttpClient adminClient = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+
+        HttpResponse<String> loginResponse = login("admin", "admin-password123", adminClient);
+        HttpResponse<String> currentUserResponse = getCurrentUser(adminClient);
+
+        assertThat(loginResponse.statusCode()).isEqualTo(200);
+        assertThat(currentUserResponse.statusCode()).isEqualTo(200);
+        assertSafeUserSummary(currentUserResponse.body(), seededAdmin, Role.ADMIN);
+    }
+
+    @Test
     void logoutRequiresAnAuthenticatedSession() throws Exception {
         HttpResponse<Void> response = logout(httpClient);
 
