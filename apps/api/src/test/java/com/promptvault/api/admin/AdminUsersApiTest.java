@@ -107,6 +107,105 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(403);
     }
 
+    @Test
+    void adminsCanDisableNormalUsers() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("disableAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity user = saveUser(uniqueUsername("disableUser"), "password123", Role.USER, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.DISABLED);
+        UserEntity reloaded = userRepository.findById(user.getId()).orElseThrow();
+        assertThat(reloaded.getAccountStatus()).isEqualTo(AccountStatus.DISABLED);
+        assertThat(reloaded.getUsername()).isEqualTo(user.getUsername());
+        assertThat(reloaded.getUsernameNormalized()).isEqualTo(user.getUsernameNormalized());
+        assertThat(reloaded.getEmailAddress()).isEqualTo(user.getEmailAddress());
+        assertThat(reloaded.getEmailAddressNormalized()).isEqualTo(user.getEmailAddressNormalized());
+        assertThat(reloaded.getRole()).isEqualTo(Role.USER);
+        assertThat(reloaded.getId()).isEqualTo(user.getId());
+    }
+
+    @Test
+    void adminsCanEnableNormalUsers() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("enableAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity user = saveUser(uniqueUsername("enableUser"), "password123", Role.USER, AccountStatus.DISABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "ENABLED");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.ENABLED);
+        assertThat(userRepository.findById(user.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+    }
+
+    @Test
+    void settingCurrentStatusIsAnIdempotentNoOp() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("noopAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity user = saveUser(uniqueUsername("noopUser"), "password123", Role.USER, AccountStatus.DISABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.DISABLED);
+    }
+
+    @Test
+    void missingTargetsReturnNotFound() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("missingAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, 999_999_999L, "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(404);
+    }
+
+    @Test
+    void adminsCannotUpdateAdminTargets() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("actorAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity targetAdmin = saveUser(uniqueUsername("targetAdmin"), "password123", Role.ADMIN, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, targetAdmin.getId(), "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(userRepository.findById(targetAdmin.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+    }
+
+    @Test
+    void adminsCannotUpdateThemselves() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("selfAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, admin.getId(), "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(userRepository.findById(admin.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+    }
+
+    @Test
+    void invalidStatusBodiesReturnValidationErrorShape() throws Exception {
+        String adminPassword = "admin-password123";
+        UserEntity admin = saveUser(uniqueUsername("invalidStatusAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity user = saveUser(uniqueUsername("invalidStatusUser"), "password123", Role.USER, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+
+        HttpResponse<String> response = updateUserStatusRaw(adminClient, user.getId(), "{\"accountStatus\":\"LOCKED\"}");
+
+        assertThat(response.statusCode()).isEqualTo(400);
+        Map<String, Object> body = readJson(response.body());
+        assertThat(body).containsEntry("message", "Signup validation failed.");
+        assertThat(extractFieldMessages(body)).containsEntry("accountStatus", "Account status must be ENABLED or DISABLED.");
+    }
+
     private HttpClient authenticatedClient(String username, String password) throws Exception {
         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
         HttpResponse<String> loginResponse = login(username, password, client);
@@ -133,6 +232,19 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
         HttpRequest request = HttpRequest.newBuilder(uri)
             .header("Accept", "application/json")
             .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> updateUserStatus(HttpClient client, Long userId, String accountStatus) throws Exception {
+        return updateUserStatusRaw(client, userId, objectMapper.writeValueAsString(Map.of("accountStatus", accountStatus)));
+    }
+
+    private HttpResponse<String> updateUserStatusRaw(HttpClient client, Long userId, String body) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/users/" + userId + "/status"))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }

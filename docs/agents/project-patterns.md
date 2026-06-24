@@ -17,6 +17,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - The web app is TanStack Start with file-based routing under `apps/web/src/routes`.
 - The root route layout is `apps/web/src/routes/__root.tsx`; it imports `@mantine/core/styles.css` and wraps the app in `MantineProvider`. The authenticated app shell/sidebar lives in the `/dashboard` layout at `apps/web/src/routes/dashboard.tsx` so login/signup/root auth routes do not render it.
 - Use Mantine form/display primitives over custom inline-styled controls.
+- Mantine notifications are available in the root layout: `@mantine/notifications/styles.css` is imported after core styles, `<Notifications />` is mounted inside `MantineProvider`, and app code can call `notifications.show(...)` for toast feedback.
 - Use TanStack Router `beforeLoad` for auth guards and throw `redirect({ to, replace: true })` for auth redirects.
 - The web root `/` is an auth gate only: unauthenticated users redirect to `/login`; authenticated users redirect to `/dashboard`.
 - `/dashboard` is the authenticated landing page for both admins and normal users.
@@ -34,6 +35,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Use `validators.onSubmitAsync` for mutation submission and navigation side effects.
 - Render errors from TanStack Form state instead of parallel React state or helper view models.
 - Use Hey API's generated TanStack Query mutation/query helpers where they fit.
+- Treat TanStack Query as the default seam for web server state: reads should flow through query helpers/`useQuery`, writes should use generated mutation helpers/`useMutation`, and successful mutation responses should update relevant cached query data with `queryClient.setQueryData` rather than duplicating server rows in local component state.
 - If generated query helpers throw for expected control-flow responses such as `401`, call the generated SDK directly in the consuming app so the route can branch on `response.status`.
 
 ## API and auth patterns

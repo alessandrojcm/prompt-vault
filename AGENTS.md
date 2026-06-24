@@ -9,7 +9,7 @@ Repo has an established app spine: a Spring Boot 4 REST API in `apps/api`, a Tan
 - Do not rediscover the stack unless the task specifically questions it: backend is Spring Boot 4 + Spring Security + Spring Data JPA + Flyway + MySQL/Testcontainers; frontend is TanStack Start + React + TanStack Router/Query/Form + Mantine; client generation is Hey API from `openapi/api.yaml`.
 - Before broad code search, read the established project patterns in [`docs/agents/project-patterns.md`](docs/agents/project-patterns.md); it records the current route/auth/form/API/test conventions.
 - Generated artifacts are intentionally not committed: backend OpenAPI output, `packages/api-client/src/generated/**`, `apps/web/dist/**`, and `apps/web/src/routeTree.gen.ts`.
-- Prefer existing seams over inventing new ones: OpenAPI contract first, generated API helpers where they fit, Mantine UI primitives, TanStack Form for forms, route-level `beforeLoad` guards for web auth, and Spring Security session-cookie auth on the API.
+- Prefer existing seams over inventing new ones: OpenAPI contract first, generated API helpers where they fit, TanStack Query for web server state/mutations/cache updates, Mantine UI primitives, TanStack Form for forms, route-level `beforeLoad` guards for web auth, and Spring Security session-cookie auth on the API.
 
 ## Toolchain
 
