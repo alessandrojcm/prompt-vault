@@ -58,7 +58,7 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
 
         assertThat(loginResponse.statusCode()).isEqualTo(200);
         assertThat(loginResponse.headers().allValues("set-cookie"))
-            .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID"));
+            .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID", "Lax"));;
         assertSafeUserSummary(loginResponse.body(), user, Role.USER);
 
         HttpResponse<String> currentUserResponse = getCurrentUser(httpClient);
@@ -116,6 +116,19 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
         assertThat(adminLoginResponse.statusCode()).isEqualTo(200);
         assertThat(adminCurrentUserResponse.statusCode()).isEqualTo(200);
         assertSafeUserSummary(adminCurrentUserResponse.body(), adminUser, Role.ADMIN);
+    }
+
+    @Test
+    void seededAdminCanLoginWithDocumentedDevPassword() throws Exception {
+        UserEntity seededAdmin = userRepository.findByUsernameNormalized("admin").orElseThrow();
+        HttpClient adminClient = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+
+        HttpResponse<String> loginResponse = login("admin", "admin-password123", adminClient);
+        HttpResponse<String> currentUserResponse = getCurrentUser(adminClient);
+
+        assertThat(loginResponse.statusCode()).isEqualTo(200);
+        assertThat(currentUserResponse.statusCode()).isEqualTo(200);
+        assertSafeUserSummary(currentUserResponse.body(), seededAdmin, Role.ADMIN);
     }
 
     @Test

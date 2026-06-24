@@ -92,6 +92,38 @@ paths:
                 $ref: '#/components/schemas/UserSummary'
         '401':
           description: No authenticated session is present.
+  /api/admin/users:
+    get:
+      tags:
+        - AdminUsers
+      operationId: listAdminUsers
+      summary: List registered users for admin user management
+      description: Returns registered users for administrators, optionally filtered by role.
+      parameters:
+        - name: role
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/UserRole'
+      responses:
+        '200':
+          description: Registered users matching the optional role filter.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSummary'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
 components:
   schemas:
     LoginRequest:

@@ -2,19 +2,18 @@
 
 import "@mantine/core/styles.css";
 
+import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from "@mantine/core";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import {
-  AppShell,
-  ColorSchemeScript,
-  Container,
-  Group,
-  MantineProvider,
-  Text,
-  Title,
-  mantineHtmlProps,
-} from "@mantine/core";
-import type { QueryClient } from "@tanstack/react-query";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+  useRouter,
+} from "@tanstack/react-router";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -38,9 +37,8 @@ function RootComponent() {
       </head>
       <body>
         <MantineProvider>
-          <PromptVaultShell>
-            <Outlet />
-          </PromptVaultShell>
+          <Outlet />
+          <PromptVaultDevtools />
         </MantineProvider>
         <Scripts />
       </body>
@@ -48,28 +46,24 @@ function RootComponent() {
   );
 }
 
-function PromptVaultShell({ children }: { children: ReactNode }) {
+function PromptVaultDevtools() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
   return (
-    <AppShell header={{ height: 72 }} padding="md">
-      <AppShell.Header>
-        <Container h="100%" size="md">
-          <Group align="center" h="100%" justify="space-between">
-            <div>
-              <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                Prompt Vault
-              </Text>
-              <Title order={1} size="h3">
-                Prompt Vault
-              </Title>
-            </div>
-          </Group>
-        </Container>
-      </AppShell.Header>
-      <AppShell.Main>
-        <Container py="xl" size="md">
-          {children}
-        </Container>
-      </AppShell.Main>
-    </AppShell>
+    import.meta.env.DEV && (
+      <TanStackDevtools
+        plugins={[
+          {
+            name: "TanStack Query",
+            render: <ReactQueryDevtools client={queryClient} />,
+          },
+          {
+            name: "TanStack Router",
+            render: <TanStackRouterDevtools router={router} />,
+          },
+        ]}
+      />
+    )
   );
 }
