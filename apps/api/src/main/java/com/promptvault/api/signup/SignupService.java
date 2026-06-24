@@ -9,8 +9,8 @@ import com.promptvault.api.user.AccountStatus;
 import com.promptvault.api.user.Role;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.api.user.UserRepository;
+import com.promptvault.api.user.UserSummaryMapper;
 import com.promptvault.contract.model.SignupRequest;
-import com.promptvault.contract.model.UserRole;
 import com.promptvault.contract.model.UserSummary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -65,13 +65,7 @@ public class SignupService {
 
         UserEntity createdUser = userRepository.save(user);
 
-        UserSummary response = new UserSummary();
-        response.setId(createdUser.getId());
-        response.setUsername(createdUser.getUsername());
-        response.setEmailAddress(createdUser.getEmailAddress());
-        response.setRole(UserRole.USER);
-        response.setAccountStatus(com.promptvault.contract.model.AccountStatus.ENABLED);
-        return response;
+        return UserSummaryMapper.toSummary(createdUser);
     }
 
     private List<FieldValidationError> validate(String username, String emailAddress, String password) {

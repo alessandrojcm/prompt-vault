@@ -1,7 +1,6 @@
-import { signupMutation, vSignupRequest } from "@prompt-vault/api-client";
+import { getCurrentUserQueryKey, loginMutation, vLoginRequest } from "@prompt-vault/api-client";
 import {
-  Alert,
-  Anchor,
+  Alert, Anchor,
   Button,
   Card,
   Fieldset,
@@ -10,36 +9,35 @@ import {
   Text,
   TextInput,
   Title,
-} from "@mantine/core";
+} from '@mantine/core';
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from '@tanstack/react-router';
 
-type SignupFormState = {
+type LoginFormState = {
   username: string;
-  emailAddress: string;
   password: string;
 };
 
-const initialFormState: SignupFormState = {
+const initialFormState: LoginFormState = {
   username: "",
-  emailAddress: "",
   password: "",
 };
 
-export function SignupScreen() {
+export function LoginScreen() {
   const navigate = useNavigate();
-  const signup = useMutation(signupMutation());
+  const queryClient = useQueryClient();
+  const login = useMutation(loginMutation());
 
   const form = useForm({
     defaultValues: initialFormState,
     validators: {
-      onSubmit: vSignupRequest,
-      onSubmitAsync: async ({ value, formApi }) => {
-        await signup.mutateAsync({ body: value });
-        await formApi.reset();
-        await navigate({ to: "/signup/success" });
+      onSubmit: vLoginRequest,
+      onSubmitAsync: async ({ value }) => {
+        const currentUser = await login.mutateAsync({ body: value });
+        queryClient.setQueryData(getCurrentUserQueryKey(), currentUser);
+        await navigate({ to: "/" });
       },
     },
   });
@@ -51,14 +49,11 @@ export function SignupScreen() {
           <Text c="dimmed" fw={700} size="xs" tt="uppercase">
             Prompt Vault
           </Text>
-          <Title order={2}>Sign up</Title>
+          <Title order={2}>Log in</Title>
         </div>
-        <Text c="dimmed">
-          Create your Prompt Vault user. Signup creates an enabled normal user.
-        </Text>
-        {signup.isError ? (
-          <Alert color="red" title="Could not create account" variant="light">
-            {signup.error instanceof Error ? signup.error.message : "Please check your details."}
+        {login.isError ? (
+          <Alert color="red" title="Could not log in" variant="light">
+            Invalid username or password.
           </Alert>
         ) : null}
         <form
@@ -86,21 +81,6 @@ export function SignupScreen() {
               />
 
               <form.Field
-                name="emailAddress"
-                children={(field) => (
-                  <TextInput
-                    error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
-                    label="Email address"
-                    name={field.name}
-                    type="email"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                  />
-                )}
-              />
-
-              <form.Field
                 name="password"
                 children={(field) => (
                   <PasswordInput
@@ -116,8 +96,8 @@ export function SignupScreen() {
 
               <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
                 {([canSubmit, isSubmitting]) => (
-                  <Button disabled={!canSubmit || isSubmitting || signup.isPending} type="submit">
-                    {isSubmitting || signup.isPending ? "Creating user..." : "Create account"}
+                  <Button disabled={!canSubmit || isSubmitting || login.isPending} type="submit">
+                    {isSubmitting || login.isPending ? "Logging in..." : "Log in"}
                   </Button>
                 )}
               </form.Subscribe>
@@ -125,9 +105,9 @@ export function SignupScreen() {
           </Fieldset>
         </form>
         <Text c="dimmed" size="sm">
-          Already have an account?&nbsp;
-          <Anchor component={Link} to="/login">
-            Log in
+          Don't have an account?&nbsp;
+          <Anchor component={Link} to="/signup">
+            Sign up
           </Anchor>
         </Text>
       </Stack>

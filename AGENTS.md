@@ -36,8 +36,9 @@ Use `mise run` as the standard command surface: `mise run install`, `mise run ge
 - API CORS is configured in Spring Security with a `CorsConfigurationSource` for `/api/**`; keep allowed browser origins explicit via `prompt-vault.cors.allowed-origins` / `PROMPT_VAULT_CORS_ALLOWED_ORIGINS` because session-cookie credentials cannot use wildcard origins.
 - The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
 - Use Spring Security session-cookie authentication for the initial auth slice; CSRF hardening is deferred to later OWASP-focused work.
-- The current tracer is `GET /api/user`: the backend returns `401` when unauthenticated, and the web app calls it through the same-origin `/api` dev proxy.
-- The web root `/` is an auth gate: it calls `GET /api/user`, stays on `/` for authenticated `204`, and redirects unauthenticated `401` users to `/signup`.
+- Login is `POST /api/login`: it authenticates case-insensitive usernames with Spring Security, saves the `SecurityContext` through `HttpSessionSecurityContextRepository`, returns a safe `UserSummary`, and returns `401` with `AuthenticationErrorResponse.message` for invalid credentials.
+- Current User is `GET /api/user`: it returns `401` when unauthenticated and returns the safe `UserSummary` from the session principal when authenticated.
+- The web root `/` is an auth gate: it calls `GET /api/user`, stays on `/` for authenticated sessions, and redirects unauthenticated `401` users to `/login`.
 - Signup is now `POST /api/signup`: it trims username/email address, preserves password spaces, creates `USER` + `ENABLED`, and returns `400` with `ValidationErrorResponse.fieldErrors[]` for form-friendly validation failures.
 - Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
 - Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
