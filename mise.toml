@@ -37,6 +37,11 @@ run = "./gradlew :apps:api:bootRun"
 description = "Run the TanStack Start web app"
 run = "pnpm --filter @prompt-vault/web dev"
 
+[tasks.dev]
+description = "Run the Spring Boot API and TanStack Start web app"
+depends = ["db:up"]
+run = [{ tasks = ["dev:api", "dev:web"] }]
+
 [tasks.build]
 description = "Build the monorepo"
 depends = ["generate"]
@@ -49,6 +54,10 @@ run = "pnpm --filter @prompt-vault/web lint"
 [tasks."format:check"]
 description = "Check frontend formatting"
 run = "pnpm --filter @prompt-vault/web format:check"
+
+[tasks."format"]
+description = "Check frontend formatting"
+run = ["pnpm --filter @prompt-vault/api-client format", "pnpm --filter @prompt-vault/web format"]
 
 [tasks.check]
 description = "Run automated verification"
