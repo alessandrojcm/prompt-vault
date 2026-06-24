@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,9 +24,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminUsersService {
 
     private final UserRepository userRepository;
+    private final SessionRegistry sessionRegistry;
 
-    public AdminUsersService(UserRepository userRepository) {
+    public AdminUsersService(UserRepository userRepository, SessionRegistry sessionRegistry) {
         this.userRepository = userRepository;
+        this.sessionRegistry = sessionRegistry;
     }
 
     @Transactional(readOnly = true)
@@ -51,8 +55,23 @@ public class AdminUsersService {
             throw new AccessDeniedException("User account status cannot be managed by this operation");
         }
 
-        target.setAccountStatus(AccountStatus.valueOf(requestedStatus.getValue()));
+        AccountStatus accountStatus = AccountStatus.valueOf(requestedStatus.getValue());
+        target.setAccountStatus(accountStatus);
+
+        if (accountStatus == AccountStatus.DISABLED) {
+            revokeSessions(target.getId());
+        }
+
         return UserSummaryMapper.toSummary(target);
+    }
+
+    private void revokeSessions(Long userId) {
+        sessionRegistry.getAllPrincipals().stream()
+            .filter(PromptVaultUserDetails.class::isInstance)
+            .map(PromptVaultUserDetails.class::cast)
+            .filter(userDetails -> userDetails.getUser().getId().equals(userId))
+            .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
+            .forEach(SessionInformation::expireNow);
     }
 
     private Long currentUserId() {

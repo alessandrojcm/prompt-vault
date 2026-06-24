@@ -51,6 +51,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Disabled users are rejected during `POST /api/login` through Spring Security's `UserDetails.isEnabled()` / `DisabledException` path; map them to `403` with `AuthenticationErrorResponse.message` (`Your account is disabled. Contact an administrator.`), do not save a `SecurityContext`, and do not establish a new session cookie.
 - Current User is `GET /api/user`: it returns `401` when unauthenticated and returns the safe `UserSummary` from the session principal when authenticated.
 - Logout is `POST /api/logout`: it requires an authenticated session and invalidates the server session via Spring Security logout handling.
+- Existing authenticated sessions are tracked with Spring Security's `SessionRegistry`; manual login must register the created HTTP session so account disablement can expire only the targeted user's sessions.
 
 ## Data and admin patterns
 

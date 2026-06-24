@@ -129,6 +129,29 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void disablingNormalUsersRevokesOnlyTheirExistingSessions() throws Exception {
+        String adminPassword = "admin-password123";
+        String targetPassword = "target-password123";
+        String otherPassword = "other-password123";
+        UserEntity admin = saveUser(uniqueUsername("revokeAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity target = saveUser(uniqueUsername("revokeTarget"), targetPassword, Role.USER, AccountStatus.ENABLED);
+        UserEntity otherUser = saveUser(uniqueUsername("revokeOther"), otherPassword, Role.USER, AccountStatus.ENABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+        HttpClient targetClient = authenticatedClient(target.getUsername(), targetPassword);
+        HttpClient otherClient = authenticatedClient(otherUser.getUsername(), otherPassword);
+        assertThat(getCurrentUser(targetClient).statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(otherClient).statusCode()).isEqualTo(200);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, target.getId(), "DISABLED");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(targetClient).statusCode()).isEqualTo(401);
+        assertThat(login(target.getUsername(), targetPassword, targetClient).statusCode()).isEqualTo(403);
+        assertThat(getCurrentUser(otherClient).statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(adminClient).statusCode()).isEqualTo(200);
+    }
+
+    @Test
     void adminsCanEnableNormalUsers() throws Exception {
         String adminPassword = "admin-password123";
         UserEntity admin = saveUser(uniqueUsername("enableAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
@@ -140,6 +163,24 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.ENABLED);
         assertThat(userRepository.findById(user.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+    }
+
+    @Test
+    void enablingNormalUsersRestoresLoginEligibilityWithoutCreatingASession() throws Exception {
+        String adminPassword = "admin-password123";
+        String userPassword = "user-password123";
+        UserEntity admin = saveUser(uniqueUsername("enableSessionAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+        UserEntity user = saveUser(uniqueUsername("enableSessionUser"), userPassword, Role.USER, AccountStatus.DISABLED);
+        HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+        HttpClient userClient = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+        assertThat(login(user.getUsername(), userPassword, userClient).statusCode()).isEqualTo(403);
+
+        HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "ENABLED");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(userClient).statusCode()).isEqualTo(401);
+        assertThat(login(user.getUsername(), userPassword, userClient).statusCode()).isEqualTo(200);
+        assertThat(getCurrentUser(userClient).statusCode()).isEqualTo(200);
     }
 
     @Test
@@ -230,6 +271,14 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
             ? baseUri.resolve("/api/admin/users")
             : baseUri.resolve("/api/admin/users?role=" + role);
         HttpRequest request = HttpRequest.newBuilder(uri)
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> getCurrentUser(HttpClient client) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/user"))
             .header("Accept", "application/json")
             .GET()
             .build();
