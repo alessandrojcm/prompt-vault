@@ -16,13 +16,15 @@ function DashboardPage() {
   const logout = useMutation(logoutMutation());
 
   async function handleLogout() {
-    try {
-      await logout.mutateAsync({});
-      queryClient.removeQueries({ queryKey: getCurrentUserQueryKey() });
-      await navigate({ to: "/login" });
-    } catch {
-      // The mutation state renders a retryable error message.
-    }
+    logout.mutate(
+      {},
+      {
+        onSuccess: () => {
+          queryClient.removeQueries({ queryKey: getCurrentUserQueryKey() });
+          navigate({ to: "/login" });
+        },
+      },
+    );
   }
 
   return (

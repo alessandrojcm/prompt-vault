@@ -1,0 +1,71 @@
+# Project Patterns
+
+Use this document before broad codebase exploration. The stack and core seams are established; only search when you need task-specific implementation details.
+
+## Architecture
+
+- Prompt Vault is a Spring Boot REST API plus TanStack Start React frontend.
+- Use an OpenAPI-first contract at `openapi/api.yaml` as the shared API source of truth.
+- Generate Spring Boot interfaces/models with OpenAPI Generator; do not commit generated backend code.
+- Generate the TypeScript API client with Hey API in `packages/api-client`; generated output lives under `packages/api-client/src/generated` and must not be committed.
+- Keep `packages/api-client/src/index.ts` as a thin re-export surface for Hey API generated SDK, types, TanStack Query helpers, and Valibot schemas.
+- Put UI-specific response mapping and client configuration in consuming apps, not `packages/api-client`.
+- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: browser calls stay same-origin (`/`), while SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback.
+
+## Web app patterns
+
+- The web app is TanStack Start with file-based routing under `apps/web/src/routes`.
+- The root route layout is `apps/web/src/routes/__root.tsx`; it imports `@mantine/core/styles.css`, wraps the app in `MantineProvider`, and uses Mantine `AppShell` for the app-wide shell.
+- Use Mantine form/display primitives over custom inline-styled controls.
+- Use TanStack Router `beforeLoad` for auth guards and throw `redirect({ to, replace: true })` for auth redirects.
+- The web root `/` is an auth gate only: unauthenticated users redirect to `/login`; authenticated users redirect to `/dashboard`.
+- `/dashboard` is the authenticated landing page for both admins and normal users.
+- Login success should navigate to `/dashboard` or through the root auth flow; do not restore the old root page as the authenticated home.
+- Logout clears the current-user query and navigates to `/login`.
+- The generated route tree `apps/web/src/routeTree.gen.ts` is generated and must not be committed.
+- Web linting/formatting uses `oxlint` and `oxfmt`; checks ignore `apps/web/dist/**` and `apps/web/src/routeTree.gen.ts`.
+
+## Form and API client patterns
+
+- Generate Valibot schemas from Hey API in `packages/api-client` (`requests`, `responses`, and `definitions`).
+- Prefer generated `v*` schemas, such as `vSignupRequest`, as TanStack Form validators for API-backed forms.
+- Use TanStack Form for app forms so signup, login, and future forms share form state and submit handling conventions.
+- Attach generated request schemas at the form level when validating the whole payload, for example `validators.onChange: vSignupRequest`.
+- Use `validators.onSubmitAsync` for mutation submission and navigation side effects.
+- Render errors from TanStack Form state instead of parallel React state or helper view models.
+- Use Hey API's generated TanStack Query mutation/query helpers where they fit.
+- If generated query helpers throw for expected control-flow responses such as `401`, call the generated SDK directly in the consuming app so the route can branch on `response.status`.
+
+## API and auth patterns
+
+- Use Spring Security session-cookie authentication for the initial auth slice; CSRF hardening is deferred to later OWASP-focused work.
+- API CORS is configured in Spring Security with a `CorsConfigurationSource` for `/api/**`; keep allowed browser origins explicit via `prompt-vault.cors.allowed-origins` / `PROMPT_VAULT_CORS_ALLOWED_ORIGINS` because session-cookie credentials cannot use wildcard origins.
+- Signup is `POST /api/signup`: it trims username/email address, preserves password spaces, creates `USER` + `ENABLED`, and returns `400` with `ValidationErrorResponse.fieldErrors[]` for form-friendly validation failures.
+- Keep SignupRequest's basic constraints in OpenAPI, including `emailAddress` as `format: email`, so generated frontend Valibot schemas and backend Bean Validation agree on basic shape.
+- Trim signup identity fields before Bean Validation and map generated validation failures into `ValidationErrorResponse`.
+- Reuse `RequestBodyNormalizationAdvice` + `RequestBodyNormalizer` for DTO normalization before generated Bean Validation.
+- Reuse `BeanValidationExceptionHandler` + `BeanValidationFieldMessageResolver` for contract-shaped validation errors with flow-specific messages.
+- Login is `POST /api/login`: it authenticates case-insensitive usernames with Spring Security, saves the `SecurityContext` through `HttpSessionSecurityContextRepository`, returns a safe `UserSummary`, and returns `401` with `AuthenticationErrorResponse.message` for invalid credentials.
+- Disabled users are rejected during `POST /api/login` through Spring Security's `UserDetails.isEnabled()` / `DisabledException` path; map them to `403` with `AuthenticationErrorResponse.message` (`Your account is disabled. Contact an administrator.`), do not save a `SecurityContext`, and do not establish a new session cookie.
+- Current User is `GET /api/user`: it returns `401` when unauthenticated and returns the safe `UserSummary` from the session principal when authenticated.
+- Logout is `POST /api/logout`: it requires an authenticated session and invalidates the server session via Spring Security logout handling.
+
+## Data and admin patterns
+
+- Use MySQL via Docker Compose, Flyway migrations/seed data, and Spring Data JPA for persistence mapping.
+- Keep the shared `docker-compose.yml` compatible with Testcontainers Compose-based tests; do not set `container_name` on services used by automated tests.
+- The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
+- Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
+- Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
+- User Management lives at `/admin/users` and is admin-only; the route guard redirects unauthenticated visitors through the auth gate/login flow and authenticated normal users to `/dashboard`.
+- Admin User Management uses `GET /api/admin/users` with an optional `role` enum query parameter (`USER` / `ADMIN`).
+- Admin User Management updates account state with `PATCH /api/admin/users/{userId}/status` and a desired `accountStatus`; the endpoint is idempotent, returns the updated user, returns `404` for missing users, and returns `403` when targeting admins or the current user.
+- The `/admin/users` UI initially requests `role=USER`, hides internal IDs and the role column, shows username/email address/account status/actions, labels enum values for humans, confirms disable actions with a small popover, enables immediately, updates rows in place, and shows toasts.
+- Disabling a normal user preserves their data and identity reservations, revokes existing sessions so subsequent current-user checks behave unauthenticated, and does not create audit records in the initial slice.
+
+## Testing patterns
+
+- Run the standard verification with `mise run check`.
+- API integration tests should prefer real MySQL coverage via Testcontainers.
+- The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
+- Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
