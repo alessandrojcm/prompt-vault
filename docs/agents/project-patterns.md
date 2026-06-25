@@ -73,6 +73,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Prompt ownership has no admin override: admins can create and manage their own Prompts, but non-owned Prompt detail/update/delete requests still return `404` and must not leak private Prompt content.
 - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.
 - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.
+- Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
 
 ## Testing patterns
 

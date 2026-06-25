@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.promptvault.api.promptcategory.PromptCategoryEntity;
 import com.promptvault.api.promptcategory.PromptCategoryRepository;
+import com.promptvault.api.user.AccountStatus;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.model.CreatePromptRequest;
 import com.promptvault.contract.model.UpdatePromptRequest;
@@ -46,6 +47,25 @@ public class PromptsService {
     @Transactional(readOnly = true)
     public PromptEntity getOwnedPrompt(Long promptId, UserEntity owner) {
         return requireOwnedPrompt(promptId, owner);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PromptEntity> listPublicPrompts(UserEntity currentUser) {
+        return promptRepository.findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
+            PromptVisibility.PUBLIC,
+            AccountStatus.ENABLED,
+            currentUser.getId()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PromptEntity getPublicPrompt(Long promptId, UserEntity currentUser) {
+        return promptRepository.findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(
+            promptId,
+            PromptVisibility.PUBLIC,
+            AccountStatus.ENABLED,
+            currentUser.getId()
+        ).orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
     }
 
     @Transactional
