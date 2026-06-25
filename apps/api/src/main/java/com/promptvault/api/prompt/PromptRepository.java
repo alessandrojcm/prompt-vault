@@ -29,4 +29,6 @@ public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
         AccountStatus ownerStatus,
         Long excludedOwnerId
     );
+
+    boolean existsByCategoryId(Long categoryId);
 }

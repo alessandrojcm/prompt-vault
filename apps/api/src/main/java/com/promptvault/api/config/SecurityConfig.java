@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/prompt/categories").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/prompt/categories/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/prompt/categories/*").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
