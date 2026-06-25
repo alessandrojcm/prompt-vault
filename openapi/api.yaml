@@ -92,7 +92,7 @@ paths:
                 $ref: '#/components/schemas/UserSummary'
         '401':
           description: No authenticated session is present.
-  /api/prompt-categories:
+  /api/prompt/categories:
     get:
       tags:
         - PromptCategories
