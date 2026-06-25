@@ -11,4 +11,8 @@ public interface PromptCategoryRepository extends JpaRepository<PromptCategoryEn
     boolean existsByLabelNormalized(String labelNormalized);
 
     boolean existsBySlug(String slug);
+
+    boolean existsByLabelNormalizedAndIdNot(String labelNormalized, Long id);
+
+    boolean existsBySlugAndIdNot(String slug, Long id);
 }

@@ -7,6 +7,7 @@ import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.PromptCategoriesApi;
 import com.promptvault.contract.model.CreatePromptCategoryRequest;
 import com.promptvault.contract.model.PromptCategory;
+import com.promptvault.contract.model.UpdatePromptCategoryRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,6 +38,14 @@ public class PromptCategoriesController implements PromptCategoriesApi {
             currentUser()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
+    }
+
+    @Override
+    public ResponseEntity<PromptCategory> updatePromptCategory(Long categoryId, UpdatePromptCategoryRequest updatePromptCategoryRequest) {
+        return ResponseEntity.ok(PromptCategoryMapper.toContract(promptCategoriesService.updatePromptCategory(
+            categoryId,
+            updatePromptCategoryRequest
+        )));
     }
 
     private UserEntity currentUser() {
