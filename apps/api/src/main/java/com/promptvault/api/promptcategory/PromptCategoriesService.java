@@ -3,6 +3,7 @@ package com.promptvault.api.promptcategory;
 import java.util.List;
 import java.util.Locale;
 
+import com.promptvault.api.prompt.PromptRepository;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.model.CreatePromptCategoryRequest;
 import com.promptvault.contract.model.UpdatePromptCategoryRequest;
@@ -15,9 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class PromptCategoriesService {
 
     private final PromptCategoryRepository promptCategoryRepository;
+    private final PromptRepository promptRepository;
 
-    public PromptCategoriesService(PromptCategoryRepository promptCategoryRepository) {
+    public PromptCategoriesService(PromptCategoryRepository promptCategoryRepository, PromptRepository promptRepository) {
         this.promptCategoryRepository = promptCategoryRepository;
+        this.promptRepository = promptRepository;
     }
 
     @Transactional(readOnly = true)
@@ -69,6 +72,18 @@ public class PromptCategoriesService {
         category.setSlug(slug);
 
         return promptCategoryRepository.save(category);
+    }
+
+    @Transactional
+    public void deletePromptCategory(Long categoryId) {
+        PromptCategoryEntity category = promptCategoryRepository.findById(categoryId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (promptRepository.existsByCategoryId(categoryId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Prompt Category is referenced by one or more prompts.");
+        }
+
+        promptCategoryRepository.delete(category);
     }
 
     private String toSnakeCaseSlug(String label) {

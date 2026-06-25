@@ -283,6 +283,100 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(401);
     }
 
+    @Test
+    void adminsCanDeleteUnusedPromptCategories() throws Exception {
+        HttpClient adminClient = authenticatedClient();
+        Map<String, Object> category = readJson(createPromptCategory(adminClient, uniqueLabel("Delete Target")).body());
+        int categoryId = (Integer) category.get("id");
+
+        HttpResponse<String> response = deletePromptCategory(adminClient, categoryId);
+
+        assertThat(response.statusCode()).isEqualTo(204);
+        assertThat(response.body()).isEmpty();
+        assertThat(promptCategoryRepository.findById((long) categoryId)).isEmpty();
+        assertThat(readList(listPromptCategories(adminClient).body()))
+            .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
+    }
+
+    @Test
+    void adminsCanDeleteUnusedSeededBaselinePromptCategories() throws Exception {
+        HttpClient adminClient = authenticatedClient();
+        PromptCategoryEntity seededCategory = promptCategoryRepository.findAllByOrderByLabelAsc()
+            .stream()
+            .filter(category -> List.of("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research").contains(category.getSlug()))
+            .filter(category -> !promptRepository.existsByCategoryId(category.getId()))
+            .findFirst()
+            .orElseThrow();
+        long categoryId = seededCategory.getId();
+        String label = seededCategory.getLabel();
+        String slug = seededCategory.getSlug();
+
+        try {
+            HttpResponse<String> response = deletePromptCategory(adminClient, Math.toIntExact(categoryId));
+
+            assertThat(response.statusCode()).isEqualTo(204);
+            assertThat(promptCategoryRepository.findById(categoryId)).isEmpty();
+            assertThat(readList(listPromptCategories(adminClient).body()))
+                .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("slug", slug));
+        }
+        finally {
+            restoreSeededCategoryIfMissing(label, slug);
+        }
+    }
+
+    @Test
+    void missingPromptCategoryDeleteTargetsReturnNotFound() throws Exception {
+        HttpClient adminClient = authenticatedClient();
+
+        HttpResponse<String> response = deletePromptCategory(adminClient, 999_999_999);
+
+        assertThat(response.statusCode()).isEqualTo(404);
+    }
+
+    @Test
+    void promptCategoriesReferencedByPromptsCannotBeDeleted() throws Exception {
+        String password = "password123";
+        UserEntity user = saveUser(uniqueUsername("pcDeleteOwner"), password, Role.USER, AccountStatus.ENABLED);
+        HttpClient userClient = authenticatedClient(user.getUsername(), password);
+        HttpClient adminClient = authenticatedClient();
+        Map<String, Object> category = readJson(createPromptCategory(adminClient, uniqueLabel("Referenced Delete Target")).body());
+        int categoryId = (Integer) category.get("id");
+        assertThat(createPrompt(userClient, Map.of(
+            "title", uniqueLabel("Prompt"),
+            "text", "Uses the category",
+            "categoryId", categoryId
+        )).statusCode()).isEqualTo(201);
+
+        HttpResponse<String> response = deletePromptCategory(adminClient, categoryId);
+
+        assertThat(response.statusCode()).isEqualTo(409);
+        assertThat(promptCategoryRepository.findById((long) categoryId)).isPresent();
+        assertThat(readList(listPromptCategories(adminClient).body()))
+            .anySatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
+    }
+
+    @Test
+    void normalUsersCannotDeletePromptCategories() throws Exception {
+        String password = "password123";
+        UserEntity user = saveUser(uniqueUsername("categoryDeleteUser"), password, Role.USER, AccountStatus.ENABLED);
+        HttpClient userClient = authenticatedClient(user.getUsername(), password);
+        Map<String, Object> category = readJson(createPromptCategory(authenticatedClient(), uniqueLabel("Forbidden Delete")).body());
+
+        HttpResponse<String> response = deletePromptCategory(userClient, (Integer) category.get("id"));
+
+        assertThat(response.statusCode()).isEqualTo(403);
+    }
+
+    @Test
+    void unauthenticatedCallersCannotDeletePromptCategories() throws Exception {
+        HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+        Map<String, Object> category = readJson(createPromptCategory(authenticatedClient(), uniqueLabel("Unauthenticated Delete")).body());
+
+        HttpResponse<String> response = deletePromptCategory(client, (Integer) category.get("id"));
+
+        assertThat(response.statusCode()).isEqualTo(401);
+    }
+
     private HttpClient authenticatedClient() throws Exception {
         return authenticatedClient(SEEDED_ADMIN_USERNAME, SEEDED_ADMIN_PASSWORD);
     }
@@ -328,6 +422,14 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> deletePromptCategory(HttpClient client, int categoryId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories/" + categoryId))
+            .header("Accept", "application/json")
+            .DELETE()
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
@@ -381,6 +483,20 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
 
     private String uniqueSuffix() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    private void restoreSeededCategoryIfMissing(String label, String slug) {
+        if (promptCategoryRepository.existsBySlug(slug)) {
+            return;
+        }
+
+        UserEntity seededAdmin = userRepository.findByUsernameNormalized(SEEDED_ADMIN_USERNAME).orElseThrow();
+        PromptCategoryEntity category = new PromptCategoryEntity();
+        category.setLabel(label);
+        category.setLabelNormalized(label.toLowerCase(java.util.Locale.ROOT));
+        category.setSlug(slug);
+        category.setCreatedBy(seededAdmin);
+        promptCategoryRepository.save(category);
     }
 
     private void assertCategoryShape(Map<String, Object> category, UserEntity seededAdmin) {

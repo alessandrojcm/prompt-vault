@@ -48,6 +48,12 @@ public class PromptCategoriesController implements PromptCategoriesApi {
         )));
     }
 
+    @Override
+    public ResponseEntity<Void> deletePromptCategory(Long categoryId) {
+        promptCategoriesService.deletePromptCategory(categoryId);
+        return ResponseEntity.noContent().build();
+    }
+
     private UserEntity currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof PromptVaultUserDetails userDetails) {

@@ -178,6 +178,30 @@ paths:
           description: The authenticated user is not an administrator.
         '404':
           description: Prompt category was not found.
+    delete:
+      tags:
+        - PromptCategories
+      operationId: deletePromptCategory
+      summary: Delete a prompt category
+      description: Deletes an existing system-wide prompt category when no Prompts reference it. Admin users only.
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Prompt category deleted successfully.
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+        '404':
+          description: Prompt category was not found.
+        '409':
+          description: Prompt category is still referenced by one or more prompts.
   /api/prompts:
     post:
       tags:
