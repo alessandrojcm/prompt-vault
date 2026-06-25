@@ -39,3 +39,45 @@ _Avoid_: Profile, me
 **User Management**:
 The admin capability for viewing registered users and managing the account status of normal users.
 _Avoid_: User admin, account management
+
+**Prompt**:
+A saved, user-owned prompt record in Prompt Vault. A prompt contains prompt text and metadata such as its title, category, and visibility.
+_Avoid_: Saved prompt, prompt entry
+
+**Prompt Text**:
+The LLM instruction or content stored inside a prompt. Prompt text is stored with surrounding whitespace trimmed while preserving internal whitespace and newlines.
+_Avoid_: Body, content
+
+**Prompt Title**:
+The display label for a prompt. Prompt titles are stored with surrounding whitespace trimmed and are not unique identifiers.
+_Avoid_: Name
+
+**Prompt Visibility**:
+Whether a prompt is private to its owner or public to all enabled authenticated users. New prompts start private; public prompts owned by disabled users are not visible to others.
+_Avoid_: Shared status, access level
+
+**Prompt Owner**:
+The user who created a prompt and is the only user allowed to change or delete it. Public prompts identify their owner by username; admins do not gain ownership privileges over prompts created by other users.
+_Avoid_: Author, creator
+
+**Prompt Category**:
+A predefined system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique stable slug, and are not owned resources.
+Initial categories are Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.
+Categories referenced by prompts remain available until those prompts are moved to another category.
+_Avoid_: Tag, topic
+
+**Share**:
+The user action of making one of their prompts public.
+_Avoid_: Publish
+
+**Unshare**:
+The user action of making one of their public prompts private again.
+_Avoid_: Unpublish
+
+**My Prompts**:
+The collection of prompts owned by the current user, regardless of visibility.
+_Avoid_: Owned prompts
+
+**Public Prompts**:
+The collection of public prompts owned by other enabled users and visible to the current user.
+_Avoid_: Prompt feed, shared prompts
