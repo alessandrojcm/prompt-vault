@@ -7,6 +7,7 @@ import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.PromptsApi;
 import com.promptvault.contract.model.CreatePromptRequest;
 import com.promptvault.contract.model.Prompt;
+import com.promptvault.contract.model.UpdatePromptRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,26 @@ public class PromptsController implements PromptsApi {
             .stream()
             .map(PromptMapper::toContract)
             .toList());
+    }
+
+    @Override
+    public ResponseEntity<Prompt> getPrompt(Long promptId) {
+        return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));
+    }
+
+    @Override
+    public ResponseEntity<Prompt> updatePrompt(Long promptId, UpdatePromptRequest updatePromptRequest) {
+        return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPrompt(
+            promptId,
+            updatePromptRequest,
+            currentUser()
+        )));
+    }
+
+    @Override
+    public ResponseEntity<Void> deletePrompt(Long promptId) {
+        promptsService.deleteOwnedPrompt(promptId, currentUser());
+        return ResponseEntity.noContent().build();
     }
 
     private UserEntity currentUser() {
