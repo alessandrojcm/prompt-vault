@@ -110,6 +110,35 @@ paths:
                   $ref: '#/components/schemas/PromptCategory'
         '401':
           description: No authenticated session is present.
+    post:
+      tags:
+        - PromptCategories
+      operationId: createPromptCategory
+      summary: Create a prompt category
+      description: Creates a system-wide prompt category. Admin users only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePromptCategoryRequest'
+      responses:
+        '201':
+          description: Prompt category created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptCategory'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
   /api/prompts:
     post:
       tags:
@@ -508,6 +537,17 @@ components:
         updatedAt:
           type: string
           format: date-time
+    CreatePromptCategoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+      properties:
+        label:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Prompt Category labels are edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
     PromptVisibility:
       type: string
       enum:
