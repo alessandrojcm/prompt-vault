@@ -176,6 +176,89 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void promptOwnersCanShareAndUnshareOwnedPrompts() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser owner = createUser();
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", "Shareable prompt",
+            "text", "Shareable text",
+            "categoryId", category.getId()
+        )).body());
+        Long promptId = ((Number) createdPrompt.get("id")).longValue();
+
+        HttpResponse<String> shareResponse = updatePromptVisibility(ownerClient, promptId, "PUBLIC");
+        HttpResponse<String> listSharedResponse = listMyPrompts(ownerClient, owner.entity().getId());
+        HttpResponse<String> unshareResponse = updatePromptVisibility(ownerClient, promptId, "PRIVATE");
+        HttpResponse<String> listUnsharedResponse = listMyPrompts(ownerClient, owner.entity().getId());
+
+        assertThat(shareResponse.statusCode()).isEqualTo(200);
+        Map<String, Object> sharedPrompt = readJson(shareResponse.body());
+        assertThat(sharedPrompt).containsEntry("id", promptId.intValue())
+            .containsEntry("visibility", "PUBLIC")
+            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+        assertThat(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")))
+            .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
+        assertThat(readList(listSharedResponse.body()))
+            .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
+            .extracting(prompt -> prompt.get("visibility"))
+            .containsExactly("PUBLIC");
+
+        assertThat(unshareResponse.statusCode()).isEqualTo(200);
+        Map<String, Object> unsharedPrompt = readJson(unshareResponse.body());
+        assertThat(unsharedPrompt).containsEntry("id", promptId.intValue())
+            .containsEntry("visibility", "PRIVATE")
+            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+        assertThat(OffsetDateTime.parse((String) unsharedPrompt.get("updatedAt")))
+            .isAfter(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")));
+        assertThat(readList(listUnsharedResponse.body()))
+            .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
+            .extracting(prompt -> prompt.get("visibility"))
+            .containsExactly("PRIVATE");
+
+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
+        assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
+    }
+
+    @Test
+    void nonOwnersAndAdminsCannotShareOrUnsharePromptsOwnedByOtherUsers() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser owner = createUser();
+        TestUser otherUser = createUser();
+        TestUser admin = createAdmin();
+        HttpClient ownerClient = authenticatedClient(owner);
+        HttpClient otherClient = authenticatedClient(otherUser);
+        HttpClient adminClient = authenticatedClient(admin);
+
+        Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Owner controlled prompt",
+            "text", "Private text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> otherUserShareResponse = updatePromptVisibility(otherClient, promptId, "PUBLIC");
+        HttpResponse<String> adminShareResponse = updatePromptVisibility(adminClient, promptId, "PUBLIC");
+        HttpResponse<String> ownerShareResponse = updatePromptVisibility(ownerClient, promptId, "PUBLIC");
+        HttpResponse<String> otherUserUnshareResponse = updatePromptVisibility(otherClient, promptId, "PRIVATE");
+        HttpResponse<String> adminUnshareResponse = updatePromptVisibility(adminClient, promptId, "PRIVATE");
+
+        assertThat(otherUserShareResponse.statusCode()).isEqualTo(404);
+        assertThat(adminShareResponse.statusCode()).isEqualTo(404);
+        assertThat(ownerShareResponse.statusCode()).isEqualTo(200);
+        assertThat(otherUserUnshareResponse.statusCode()).isEqualTo(404);
+        assertThat(adminUnshareResponse.statusCode()).isEqualTo(404);
+        assertThat(otherUserShareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
+        assertThat(adminShareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
+        assertThat(otherUserUnshareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
+        assertThat(adminUnshareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
+
+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
+        assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
+        assertThat(persistedPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
+    }
+
+    @Test
     void promptOwnersCanRetrieveAndUpdateOwnedPromptDetails() throws Exception {
         List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
         PromptCategoryEntity originalCategory = categories.getFirst();
@@ -382,10 +465,12 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             "text", "Valid text",
             "categoryId", category.getId()
         ));
+        HttpResponse<String> visibilityResponse = updatePromptVisibility(client, missingPromptId, "PUBLIC");
         HttpResponse<String> deleteResponse = deletePrompt(client, missingPromptId);
 
         assertThat(detailResponse.statusCode()).isEqualTo(404);
         assertThat(updateResponse.statusCode()).isEqualTo(404);
+        assertThat(visibilityResponse.statusCode()).isEqualTo(404);
         assertThat(deleteResponse.statusCode()).isEqualTo(404);
     }
 
@@ -406,12 +491,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             "text", "Blocked text",
             "categoryId", category.getId()
         ));
+        HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, "PUBLIC");
         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
 
         assertThat(createResponse.statusCode()).isEqualTo(401);
         assertThat(listResponse.statusCode()).isEqualTo(401);
         assertThat(detailResponse.statusCode()).isEqualTo(401);
         assertThat(updateResponse.statusCode()).isEqualTo(401);
+        assertThat(visibilityResponse.statusCode()).isEqualTo(401);
         assertThat(deleteResponse.statusCode()).isEqualTo(401);
     }
 
@@ -496,6 +583,17 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> updatePromptVisibility(HttpClient client, Long promptId, String visibility) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId + "/visibility"))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                "visibility", visibility
+            ))))
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }

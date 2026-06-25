@@ -8,6 +8,7 @@ import com.promptvault.contract.api.PromptsApi;
 import com.promptvault.contract.model.CreatePromptRequest;
 import com.promptvault.contract.model.Prompt;
 import com.promptvault.contract.model.UpdatePromptRequest;
+import com.promptvault.contract.model.UpdatePromptVisibilityRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -60,6 +61,18 @@ public class PromptsController implements PromptsApi {
     public ResponseEntity<Void> deletePrompt(Long promptId) {
         promptsService.deleteOwnedPrompt(promptId, currentUser());
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Prompt> updatePromptVisibility(
+        Long promptId,
+        UpdatePromptVisibilityRequest updatePromptVisibilityRequest
+    ) {
+        return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPromptVisibility(
+            promptId,
+            PromptVisibility.valueOf(updatePromptVisibilityRequest.getVisibility().getValue()),
+            currentUser()
+        )));
     }
 
     private UserEntity currentUser() {

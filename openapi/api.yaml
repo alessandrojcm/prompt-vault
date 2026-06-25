@@ -219,6 +219,43 @@ paths:
           description: No authenticated session is present.
         '404':
           description: The prompt does not exist for the current owner.
+  /api/prompts/{promptId}/visibility:
+    patch:
+      tags:
+        - Prompts
+      operationId: updatePromptVisibility
+      summary: Share or unshare an owned prompt
+      description: Updates Prompt Visibility when the prompt is owned by the current authenticated user.
+      parameters:
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePromptVisibilityRequest'
+      responses:
+        '200':
+          description: The prompt with the requested visibility.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prompt'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '404':
+          description: The prompt does not exist for the current owner.
   /api/users/{userId}/prompts:
     get:
       tags:
@@ -477,6 +514,14 @@ components:
           type: integer
           format: int64
           minimum: 1
+    UpdatePromptVisibilityRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - visibility
+      properties:
+        visibility:
+          $ref: '#/components/schemas/PromptVisibility'
     Prompt:
       type: object
       additionalProperties: false
