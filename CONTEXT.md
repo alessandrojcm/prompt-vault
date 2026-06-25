@@ -61,7 +61,7 @@ The user who created a prompt and is the only user allowed to change or delete i
 _Avoid_: Author, creator
 
 **Prompt Category**:
-A predefined system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique stable slug, and are not owned resources.
+A system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique auto-generated slug derived from the label, and are not owned resources.
 Initial categories are Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.
 Categories referenced by prompts remain available until those prompts are moved to another category.
 _Avoid_: Tag, topic
