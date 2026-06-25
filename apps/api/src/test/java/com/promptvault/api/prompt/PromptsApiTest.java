@@ -194,6 +194,11 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
         HttpResponse<String> otherUserDetailResponse = getPrompt(otherClient, promptId);
+        HttpResponse<String> otherUserUpdateResponse = updatePrompt(otherClient, promptId, Map.of(
+            "title", "Other user title",
+            "text", "Other user text",
+            "categoryId", updatedCategory.getId()
+        ));
         HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
             "title", "  Updated title  ",
             "text", "  Updated text\n\n  still here  ",
@@ -207,6 +212,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             .containsEntry("categoryId", originalCategory.getId().intValue())
             .containsEntry("ownerUserId", owner.entity().getId().intValue());
         assertThat(otherUserDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(otherUserDetailResponse.body()).doesNotContain("Original title", "Original text");
+        assertThat(otherUserUpdateResponse.statusCode()).isEqualTo(404);
+        assertThat(otherUserUpdateResponse.body()).doesNotContain("Original title", "Original text");
         assertThat(updateResponse.statusCode()).isEqualTo(200);
 
         Map<String, Object> updatedPrompt = readJson(updateResponse.body());
@@ -222,6 +230,70 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(persistedPrompt.getTitle()).isEqualTo("Updated title");
         assertThat(persistedPrompt.getText()).isEqualTo("Updated text\n\n  still here");
         assertThat(persistedPrompt.getCategory().getId()).isEqualTo(updatedCategory.getId());
+    }
+
+    @Test
+    void adminsCanManageTheirOwnPromptsButCannotManagePromptsOwnedByOtherUsers() throws Exception {
+        List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
+        PromptCategoryEntity originalCategory = categories.getFirst();
+        PromptCategoryEntity updatedCategory = categories.getLast();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        HttpClient adminClient = authenticatedClient(admin);
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Long adminPromptId = ((Number) readJson(createPrompt(adminClient, Map.of(
+            "title", "Admin private title",
+            "text", "Admin private text",
+            "categoryId", originalCategory.getId()
+        )).body()).get("id")).longValue();
+        Long ownerPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Owner secret title",
+            "text", "Owner secret text",
+            "categoryId", originalCategory.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> adminOwnDetailResponse = getPrompt(adminClient, adminPromptId);
+        HttpResponse<String> adminOwnUpdateResponse = updatePrompt(adminClient, adminPromptId, Map.of(
+            "title", "Admin updated title",
+            "text", "Admin updated text",
+            "categoryId", updatedCategory.getId()
+        ));
+        HttpResponse<String> adminOtherDetailResponse = getPrompt(adminClient, ownerPromptId);
+        HttpResponse<String> adminOtherUpdateResponse = updatePrompt(adminClient, ownerPromptId, Map.of(
+            "title", "Admin takeover title",
+            "text", "Admin takeover text",
+            "categoryId", updatedCategory.getId()
+        ));
+        HttpResponse<String> adminOtherDeleteResponse = deletePrompt(adminClient, ownerPromptId);
+        HttpResponse<String> adminOwnDeleteResponse = deletePrompt(adminClient, adminPromptId);
+
+        assertThat(adminOwnDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(adminOwnDetailResponse.body()))
+            .containsEntry("id", adminPromptId.intValue())
+            .containsEntry("ownerUserId", admin.entity().getId().intValue())
+            .containsEntry("text", "Admin private text");
+        assertThat(adminOwnUpdateResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(adminOwnUpdateResponse.body()))
+            .containsEntry("id", adminPromptId.intValue())
+            .containsEntry("title", "Admin updated title")
+            .containsEntry("text", "Admin updated text")
+            .containsEntry("ownerUserId", admin.entity().getId().intValue());
+        assertThat(adminOwnDeleteResponse.statusCode()).isEqualTo(204);
+        assertThat(promptRepository.findById(adminPromptId)).isEmpty();
+
+        assertThat(adminOtherDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(adminOtherUpdateResponse.statusCode()).isEqualTo(404);
+        assertThat(adminOtherDeleteResponse.statusCode()).isEqualTo(404);
+        assertThat(adminOtherDetailResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
+        assertThat(adminOtherUpdateResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
+        assertThat(adminOtherDeleteResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
+
+        PromptEntity ownerPrompt = promptRepository.findById(ownerPromptId).orElseThrow();
+        assertThat(ownerPrompt.getTitle()).isEqualTo("Owner secret title");
+        assertThat(ownerPrompt.getText()).isEqualTo("Owner secret text");
+        assertThat(ownerPrompt.getCategory().getId()).isEqualTo(originalCategory.getId());
+        assertThat(ownerPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
     }
 
     @Test
@@ -344,6 +416,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     private TestUser createUser() {
+        return createUser(Role.USER);
+    }
+
+    private TestUser createAdmin() {
+        return createUser(Role.ADMIN);
+    }
+
+    private TestUser createUser(Role role) {
         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         String username = "user" + suffix;
         String password = "password123";
@@ -354,7 +434,7 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         user.setEmailAddress(username + "@example.com");
         user.setEmailAddressNormalized(username + "@example.com");
         user.setPasswordHash(passwordEncoder.encode(password));
-        user.setRole(Role.USER);
+        user.setRole(role);
         user.setAccountStatus(AccountStatus.ENABLED);
         return new TestUser(userRepository.save(user), password);
     }
