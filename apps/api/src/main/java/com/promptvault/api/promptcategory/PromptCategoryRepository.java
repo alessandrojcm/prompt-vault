@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PromptCategoryRepository extends JpaRepository<PromptCategoryEntity, Long> {
 
     List<PromptCategoryEntity> findAllByOrderByLabelAsc();
+
+    boolean existsByLabelNormalized(String labelNormalized);
+
+    boolean existsBySlug(String slug);
 }

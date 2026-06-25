@@ -12,6 +12,11 @@ apps/**/build
 
 # Ignore local IDE files
 .idea
+.project
+.classpath
+.settings
+bin
+**/bin
 
 # Ignore Node and pnpm artifacts
 node_modules

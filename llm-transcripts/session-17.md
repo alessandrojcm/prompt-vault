@@ -1,139 +1,269 @@
-# Issue 28 Graphite stack entry
+# Admin-only category CRUD endpoints
 
-**Session ID:** ses_100439517ffeq3ojssr254GBKq
-**Created:** 6/25/2026, 6:03:18 PM
-**Updated:** 6/25/2026, 6:10:53 PM
+**Session ID:** ses_100044518ffenmyuFCRxLjDEId
+**Created:** 6/25/2026, 7:12:28 PM
+**Updated:** 6/25/2026, 7:28:37 PM
 
 ---
 
 ## User
 
-let's work on issue 28, remember to create a new graphite stack entry for it
+Run a `/grilling` session, using the `/domain-modeling` skill.
+
+
+let's build up on the @apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryRepository.java and the current categories endpoints we have adding the following:
+
+1) Categories can be CRUD by admins _only_
 
 ---
 
-## Assistant (Build · GPT-5.5 · 9.6s)
+## Assistant (Build · GPT-5.5 · 3.6s)
 
 _Thinking:_
 
-**Inspecting the issue**
 
-I need to look into the issue carefully. I might use GitHub, and it's essential to update my to-dos. It seems like I also need to check the AGENTS skill and Graphite. First, maybe I should do a "git status" to see where things stand. I’ll want to view the issue details using the Bash command for GitHub and consider checking the documentation for patterns as well. I think I'll avoid any grep commands.
 
-**Tool: todowrite**
+**Tool: skill**
 
 **Input:**
 ```json
 {
-  "todos": [
-    {
-      "content": "Inspect issue 28 and current workspace state",
-      "status": "in_progress",
-      "priority": "high"
-    },
-    {
-      "content": "Create a new Graphite stack entry for issue 28",
-      "status": "pending",
-      "priority": "high"
-    },
-    {
-      "content": "Implement issue 28 following project patterns",
-      "status": "pending",
-      "priority": "high"
-    },
-    {
-      "content": "Run relevant checks",
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "content": "Update AGENTS.md if new project info is learned",
-      "status": "pending",
-      "priority": "medium"
-    }
-  ]
+  "name": "grilling"
 }
 ```
 
 **Output:**
 ```
-[
-  {
-    "content": "Inspect issue 28 and current workspace state",
-    "status": "in_progress",
-    "priority": "high"
-  },
-  {
-    "content": "Create a new Graphite stack entry for issue 28",
-    "status": "pending",
-    "priority": "high"
-  },
-  {
-    "content": "Implement issue 28 following project patterns",
-    "status": "pending",
-    "priority": "high"
-  },
-  {
-    "content": "Run relevant checks",
-    "status": "pending",
-    "priority": "medium"
-  },
-  {
-    "content": "Update AGENTS.md if new project info is learned",
-    "status": "pending",
-    "priority": "medium"
-  }
-]
+<skill_content name="grilling">
+# Skill: grilling
+
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+
+If a question can be answered by exploring the codebase, explore the codebase instead.
+
+Base directory for this skill: file:///Users/alessandrojcm/.agents/skills/grilling
+Relative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.
+Note: file list is sampled.
+
+<skill_files>
+
+</skill_files>
+</skill_content>
 ```
 
 ---
 
-## Assistant (Build · GPT-5.5 · 11.8s)
+## Assistant (Build · GPT-5.5 · 2.9s)
 
-**Tool: bash**
+**Tool: skill**
 
 **Input:**
 ```json
 {
-  "command": "git status --short --branch && git log --oneline -10",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows git status and recent commits"
+  "name": "domain-modeling"
 }
 ```
 
 **Output:**
 ```
-## issue-27-share-unshare-prompts...origin/issue-27-share-unshare-prompts
-b4cf8d4 prompt sharing
-37eda9e enforce prompt ownership boundaries
-7281a11 manage owned prompt details
-6113451 prompt management service
-c73cb77 feat: add prompt category catalog
-afca52b prompt management context
-c220ffb feat: revoke disabled user sessions (#21)
-7850b13 feat: revoke disabled user sessions
-8381237 enable/disable user patch Closes #15 (#20)
-88442c4 enable/disable user patch Closes #15
+<skill_content name="domain-modeling">
+# Skill: domain-modeling
+
+# Domain Modeling
+
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+
+## File structure
+
+Most repos have a single context:
 
 ```
+/
+├── CONTEXT.md
+├── docs/
+│   └── adr/
+│       ├── 0001-event-sourced-orders.md
+│       └── 0002-postgres-for-write-model.md
+└── src/
+```
 
-**Tool: bash**
+If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+
+```
+/
+├── CONTEXT-MAP.md
+├── docs/
+│   └── adr/                          ← system-wide decisions
+├── src/
+│   ├── ordering/
+│   │   ├── CONTEXT.md
+│   │   └── docs/adr/                 ← context-specific decisions
+│   └── billing/
+│       ├── CONTEXT.md
+│       └── docs/adr/
+```
+
+Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+
+## During the session
+
+### Challenge against the glossary
+
+When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+
+### Sharpen fuzzy language
+
+When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+
+### Discuss concrete scenarios
+
+When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+
+### Cross-reference with code
+
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+
+### Update CONTEXT.md inline
+
+When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+
+`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+
+### Offer ADRs sparingly
+
+Only offer to create an ADR when all three are true:
+
+1. **Hard to reverse** — the cost of changing your mind later is meaningful
+2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
+3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
+
+If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+
+Base directory for this skill: file:///Users/alessandrojcm/.agents/skills/domain-modeling
+Relative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.
+Note: file list is sampled.
+
+<skill_files>
+<file>/Users/alessandrojcm/.agents/skills/domain-modeling/ADR-FORMAT.md</file>
+<file>/Users/alessandrojcm/.agents/skills/domain-modeling/CONTEXT-FORMAT.md</file>
+</skill_files>
+</skill_content>
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.6s)
+
+_Thinking:_
+
+**Exploring grilling context**
+
+I need to ask one question and recommend an answer. It might be helpful to inspect the context and see what patterns emerge. If the user’s question can be addressed by exploring the codebase, then I should focus on that approach instead. Exploring the context might just provide a clearer perspective on the grilling topic. So, let's dive into the details to figure this out!
+
+**Tool: read**
 
 **Input:**
 ```json
 {
-  "command": "gh issue view 28 --repo alessandrojcm/prompt-vault --json number,title,body,labels,state,url",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Fetches GitHub issue 28 details"
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md",
+  "offset": 1,
+  "limit": 200
 }
 ```
 
 **Output:**
 ```
-{"body":"## Parent\n\nhttps://github.com/alessandrojcm/prompt-vault/issues/22\n\n## What to build\n\nAdd Public Prompts read behavior. Authenticated enabled users should be able to list and retrieve public Prompts owned by other enabled users. Public Prompts should exclude the Current User's own public Prompts, identify the Prompt Owner by Username only, hide public Prompts owned by disabled users, and preserve disabled owners' Prompt data.\n\n## Acceptance criteria\n\n- [ ] Authenticated users can list Public Prompts owned by other enabled users.\n- [ ] Public Prompts excludes the Current User's own public Prompts.\n- [ ] Public Prompt responses identify the Prompt Owner by Username only and do not expose Email Address.\n- [ ] Authenticated users can retrieve detail for a visible Public Prompt owned by another enabled user.\n- [ ] Private Prompts owned by other users are not included in Public Prompts and cannot be retrieved as public detail.\n- [ ] Public Prompts owned by disabled Users are hidden from other users.\n- [ ] Disabling a User hides that User's public Prompts without deleting the Prompt records.\n- [ ] Editing a public Prompt as its owner is reflected immediately in public reads.\n- [ ] Disabled users cannot access Prompt APIs through active sessions, consistently with existing Account Status behavior.\n- [ ] HTTP integration tests cover public list/detail visibility, owner attribution, own-prompt exclusion, disabled-owner hiding, and no Email Address leakage against real MySQL.\n\n## Blocked by\n\n- https://github.com/alessandrojcm/prompt-vault/issues/26\n- https://github.com/alessandrojcm/prompt-vault/issues/27\n","labels":[{"id":"LA_kwDOTC_uAM8AAAACooIMbA","name":"ready-for-agent","description":"Fully specified, ready for an AFK agent","color":"0e8a16"}],"number":28,"state":"OPEN","title":"Read Public Prompts from other enabled users","url":"https://github.com/alessandrojcm/prompt-vault/issues/28"}
+<path>/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md</path>
+<type>file</type>
+<content>
+1: # Prompt Vault
+2: 
+3: Prompt Vault is a web application for creating and sharing LLM prompts with keyword-triggered security alerts.
+4: 
+5: ## Language
+6: 
+7: **User**:
+8: The single authenticated identity in Prompt Vault. A user has exactly one role, such as admin or normal user.
+9: _Avoid_: Account, member
+10: 
+11: **Admin**:
+12: A user whose role grants administrative capabilities. Admins are predefined by seeding them into the system rather than being created through signup, and can manage the account status of normal users but not admins.
+13: _Avoid_: Administrator account
+14: 
+15: **Normal User**:
+16: A user whose role represents regular application access. Normal users are created through signup.
+17: _Avoid_: Regular user, standard user
+18: 
+19: **Role**:
+20: The fixed classification that determines whether a user is an admin or a normal user. Roles are assigned when a user is created and are not changed through the application.
+21: _Avoid_: User type, permission level
+22: 
+23: **Username**:
+24: The unique name a user uses to log in and be identified in Prompt Vault.
+25: _Avoid_: Handle, screen name
+26: 
+27: **Email Address**:
+28: The unique contact address associated with a user.
+29: _Avoid_: Email, contact email
+30: 
+31: **Account Status**:
+32: Whether a user is allowed to authenticate. Enabled users can log in; disabled users cannot log in or continue using an existing authenticated session.
+33: _Avoid_: State, active/inactive
+34: 
+35: **Current User**:
+36: The user associated with the active authenticated session.
+37: _Avoid_: Profile, me
+38: 
+39: **User Management**:
+40: The admin capability for viewing registered users and managing the account status of normal users.
+41: _Avoid_: User admin, account management
+42: 
+43: **Prompt**:
+44: A saved, user-owned prompt record in Prompt Vault. A prompt contains prompt text and metadata such as its title, category, and visibility.
+45: _Avoid_: Saved prompt, prompt entry
+46: 
+47: **Prompt Text**:
+48: The LLM instruction or content stored inside a prompt. Prompt text is stored with surrounding whitespace trimmed while preserving internal whitespace and newlines.
+49: _Avoid_: Body, content
+50: 
+51: **Prompt Title**:
+52: The display label for a prompt. Prompt titles are stored with surrounding whitespace trimmed and are not unique identifiers.
+53: _Avoid_: Name
+54: 
+55: **Prompt Visibility**:
+56: Whether a prompt is private to its owner or public to all enabled authenticated users. New prompts start private; public prompts owned by disabled users are not visible to others.
+57: _Avoid_: Shared status, access level
+58: 
+59: **Prompt Owner**:
+60: The user who created a prompt and is the only user allowed to change or delete it. Public prompts identify their owner by username; admins do not gain ownership privileges over prompts created by other users.
+61: _Avoid_: Author, creator
+62: 
+63: **Prompt Category**:
+64: A predefined system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique stable slug, and are not owned resources.
+65: Initial categories are Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.
+66: Categories referenced by prompts remain available until those prompts are moved to another category.
+67: _Avoid_: Tag, topic
+68: 
+69: **Share**:
+70: The user action of making one of their prompts public.
+71: _Avoid_: Publish
+72: 
+73: **Unshare**:
+74: The user action of making one of their public prompts private again.
+75: _Avoid_: Unpublish
+76: 
+77: **My Prompts**:
+78: The collection of prompts owned by the current user, regardless of visibility.
+79: _Avoid_: Owned prompts
+80: 
+81: **Public Prompts**:
+82: The collection of public prompts owned by other enabled users and visible to the current user.
+83: _Avoid_: Prompt feed, shared prompts
 
+(End of file - total 83 lines)
+</content>
 ```
 
 **Tool: read**
@@ -143,7 +273,7 @@ c220ffb feat: revoke disabled user sessions (#21)
 {
   "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md",
   "offset": 1,
-  "limit": 2000
+  "limit": 200
 }
 ```
 
@@ -227,17 +357,95 @@ c220ffb feat: revoke disabled user sessions (#21)
 73: - Prompt ownership has no admin override: admins can create and manage their own Prompts, but non-owned Prompt detail/update/delete requests still return `404` and must not leak private Prompt content.
 74: - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.
 75: - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.
-76: 
-77: ## Testing patterns
-78: 
-79: - Run the standard verification with `mise run check`.
-80: - API integration tests should prefer real MySQL coverage via Testcontainers.
-81: - The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
-82: - Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
-83: - Web tests use Vitest 4 Browser Mode with the Playwright Chromium provider; prefer `vitest-browser-react` locators/assertions for component tests instead of jsdom or Testing Library shims.
-84: - Use TanStack Table for web data tables that need client-side table behavior such as filtering; render the headless table model with Mantine table primitives.
+76: - Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
+77: 
+78: ## Testing patterns
+79: 
+80: - Run the standard verification with `mise run check`.
+81: - API integration tests should prefer real MySQL coverage via Testcontainers.
+82: - The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
+83: - Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
+84: - Web tests use Vitest 4 Browser Mode with the Playwright Chromium provider; prefer `vitest-browser-react` locators/assertions for component tests instead of jsdom or Testing Library shims.
+85: - Use TanStack Table for web data tables that need client-side table behavior such as filtering; render the headless table model with Mantine table primitives.
 
-(End of file - total 84 lines)
+(End of file - total 85 lines)
+</content>
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 9.9s)
+
+_Thinking:_
+
+
+
+**Tool: glob**
+
+**Input:**
+```json
+{
+  "pattern": "apps/api/src/main/java/com/promptvault/api/promptcategory/*.java",
+  "path": "/Users/alessandrojcm/repos/prompt-vault"
+}
+```
+
+**Output:**
+```
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryEntity.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryRepository.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoriesController.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryMapper.java
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.8s)
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoriesController.java",
+  "offset": 1,
+  "limit": 200
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoriesController.java</path>
+<type>file</type>
+<content>
+1: package com.promptvault.api.promptcategory;
+2: 
+3: import java.util.List;
+4: 
+5: import com.promptvault.contract.api.PromptCategoriesApi;
+6: import com.promptvault.contract.model.PromptCategory;
+7: import org.springframework.http.ResponseEntity;
+8: import org.springframework.web.bind.annotation.RestController;
+9: 
+10: @RestController
+11: public class PromptCategoriesController implements PromptCategoriesApi {
+12: 
+13:     private final PromptCategoryRepository promptCategoryRepository;
+14: 
+15:     public PromptCategoriesController(PromptCategoryRepository promptCategoryRepository) {
+16:         this.promptCategoryRepository = promptCategoryRepository;
+17:     }
+18: 
+19:     @Override
+20:     public ResponseEntity<List<PromptCategory>> listPromptCategories() {
+21:         return ResponseEntity.ok(promptCategoryRepository.findAllByOrderByLabelAsc()
+22:             .stream()
+23:             .map(PromptCategoryMapper::toContract)
+24:             .toList());
+25:     }
+26: }
+
+(End of file - total 26 lines)
 </content>
 ```
 
@@ -246,39 +454,164 @@ c220ffb feat: revoke disabled user sessions (#21)
 **Input:**
 ```json
 {
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/issue-tracker.md",
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryEntity.java",
   "offset": 1,
-  "limit": 2000
+  "limit": 200
 }
 ```
 
 **Output:**
 ```
-<path>/Users/alessandrojcm/repos/prompt-vault/docs/agents/issue-tracker.md</path>
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryEntity.java</path>
 <type>file</type>
 <content>
-1: # Issue tracker: GitHub
+1: package com.promptvault.api.promptcategory;
 2: 
-3: Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+3: import java.time.Instant;
 4: 
-5: ## Conventions
-6: 
-7: - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-8: - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
-9: - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
-10: - **Comment on an issue**: `gh issue comment <number> --body "..."`
-11: - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-12: - **Close**: `gh issue close <number> --comment "..."`
-13: 
-14: Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
-15: 
-16: ## When a skill says "publish to the issue tracker"
+5: import com.promptvault.api.user.UserEntity;
+6: import jakarta.persistence.Column;
+7: import jakarta.persistence.Entity;
+8: import jakarta.persistence.FetchType;
+9: import jakarta.persistence.GeneratedValue;
+10: import jakarta.persistence.GenerationType;
+11: import jakarta.persistence.Id;
+12: import jakarta.persistence.JoinColumn;
+13: import jakarta.persistence.ManyToOne;
+14: import jakarta.persistence.PrePersist;
+15: import jakarta.persistence.PreUpdate;
+16: import jakarta.persistence.Table;
 17: 
-18: Create a GitHub issue.
-19: 
-20: ## When a skill says "fetch the relevant ticket"
+18: @Entity
+19: @Table(name = "prompt_categories")
+20: public class PromptCategoryEntity {
 21: 
-22: Run `gh issue view <number> --comments`.
+22:     @Id
+23:     @GeneratedValue(strategy = GenerationType.IDENTITY)
+24:     private Long id;
+25: 
+26:     @Column(nullable = false, length = 100)
+27:     private String label;
+28: 
+29:     @Column(name = "label_normalized", nullable = false, length = 100)
+30:     private String labelNormalized;
+31: 
+32:     @Column(nullable = false, length = 100)
+33:     private String slug;
+34: 
+35:     @Column(name = "created_at", nullable = false, updatable = false)
+36:     private Instant createdAt;
+37: 
+38:     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+39:     @JoinColumn(name = "created_by_user_id", nullable = false, updatable = false)
+40:     private UserEntity createdBy;
+41: 
+42:     @Column(name = "updated_at", nullable = false)
+43:     private Instant updatedAt;
+44: 
+45:     public Long getId() {
+46:         return id;
+47:     }
+48: 
+49:     public String getLabel() {
+50:         return label;
+51:     }
+52: 
+53:     public void setLabel(String label) {
+54:         this.label = label;
+55:     }
+56: 
+57:     public String getLabelNormalized() {
+58:         return labelNormalized;
+59:     }
+60: 
+61:     public void setLabelNormalized(String labelNormalized) {
+62:         this.labelNormalized = labelNormalized;
+63:     }
+64: 
+65:     public String getSlug() {
+66:         return slug;
+67:     }
+68: 
+69:     public void setSlug(String slug) {
+70:         this.slug = slug;
+71:     }
+72: 
+73:     public Instant getCreatedAt() {
+74:         return createdAt;
+75:     }
+76: 
+77:     public UserEntity getCreatedBy() {
+78:         return createdBy;
+79:     }
+80: 
+81:     public void setCreatedBy(UserEntity createdBy) {
+82:         this.createdBy = createdBy;
+83:     }
+84: 
+85:     public Instant getUpdatedAt() {
+86:         return updatedAt;
+87:     }
+88: 
+89:     @PrePersist
+90:     void onCreate() {
+91:         Instant now = Instant.now();
+92:         if (createdAt == null) {
+93:             createdAt = now;
+94:         }
+95:         if (updatedAt == null) {
+96:             updatedAt = now;
+97:         }
+98:     }
+99: 
+100:     @PreUpdate
+101:     void onUpdate() {
+102:         updatedAt = Instant.now();
+103:     }
+104: }
+
+(End of file - total 104 lines)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryMapper.java",
+  "offset": 1,
+  "limit": 200
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryMapper.java</path>
+<type>file</type>
+<content>
+1: package com.promptvault.api.promptcategory;
+2: 
+3: import java.time.ZoneOffset;
+4: 
+5: import com.promptvault.contract.model.PromptCategory;
+6: 
+7: public final class PromptCategoryMapper {
+8: 
+9:     private PromptCategoryMapper() {
+10:     }
+11: 
+12:     public static PromptCategory toContract(PromptCategoryEntity category) {
+13:         return new PromptCategory(
+14:             category.getId(),
+15:             category.getLabel(),
+16:             category.getSlug(),
+17:             category.getCreatedAt().atOffset(ZoneOffset.UTC),
+18:             category.getCreatedBy().getId(),
+19:             category.getUpdatedAt().atOffset(ZoneOffset.UTC)
+20:         );
+21:     }
+22: }
 
 (End of file - total 22 lines)
 </content>
@@ -286,388 +619,11 @@ c220ffb feat: revoke disabled user sessions (#21)
 
 ---
 
-## Assistant (Build · GPT-5.5 · 10.1s)
+## Assistant (Build · GPT-5.5 · 3.6s)
 
 _Thinking:_
 
-**Creating Graphite stack entry**
 
-I need to create a Graphite stack entry, so I should familiarize myself with the Graphite CLI. I may need to inspect branches to see if issue 27 already exists since we’re currently working on issue 27. Also, issue 28 seems blocked by 27, so I could stack that on top of the existing one. I need to figure out the appropriate Graphite commands, possibly checking if `gt` is useful for this. Let's check the status!
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git status --short",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows unstaged workspace changes"
-}
-```
-
-**Output:**
-```
-(no output)
-```
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gt --version",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Checks Graphite CLI availability"
-}
-```
-
-**Output:**
-```
-1.8.6
-
-```
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gt stack",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows current Graphite stack"
-}
-```
-
-**Output:**
-```
-gt stack <command>
-
-Commands:
-  gt stack restack  Ensure each branch in the current stack is based on its parent, rebasing if necessary.
-                                                                                          [aliases: r, fix, f]
-  gt stack submit   Idempotently force push all branches in the current stack to GitHub, creating or updating
-                    distinct pull requests for each.                                              [aliases: s]
-
-Global options:
-      --cwd          Working directory in which to perform operations.                                [string]
-      --debug        Write debug output to the terminal.                            [boolean] [default: false]
-      --interactive  Enable interactive features like prompts, pagers, and editors. Enabled by default. Disabl
-                     e with `--no-interactive`.                                     [boolean] [default: false]
-      --verify       Enable git hooks. Enabled by default. Disable with `--no-verify`.
-                                                                                     [boolean] [default: true]
-  -q, --quiet        Minimize output to the terminal. Implies `--no-interactive`.   [boolean] [default: false]
-
-Options:
-      --help  Show help for a command.                                              [boolean] [default: false]
-
-Not enough non-option arguments: got 0, need at least 1
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 4.6s)
-
-_Thinking:_
-
-**Creating a branch**
-
-I’m thinking about creating a branch. I wonder if I should create a "gt" branch as a good option? It seems like it’s a necessary step, but I want to be sure that this is the right approach. There’s a lot here to consider in terms of how I’ll use the branch and what impact it will have down the line. I’m curious about the overall structure too. Let’s take this step by step!
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gt branch --help",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows Graphite branch command help"
-}
-```
-
-**Output:**
-```
-gt branch <command>
-
-Commands:
-  gt branch bottom             Switch to the branch closest to trunk in the current stack.        [aliases: b]
-  gt branch checkout [branch]  Switch to a branch. If no branch is provided, opens an interactive selector.
-                                                                                                 [aliases: co]
-  gt branch create [name]      Create a new branch stacked on top of the current branch and commit staged chan
-                               ges. If no branch name is specified, generate a branch name from the commit mes
-                               sage. If your working directory contains no changes, an empty branch will be cr
-                               eated. If you have any unstaged changes, you will be asked whether you'd like t
-                               o stage them.                                                      [aliases: c]
-  gt branch delete [name]      Delete a branch and its Graphite metadata (local-only). Children will be restac
-                               ked onto the parent branch. If the branch is not merged or closed, prompts for
-                               confirmation. This command does not perform any action on GitHub or the remote
-                               repository. If you delete a branch with an open pull request, you will need to
-                               manually close the pull request.                                  [aliases: dl]
-  gt branch down [steps]       Switch to the parent of the current branch.                        [aliases: d]
-  gt branch edit               Run an interactive rebase on the current branch's commits and restack upstack b
-                               ranches.                                                           [aliases: e]
-  gt branch fold               Fold a branch's changes into its parent, update dependencies of descendants of
-                               the new combined branch, and restack. This is useful when you have a branch tha
-                               t is no longer needed and you want to combine its changes with its parent branc
-                               h. This command does not perform any action on GitHub or the remote repository.
-                                If the branch has an open pull request, you can use `--close` to close the pul
-                               l request.                                                         [aliases: f]
-  gt branch info [branch]      Display information about the current branch.                      [aliases: i]
-  gt branch rename [name]      Rename a branch and update metadata referencing it. If no branch name is suppli
-                               ed, you will be prompted for a new branch name. Note that this removes any asso
-                               ciation to a pull request, as GitHub pull request branch names are immutable.
-                                                                                                 [aliases: rn]
-  gt branch restack            Ensure the current branch is based on its parent, rebasing if necessary.
-                                                                                                  [aliases: r]
-  gt branch split              Split the current branch into multiple branches.
-
-                               Has three forms: `gt split --
-                               by-commit`, `gt split --by-hunk`, and `gt split --by-file <pathspec>`.
-
-                                * `gt
-                               split --by-commit` slices up the commit history, allowing you to select split p
-                               oints between existing commits.
-                                * `gt split --by-hunk` interactively stages ch
-                               anges to create new single-commit branches.
-                                * `gt split --by-file <pathspec>`
-                               extracts files matching the pathspec and splits them into a new parent branch.
-                               Repeat the flag for multiple patterns (e.g., `-f "*.json" -f "*.yaml"`).
-
-                               All f
-                               orms must be run interactively except for `--by-file` which can run non-interac
-                               tively.
-                               `gt split` without options will prompt for a splitting strategy.
-
-                               `gt s
-                               p` is an alias for `gt split`.                                    [aliases: sp]
-  gt branch squash             Squash all commits in the current branch into a single commit and restack upsta
-                               ck branches.                                                      [aliases: sq]
-  gt branch submit             Idempotently force push the current branch to GitHub, creating or updating a pu
-                               ll request.                                                        [aliases: s]
-  gt branch top                Switch to the tip branch of the current stack. Prompts if ambiguous.
-                                                                                                  [aliases: t]
-  gt branch track [branch]     Start tracking the current (or provided) branch with Graphite by selecting its
-                               parent. This command can also be used to fix corrupted Graphite metadata.
-                                                                                                 [aliases: tr]
-  gt branch unbranch           Delete the current branch but retain the state of files in the working tree.
-                                                                                                 [aliases: ub]
-  gt branch untrack [branch]   Stop tracking a branch with Graphite. If the branch has children, they will als
-                               o be untracked. Default to the current branch if none is passed in.
-                                                                                                [aliases: utr]
-  gt branch up [steps]         Switch to the child of the current branch. Prompts if ambiguous.   [aliases: u]
-
-Global options:
-      --cwd          Working directory in which to perform operations.                                [string]
-      --debug        Write debug output to the terminal.                            [boolean] [default: false]
-      --interactive  Enable interactive features like prompts, pagers, and editors. Enabled by default. Disabl
-                     e with `--no-interactive`.                                     [boolean] [default: false]
-      --verify       Enable git hooks. Enabled by default. Disable with `--no-verify`.
-                                                                                     [boolean] [default: true]
-  -q, --quiet        Minimize output to the terminal. Implies `--no-interactive`.   [boolean] [default: false]
-
-Options:
-      --help  Show help for a command.                                              [boolean] [default: false]
-
-Not enough non-option arguments: got 0, need at least 1
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 5.7s)
-
-_Thinking:_
-
-**Considering branch name**
-
-I need to decide on a branch name. I'm thinking of creating an empty stack entry, and maybe using "issue-28-read-public-prompts." The system indicates that an empty branch will be created if there are no changes, so I guess I should just go for it and do it! It seems straightforward enough; I just want to ensure I’m naming it appropriately. Let's see how it goes!
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gt branch create issue-28-read-public-prompts --no-interactive",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Creates Graphite branch for issue 28"
-}
-```
-
-**Output:**
-```
-No staged changes; creating a branch with no commit.
-WARNING: This command has been renamed and will be fully removed soon. Please use gt create instead.
-You can now use gt aliases to configure your own command aliases.
-Try gt aliases --legacy to automatically add all of the old shortcuts to your aliases configuration.
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 6.3s)
-
-**Tool: todowrite**
-
-**Input:**
-```json
-{
-  "todos": [
-    {
-      "content": "Inspect issue 28 and current workspace state",
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "content": "Create a new Graphite stack entry for issue 28",
-      "status": "completed",
-      "priority": "high"
-    },
-    {
-      "content": "Implement issue 28 following project patterns",
-      "status": "in_progress",
-      "priority": "high"
-    },
-    {
-      "content": "Run relevant checks",
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "content": "Update AGENTS.md if new project info is learned",
-      "status": "pending",
-      "priority": "medium"
-    }
-  ]
-}
-```
-
-**Output:**
-```
-[
-  {
-    "content": "Inspect issue 28 and current workspace state",
-    "status": "completed",
-    "priority": "high"
-  },
-  {
-    "content": "Create a new Graphite stack entry for issue 28",
-    "status": "completed",
-    "priority": "high"
-  },
-  {
-    "content": "Implement issue 28 following project patterns",
-    "status": "in_progress",
-    "priority": "high"
-  },
-  {
-    "content": "Run relevant checks",
-    "status": "pending",
-    "priority": "medium"
-  },
-  {
-    "content": "Update AGENTS.md if new project info is learned",
-    "status": "pending",
-    "priority": "medium"
-  }
-]
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 7.7s)
-
-_Thinking:_
-
-**Exploring codebase**
-
-I need to delve into the code, but I shouldn’t use grep directly. Instead, I'm considering using glob or read, which seems okay. It sounds like I'll explore the structure of the codebase using an indexer to help with this. Listing files is my current plan with glob, and it feels like a good method to start my discovery process. Let's see how this goes!
-
-**Tool: glob**
-
-**Input:**
-```json
-{
-  "pattern": "apps/api/src/main/java/**/*.java",
-  "path": "/Users/alessandrojcm/repos/prompt-vault"
-}
-```
-
-**Output:**
-```
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/currentuser/CurrentUserController.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/RequestBodyExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/RequestParameterExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/RequestBodyNormalizer.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/RequestBodyNormalizationAdvice.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/ValidationErrorResponseFactory.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/BeanValidationExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/BeanValidationFieldMessageResolver.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/validation/ContractFieldValidationError.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryEntity.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryRepository.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoriesController.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/promptcategory/PromptCategoryMapper.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/CreatePromptRequestNormalizer.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/FieldValidationError.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptValidationException.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptEntity.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptVisibility.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptBeanValidationMessageResolver.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/FieldValidationError.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupController.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupRequestNormalizer.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupBeanValidationMessageResolver.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupValidationException.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/signup/SignupService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/Role.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/UserRepository.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/UserSummaryMapper.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/AccountStatus.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/UserEntity.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/PromptVaultApiApplication.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/LoginService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/DisabledAccountException.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/PromptVaultUserDetails.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/PromptVaultUserDetailsService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/AuthExceptionHandler.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/InvalidCredentialsException.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/auth/LogoutService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/admin/AdminUsersController.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/admin/AdminUsersService.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/config/SecurityConfig.java
-```
-
-**Tool: glob**
-
-**Input:**
-```json
-{
-  "pattern": "apps/api/src/test/java/**/*.java",
-  "path": "/Users/alessandrojcm/repos/prompt-vault"
-}
-```
-
-**Output:**
-```
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/currentuser/CurrentUserSecurityTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/admin/AdminUsersApiTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/config/CorsSecurityTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/promptcategory/PromptCategoriesApiTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/signup/SignupApiTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/support/AbstractMySqlIntegrationTest.java
-/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
-```
 
 **Tool: read**
 
@@ -676,7 +632,7 @@ I need to delve into the code, but I shouldn’t use grep directly. Instead, I'm
 {
   "filePath": "/Users/alessandrojcm/repos/prompt-vault/openapi/api.yaml",
   "offset": 1,
-  "limit": 2000
+  "limit": 200
 }
 ```
 
@@ -825,1971 +781,107 @@ I need to delve into the code, but I shouldn’t use grep directly. Instead, I'm
 138:                 $ref: '#/components/schemas/ValidationErrorResponse'
 139:         '401':
 140:           description: No authenticated session is present.
-141:   /api/prompts/{promptId}:
+141:   /api/public-prompts:
 142:     get:
 143:       tags:
 144:         - Prompts
-145:       operationId: getPrompt
-146:       summary: Get an owned prompt
-147:       description: Returns prompt detail when the prompt is owned by the current authenticated user.
-148:       parameters:
-149:         - name: promptId
-150:           in: path
-151:           required: true
-152:           schema:
-153:             type: integer
-154:             format: int64
-155:       responses:
-156:         '200':
-157:           description: Prompt detail for the current owner.
-158:           content:
-159:             application/json:
-160:               schema:
-161:                 $ref: '#/components/schemas/Prompt'
-162:         '401':
-163:           description: No authenticated session is present.
-164:         '404':
-165:           description: The prompt does not exist for the current owner.
-166:     patch:
-167:       tags:
-168:         - Prompts
-169:       operationId: updatePrompt
-170:       summary: Update an owned prompt
-171:       description: Updates prompt content and category when the prompt is owned by the current authenticated user.
-172:       parameters:
-173:         - name: promptId
-174:           in: path
-175:           required: true
-176:           schema:
-177:             type: integer
-178:             format: int64
-179:       requestBody:
-180:         required: true
-181:         content:
-182:           application/json:
-183:             schema:
-184:               $ref: '#/components/schemas/UpdatePromptRequest'
-185:       responses:
-186:         '200':
-187:           description: The updated prompt.
-188:           content:
-189:             application/json:
-190:               schema:
-191:                 $ref: '#/components/schemas/Prompt'
-192:         '400':
-193:           description: Validation failed.
-194:           content:
-195:             application/json:
-196:               schema:
-197:                 $ref: '#/components/schemas/ValidationErrorResponse'
-198:         '401':
-199:           description: No authenticated session is present.
-200:         '404':
-201:           description: The prompt does not exist for the current owner.
-202:     delete:
-203:       tags:
-204:         - Prompts
-205:       operationId: deletePrompt
-206:       summary: Delete an owned prompt
-207:       description: Permanently deletes a prompt when it is owned by the current authenticated user.
-208:       parameters:
-209:         - name: promptId
-210:           in: path
-211:           required: true
-212:           schema:
-213:             type: integer
-214:             format: int64
-215:       responses:
-216:         '204':
-217:           description: Prompt deleted successfully.
-218:         '401':
-219:           description: No authenticated session is present.
-220:         '404':
-221:           description: The prompt does not exist for the current owner.
-222:   /api/prompts/{promptId}/visibility:
-223:     patch:
-224:       tags:
-225:         - Prompts
-226:       operationId: updatePromptVisibility
-227:       summary: Share or unshare an owned prompt
-228:       description: Updates Prompt Visibility when the prompt is owned by the current authenticated user.
-229:       parameters:
-230:         - name: promptId
-231:           in: path
-232:           required: true
-233:           schema:
-234:             type: integer
-235:             format: int64
-236:       requestBody:
-237:         required: true
-238:         content:
-239:           application/json:
-240:             schema:
-241:               $ref: '#/components/schemas/UpdatePromptVisibilityRequest'
-242:       responses:
-243:         '200':
-244:           description: The prompt with the requested visibility.
-245:           content:
-246:             application/json:
-247:               schema:
-248:                 $ref: '#/components/schemas/Prompt'
-249:         '400':
-250:           description: Validation failed.
-251:           content:
-252:             application/json:
-253:               schema:
-254:                 $ref: '#/components/schemas/ValidationErrorResponse'
-255:         '401':
-256:           description: No authenticated session is present.
-257:         '404':
-258:           description: The prompt does not exist for the current owner.
-259:   /api/users/{userId}/prompts:
-260:     get:
-261:       tags:
-262:         - Prompts
-263:       operationId: listMyPrompts
-264:       summary: List my prompts
-265:       description: Returns all prompts owned by the current authenticated user, including private prompts.
-266:       parameters:
-267:         - name: userId
-268:           in: path
-269:           required: true
-270:           schema:
-271:             type: integer
-272:             format: int64
-273:       responses:
-274:         '200':
-275:           description: Prompts owned by the current user.
-276:           content:
-277:             application/json:
-278:               schema:
-279:                 type: array
-280:                 items:
-281:                   $ref: '#/components/schemas/Prompt'
-282:         '401':
-283:           description: No authenticated session is present.
-284:         '403':
-285:           description: The requested user is not the current authenticated user.
-286:   /api/admin/users:
-287:     get:
-288:       tags:
-289:         - AdminUsers
-290:       operationId: listAdminUsers
-291:       summary: List registered users for admin user management
-292:       description: Returns registered users for administrators, optionally filtered by role.
-293:       parameters:
-294:         - name: role
-295:           in: query
-296:           required: false
-297:           schema:
-298:             $ref: '#/components/schemas/UserRole'
-299:       responses:
-300:         '200':
-301:           description: Registered users matching the optional role filter.
-302:           content:
-303:             application/json:
-304:               schema:
-305:                 type: array
-306:                 items:
-307:                   $ref: '#/components/schemas/UserSummary'
-308:         '400':
-309:           description: Validation failed.
-310:           content:
-311:             application/json:
-312:               schema:
-313:                 $ref: '#/components/schemas/ValidationErrorResponse'
-314:         '401':
-315:           description: No authenticated session is present.
-316:         '403':
-317:           description: The authenticated user is not an administrator.
-318:   /api/admin/users/{userId}/status:
-319:     patch:
-320:       tags:
-321:         - AdminUsers
-322:       operationId: updateAdminUserStatus
-323:       summary: Set a normal user's account status
-324:       description: Updates the desired account status for a normal user. The operation is idempotent.
-325:       parameters:
-326:         - name: userId
-327:           in: path
-328:           required: true
-329:           schema:
-330:             type: integer
-331:             format: int64
-332:       requestBody:
-333:         required: true
-334:         content:
-335:           application/json:
-336:             schema:
-337:               $ref: '#/components/schemas/AdminUserStatusUpdateRequest'
-338:       responses:
-339:         '200':
-340:           description: The user with the requested account status.
-341:           content:
-342:             application/json:
-343:               schema:
-344:                 $ref: '#/components/schemas/UserSummary'
-345:         '400':
-346:           description: Validation failed.
-347:           content:
-348:             application/json:
-349:               schema:
-350:                 $ref: '#/components/schemas/ValidationErrorResponse'
-351:         '401':
-352:           description: No authenticated session is present.
-353:         '403':
-354:           description: The target cannot be managed by this operation.
-355:         '404':
-356:           description: The target user does not exist.
-357: components:
-358:   schemas:
-359:     LoginRequest:
-360:       type: object
-361:       additionalProperties: false
-362:       required:
-363:         - username
-364:         - password
-365:       properties:
-366:         username:
-367:           type: string
-368:           minLength: 1
-369:           maxLength: 30
-370:           description: Usernames are trimmed and matched case-insensitively.
-371:         password:
-372:           type: string
-373:           minLength: 1
-374:           maxLength: 255
-375:           description: Passwords preserve spaces exactly as entered.
-376:     SignupRequest:
-377:       type: object
-378:       additionalProperties: false
-379:       required:
-380:         - username
-381:         - emailAddress
-382:         - password
-383:       properties:
-384:         username:
-385:           type: string
-386:           minLength: 3
-387:           maxLength: 30
-388:           description: Usernames are trimmed before validation and persistence.
-389:         emailAddress:
-390:           type: string
-391:           minLength: 1
-392:           maxLength: 255
-393:           description: Email addresses are trimmed before validation and persistence.
-394:           format: email
-395:         password:
-396:           type: string
-397:           minLength: 8
-398:           maxLength: 255
-399:           description: Passwords preserve spaces exactly as entered.
-400:     UserRole:
-401:       type: string
-402:       enum:
-403:         - ADMIN
-404:         - USER
-405:     AccountStatus:
-406:       type: string
-407:       enum:
-408:         - ENABLED
-409:         - DISABLED
-410:     AdminUserStatusUpdateRequest:
-411:       type: object
-412:       additionalProperties: false
-413:       required:
-414:         - accountStatus
-415:       properties:
-416:         accountStatus:
-417:           $ref: '#/components/schemas/AccountStatus'
-418:     UserSummary:
-419:       type: object
-420:       additionalProperties: false
-421:       required:
-422:         - id
-423:         - username
-424:         - emailAddress
-425:         - role
-426:         - accountStatus
-427:       properties:
-428:         id:
-429:           type: integer
-430:           format: int64
-431:         username:
-432:           type: string
-433:         emailAddress:
-434:           type: string
-435:           format: email
-436:         role:
-437:           $ref: '#/components/schemas/UserRole'
-438:         accountStatus:
-439:           $ref: '#/components/schemas/AccountStatus'
-440:     PromptCategory:
-441:       type: object
-442:       additionalProperties: false
-443:       required:
-444:         - id
-445:         - label
-446:         - slug
-447:         - createdAt
-448:         - createdByUserId
-449:         - updatedAt
-450:       properties:
-451:         id:
-452:           type: integer
-453:           format: int64
-454:         label:
-455:           type: string
-456:         slug:
-457:           type: string
-458:           description: Stable snake_case category identifier.
-459:         createdAt:
-460:           type: string
-461:           format: date-time
-462:         createdByUserId:
-463:           type: integer
-464:           format: int64
-465:         updatedAt:
-466:           type: string
-467:           format: date-time
-468:     PromptVisibility:
-469:       type: string
-470:       enum:
-471:         - PRIVATE
-472:         - PUBLIC
-473:     CreatePromptRequest:
-474:       type: object
-475:       additionalProperties: false
-476:       required:
-477:         - title
-478:         - text
-479:         - categoryId
-480:       properties:
-481:         title:
-482:           type: string
-483:           minLength: 1
-484:           maxLength: 120
-485:           description: Prompt titles are trimmed before validation and persistence.
-486:         text:
-487:           type: string
-488:           minLength: 1
-489:           maxLength: 10000
-490:           description: Prompt text is edge-trimmed before validation and persistence while preserving internal whitespace and newlines.
-491:         categoryId:
-492:           type: integer
-493:           format: int64
-494:           minimum: 1
-495:     UpdatePromptRequest:
-496:       type: object
-497:       additionalProperties: false
-498:       required:
-499:         - title
-500:         - text
-501:         - categoryId
-502:       properties:
-503:         title:
-504:           type: string
-505:           minLength: 1
-506:           maxLength: 120
-507:           description: Prompt titles are trimmed before validation and persistence.
-508:         text:
-509:           type: string
-510:           minLength: 1
-511:           maxLength: 10000
-512:           description: Prompt text is edge-trimmed before validation and persistence while preserving internal whitespace and newlines.
-513:         categoryId:
-514:           type: integer
-515:           format: int64
-516:           minimum: 1
-517:     UpdatePromptVisibilityRequest:
-518:       type: object
-519:       additionalProperties: false
-520:       required:
-521:         - visibility
-522:       properties:
-523:         visibility:
-524:           $ref: '#/components/schemas/PromptVisibility'
-525:     Prompt:
-526:       type: object
-527:       additionalProperties: false
-528:       required:
-529:         - id
-530:         - title
-531:         - text
-532:         - visibility
-533:         - categoryId
-534:         - ownerUserId
-535:         - createdAt
-536:         - updatedAt
-537:       properties:
-538:         id:
-539:           type: integer
-540:           format: int64
-541:         title:
-542:           type: string
-543:         text:
-544:           type: string
-545:         visibility:
-546:           $ref: '#/components/schemas/PromptVisibility'
-547:         categoryId:
-548:           type: integer
-549:           format: int64
-550:         ownerUserId:
-551:           type: integer
-552:           format: int64
-553:         createdAt:
-554:           type: string
-555:           format: date-time
-556:         updatedAt:
-557:           type: string
-558:           format: date-time
-559:     ValidationFieldError:
-560:       type: object
-561:       additionalProperties: false
-562:       required:
-563:         - field
-564:         - message
-565:       properties:
-566:         field:
-567:           type: string
-568:         message:
-569:           type: string
-570:     ValidationErrorResponse:
-571:       type: object
-572:       additionalProperties: false
-573:       required:
-574:         - message
-575:         - fieldErrors
-576:       properties:
-577:         message:
-578:           type: string
-579:         fieldErrors:
-580:           type: array
-581:           items:
-582:             $ref: '#/components/schemas/ValidationFieldError'
-583:     AuthenticationErrorResponse:
-584:       type: object
-585:       additionalProperties: false
-586:       required:
-587:         - message
-588:       properties:
-589:         message:
-590:           type: string
+145:       operationId: listPublicPrompts
+146:       summary: List public prompts
+147:       description: Returns public prompts owned by other enabled users.
+148:       responses:
+149:         '200':
+150:           description: Public prompts visible to the current authenticated user.
+151:           content:
+152:             application/json:
+153:               schema:
+154:                 type: array
+155:                 items:
+156:                   $ref: '#/components/schemas/PublicPrompt'
+157:         '401':
+158:           description: No authenticated session is present.
+159:   /api/public-prompts/{promptId}:
+160:     get:
+161:       tags:
+162:         - Prompts
+163:       operationId: getPublicPrompt
+164:       summary: Get public prompt detail
+165:       description: Returns public prompt detail when the prompt is owned by another enabled user.
+166:       parameters:
+167:         - name: promptId
+168:           in: path
+169:           required: true
+170:           schema:
+171:             type: integer
+172:             format: int64
+173:       responses:
+174:         '200':
+175:           description: Public prompt detail visible to the current authenticated user.
+176:           content:
+177:             application/json:
+178:               schema:
+179:                 $ref: '#/components/schemas/PublicPrompt'
+180:         '401':
+181:           description: No authenticated session is present.
+182:         '404':
+183:           description: The prompt is not visible as a public prompt to the current user.
+184:   /api/prompts/{promptId}:
+185:     get:
+186:       tags:
+187:         - Prompts
+188:       operationId: getPrompt
+189:       summary: Get an owned prompt
+190:       description: Returns prompt detail when the prompt is owned by the current authenticated user.
+191:       parameters:
+192:         - name: promptId
+193:           in: path
+194:           required: true
+195:           schema:
+196:             type: integer
+197:             format: int64
+198:       responses:
+199:         '200':
+200:           description: Prompt detail for the current owner.
 
-(End of file - total 590 lines)
+(Showing lines 1-200 of 666. Use offset=201 to continue.)
 </content>
 ```
 
 ---
 
-## Assistant (Build · GPT-5.5 · 14.3s)
+## Assistant (Build · GPT-5.5 · 13.0s)
 
 _Thinking:_
 
+**Clarifying CRUD semantics**
 
+I'm thinking about starting the session and whether I need to update the context inline once a term is resolved. First, I need to clarify the CRUD semantics because it seems like deletion might occur if something is referenced. The existing glossary mentions that categories referenced by prompts stay available until moved elsewhere, which implies no hard deletion. I'm wondering about potential conflicts with the new admin CRUD process, so I think I need to ask about this.
 
-**Tool: read**
+Let’s grill this, domain-first.
 
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java",
-  "offset": 1,
-  "limit": 2000
-}
-```
+Your glossary already says:
 
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.prompt;
-2: 
-3: import java.util.List;
-4: 
-5: import com.promptvault.api.auth.PromptVaultUserDetails;
-6: import com.promptvault.api.user.UserEntity;
-7: import com.promptvault.contract.api.PromptsApi;
-8: import com.promptvault.contract.model.CreatePromptRequest;
-9: import com.promptvault.contract.model.Prompt;
-10: import com.promptvault.contract.model.UpdatePromptRequest;
-11: import com.promptvault.contract.model.UpdatePromptVisibilityRequest;
-12: import org.springframework.http.HttpStatus;
-13: import org.springframework.http.ResponseEntity;
-14: import org.springframework.security.core.Authentication;
-15: import org.springframework.security.core.context.SecurityContextHolder;
-16: import org.springframework.web.bind.annotation.RestController;
-17: 
-18: @RestController
-19: public class PromptsController implements PromptsApi {
-20: 
-21:     private final PromptsService promptsService;
-22: 
-23:     public PromptsController(PromptsService promptsService) {
-24:         this.promptsService = promptsService;
-25:     }
-26: 
-27:     @Override
-28:     public ResponseEntity<Prompt> createPrompt(CreatePromptRequest createPromptRequest) {
-29:         Prompt prompt = PromptMapper.toContract(promptsService.createPrompt(createPromptRequest, currentUser()));
-30:         return ResponseEntity.status(HttpStatus.CREATED).body(prompt);
-31:     }
-32: 
-33:     @Override
-34:     public ResponseEntity<List<Prompt>> listMyPrompts(Long userId) {
-35:         UserEntity currentUser = currentUser();
-36:         if (!currentUser.getId().equals(userId)) {
-37:             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-38:         }
-39: 
-40:         return ResponseEntity.ok(promptsService.listMyPrompts(currentUser)
-41:             .stream()
-42:             .map(PromptMapper::toContract)
-43:             .toList());
-44:     }
-45: 
-46:     @Override
-47:     public ResponseEntity<Prompt> getPrompt(Long promptId) {
-48:         return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));
-49:     }
-50: 
-51:     @Override
-52:     public ResponseEntity<Prompt> updatePrompt(Long promptId, UpdatePromptRequest updatePromptRequest) {
-53:         return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPrompt(
-54:             promptId,
-55:             updatePromptRequest,
-56:             currentUser()
-57:         )));
-58:     }
-59: 
-60:     @Override
-61:     public ResponseEntity<Void> deletePrompt(Long promptId) {
-62:         promptsService.deleteOwnedPrompt(promptId, currentUser());
-63:         return ResponseEntity.noContent().build();
-64:     }
-65: 
-66:     @Override
-67:     public ResponseEntity<Prompt> updatePromptVisibility(
-68:         Long promptId,
-69:         UpdatePromptVisibilityRequest updatePromptVisibilityRequest
-70:     ) {
-71:         return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPromptVisibility(
-72:             promptId,
-73:             PromptVisibility.valueOf(updatePromptVisibilityRequest.getVisibility().getValue()),
-74:             currentUser()
-75:         )));
-76:     }
-77: 
-78:     private UserEntity currentUser() {
-79:         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-80:         if (authentication != null && authentication.getPrincipal() instanceof PromptVaultUserDetails userDetails) {
-81:             return userDetails.getUser();
-82:         }
-83: 
-84:         throw new IllegalStateException("Authenticated principal is not a Prompt Vault user");
-85:     }
-86: }
+> **Prompt Category**: A predefined system-wide classification that every prompt belongs to exactly once… Categories referenced by prompts remain available until those prompts are moved to another category.
 
-(End of file - total 86 lines)
-</content>
-```
+So “CRUD by admins only” conflicts slightly with “predefined” and raises the hardest domain question first:
 
-**Tool: read**
+**Question 1:** When an admin deletes a Prompt Category that is currently used by one or more Prompts, what should happen?
 
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java",
-  "offset": 1,
-  "limit": 2000
-}
-```
+My recommended answer: **block deletion with `409 Conflict` until no prompts reference the category.**  
+Reason: it preserves the invariant “every prompt belongs to exactly one existing Prompt Category,” matches the current glossary line about referenced categories remaining available, and avoids surprising automatic prompt reassignment.
 
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.prompt;
-2: 
-3: import java.util.List;
-4: 
-5: import com.promptvault.api.promptcategory.PromptCategoryEntity;
-6: import com.promptvault.api.promptcategory.PromptCategoryRepository;
-7: import com.promptvault.api.user.UserEntity;
-8: import com.promptvault.contract.model.CreatePromptRequest;
-9: import com.promptvault.contract.model.UpdatePromptRequest;
-10: import org.springframework.stereotype.Service;
-11: import org.springframework.transaction.annotation.Transactional;
-12: import org.springframework.web.server.ResponseStatusException;
-13: 
-14: import static org.springframework.http.HttpStatus.NOT_FOUND;
-15: 
-16: @Service
-17: public class PromptsService {
-18: 
-19:     private final PromptRepository promptRepository;
-20:     private final PromptCategoryRepository promptCategoryRepository;
-21: 
-22:     public PromptsService(PromptRepository promptRepository, PromptCategoryRepository promptCategoryRepository) {
-23:         this.promptRepository = promptRepository;
-24:         this.promptCategoryRepository = promptCategoryRepository;
-25:     }
-26: 
-27:     @Transactional
-28:     public PromptEntity createPrompt(CreatePromptRequest request, UserEntity owner) {
-29:         PromptCategoryEntity category = requireCategory(request.getCategoryId());
-30: 
-31:         PromptEntity prompt = new PromptEntity();
-32:         prompt.setTitle(request.getTitle());
-33:         prompt.setText(request.getText());
-34:         prompt.setVisibility(PromptVisibility.PRIVATE);
-35:         prompt.setOwner(owner);
-36:         prompt.setCategory(category);
-37: 
-38:         return promptRepository.save(prompt);
-39:     }
-40: 
-41:     @Transactional(readOnly = true)
-42:     public List<PromptEntity> listMyPrompts(UserEntity owner) {
-43:         return promptRepository.findAllByOwnerIdOrderByCreatedAtDescIdDesc(owner.getId());
-44:     }
-45: 
-46:     @Transactional(readOnly = true)
-47:     public PromptEntity getOwnedPrompt(Long promptId, UserEntity owner) {
-48:         return requireOwnedPrompt(promptId, owner);
-49:     }
-50: 
-51:     @Transactional
-52:     public PromptEntity updateOwnedPrompt(Long promptId, UpdatePromptRequest request, UserEntity owner) {
-53:         PromptEntity prompt = requireOwnedPrompt(promptId, owner);
-54:         PromptCategoryEntity category = requireCategory(request.getCategoryId());
-55: 
-56:         prompt.setTitle(request.getTitle());
-57:         prompt.setText(request.getText());
-58:         prompt.setCategory(category);
-59: 
-60:         return promptRepository.save(prompt);
-61:     }
-62: 
-63:     @Transactional
-64:     public void deleteOwnedPrompt(Long promptId, UserEntity owner) {
-65:         promptRepository.delete(requireOwnedPrompt(promptId, owner));
-66:     }
-67: 
-68:     @Transactional
-69:     public PromptEntity updateOwnedPromptVisibility(Long promptId, PromptVisibility visibility, UserEntity owner) {
-70:         PromptEntity prompt = requireOwnedPrompt(promptId, owner);
-71:         prompt.setVisibility(visibility);
-72:         return promptRepository.save(prompt);
-73:     }
-74: 
-75:     private PromptEntity requireOwnedPrompt(Long promptId, UserEntity owner) {
-76:         return promptRepository.findByIdAndOwnerId(promptId, owner.getId())
-77:             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
-78:     }
-79: 
-80:     private PromptCategoryEntity requireCategory(Long categoryId) {
-81:         return promptCategoryRepository.findById(categoryId)
-82:             .orElseThrow(() -> new PromptValidationException(List.of(new FieldValidationError(
-83:                 "categoryId",
-84:                 "Prompt Category must exist."
-85:             ))));
-86:     }
-87: }
+Options:
+1. **Block deletion if in use** — recommended.
+2. **Allow delete and move prompts to another category** — requires choosing/furnishing a replacement category.
+3. **Allow delete and orphan prompts** — I strongly recommend against this because it breaks the domain invariant.
+4. **Soft-delete/hide category** — useful later, but adds lifecycle states now.
 
-(End of file - total 87 lines)
-</content>
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java",
-  "offset": 1,
-  "limit": 2000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.prompt;
-2: 
-3: import java.util.List;
-4: import java.util.Optional;
-5: 
-6: import org.springframework.data.jpa.repository.EntityGraph;
-7: import org.springframework.data.jpa.repository.JpaRepository;
-8: 
-9: public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
-10: 
-11:     @EntityGraph(attributePaths = { "owner", "category" })
-12:     List<PromptEntity> findAllByOwnerIdOrderByCreatedAtDescIdDesc(Long ownerId);
-13: 
-14:     @EntityGraph(attributePaths = { "owner", "category" })
-15:     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);
-16: }
-
-(End of file - total 16 lines)
-</content>
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java",
-  "offset": 1,
-  "limit": 2000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.prompt;
-2: 
-3: import java.time.ZoneOffset;
-4: 
-5: import com.promptvault.contract.model.Prompt;
-6: 
-7: public final class PromptMapper {
-8: 
-9:     private PromptMapper() {
-10:     }
-11: 
-12:     public static Prompt toContract(PromptEntity prompt) {
-13:         return new Prompt(
-14:             prompt.getId(),
-15:             prompt.getTitle(),
-16:             prompt.getText(),
-17:             com.promptvault.contract.model.PromptVisibility.fromValue(prompt.getVisibility().name()),
-18:             prompt.getCategory().getId(),
-19:             prompt.getOwner().getId(),
-20:             prompt.getCreatedAt().atOffset(ZoneOffset.UTC),
-21:             prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
-22:         );
-23:     }
-24: }
-
-(End of file - total 24 lines)
-</content>
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java",
-  "offset": 1,
-  "limit": 2000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.prompt;
-2: 
-3: import java.net.CookieManager;
-4: import java.net.URI;
-5: import java.net.http.HttpClient;
-6: import java.net.http.HttpRequest;
-7: import java.net.http.HttpResponse;
-8: import java.time.OffsetDateTime;
-9: import java.util.List;
-10: import java.util.Map;
-11: import java.util.UUID;
-12: import java.util.stream.Collectors;
-13: 
-14: import com.fasterxml.jackson.core.type.TypeReference;
-15: import com.fasterxml.jackson.databind.ObjectMapper;
-16: import com.promptvault.api.promptcategory.PromptCategoryEntity;
-17: import com.promptvault.api.promptcategory.PromptCategoryRepository;
-18: import com.promptvault.api.support.AbstractMySqlIntegrationTest;
-19: import com.promptvault.api.user.AccountStatus;
-20: import com.promptvault.api.user.Role;
-21: import com.promptvault.api.user.UserEntity;
-22: import com.promptvault.api.user.UserRepository;
-23: import org.junit.jupiter.api.Test;
-24: import org.springframework.beans.factory.annotation.Autowired;
-25: import org.springframework.beans.factory.annotation.Value;
-26: import org.springframework.boot.test.context.SpringBootTest;
-27: import org.springframework.security.crypto.password.PasswordEncoder;
-28: 
-29: import static org.assertj.core.api.Assertions.assertThat;
-30: 
-31: @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-32: class PromptsApiTest extends AbstractMySqlIntegrationTest {
-33: 
-34:     @Autowired
-35:     private UserRepository userRepository;
-36: 
-37:     @Autowired
-38:     private PromptCategoryRepository promptCategoryRepository;
-39: 
-40:     @Autowired
-41:     private PromptRepository promptRepository;
-42: 
-43:     @Autowired
-44:     private PasswordEncoder passwordEncoder;
-45: 
-46:     private final ObjectMapper objectMapper = new ObjectMapper();
-47:     private final URI baseUri;
-48: 
-49:     PromptsApiTest(@Value("${local.server.port}") int port) {
-50:         this.baseUri = URI.create("http://127.0.0.1:" + port);
-51:     }
-52: 
-53:     @Test
-54:     void authenticatedUsersCanCreatePrivatePromptsWithNormalizedContentAndDuplicateTitles() throws Exception {
-55:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-56:         TestUser user = createUser();
-57:         HttpClient client = authenticatedClient(user);
-58: 
-59:         String duplicateTitle = "Repeatable title";
-60:         HttpResponse<String> response = createPrompt(client, Map.of(
-61:             "title", "  " + duplicateTitle + "  ",
-62:             "text", "  First line\n\n  Second line  ",
-63:             "categoryId", category.getId()
-64:         ));
-65:         HttpResponse<String> duplicateResponse = createPrompt(client, Map.of(
-66:             "title", duplicateTitle,
-67:             "text", "Different text",
-68:             "categoryId", category.getId()
-69:         ));
-70: 
-71:         assertThat(response.statusCode()).isEqualTo(201);
-72:         assertThat(duplicateResponse.statusCode()).isEqualTo(201);
-73: 
-74:         Map<String, Object> body = readJson(response.body());
-75:         assertThat(body).containsEntry("title", duplicateTitle)
-76:             .containsEntry("text", "First line\n\n  Second line")
-77:             .containsEntry("visibility", "PRIVATE")
-78:             .containsEntry("categoryId", category.getId().intValue())
-79:             .containsEntry("ownerUserId", user.entity().getId().intValue());
-80:         assertThat(OffsetDateTime.parse((String) body.get("createdAt"))).isNotNull();
-81:         assertThat(OffsetDateTime.parse((String) body.get("updatedAt"))).isNotNull();
-82: 
-83:         Long promptId = ((Number) body.get("id")).longValue();
-84:         PromptEntity persistedPrompt = promptRepository.findAllByOwnerIdOrderByCreatedAtDescIdDesc(user.entity().getId())
-85:             .stream()
-86:             .filter(prompt -> prompt.getId().equals(promptId))
-87:             .findFirst()
-88:             .orElseThrow();
-89:         assertThat(persistedPrompt.getTitle()).isEqualTo(duplicateTitle);
-90:         assertThat(persistedPrompt.getText()).isEqualTo("First line\n\n  Second line");
-91:         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
-92:         assertThat(persistedPrompt.getOwner().getId()).isEqualTo(user.entity().getId());
-93:         assertThat(persistedPrompt.getCategory().getId()).isEqualTo(category.getId());
-94:         assertThat(persistedPrompt.getCreatedAt()).isNotNull();
-95:         assertThat(persistedPrompt.getUpdatedAt()).isNotNull();
-96:     }
-97: 
-98:     @Test
-99:     void promptCreationReturnsValidationErrorsForTrimmedBlankOversizedMissingAndUnknownCategories() throws Exception {
-100:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-101:         HttpClient client = authenticatedClient(createUser());
-102: 
-103:         HttpResponse<String> blankResponse = createPrompt(client, Map.of(
-104:             "title", "   ",
-105:             "text", "  ",
-106:             "categoryId", category.getId()
-107:         ));
-108:         HttpResponse<String> oversizedResponse = createPrompt(client, Map.of(
-109:             "title", "t".repeat(121),
-110:             "text", "x".repeat(10001),
-111:             "categoryId", category.getId()
-112:         ));
-113:         HttpResponse<String> missingCategoryResponse = createPromptJson(client, """
-114:             {"title":"Valid title","text":"Valid text"}
-115:             """);
-116:         HttpResponse<String> unknownCategoryResponse = createPrompt(client, Map.of(
-117:             "title", "Valid title",
-118:             "text", "Valid text",
-119:             "categoryId", 999_999_999
-120:         ));
-121: 
-122:         assertThat(blankResponse.statusCode()).isEqualTo(400);
-123:         assertThat(extractFieldMessages(readJson(blankResponse.body())))
-124:             .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-125:             .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
-126:         assertThat(oversizedResponse.statusCode()).isEqualTo(400);
-127:         assertThat(extractFieldMessages(readJson(oversizedResponse.body())))
-128:             .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-129:             .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
-130:         assertThat(missingCategoryResponse.statusCode()).isEqualTo(400);
-131:         assertThat(extractFieldMessages(readJson(missingCategoryResponse.body())))
-132:             .containsEntry("categoryId", "Prompt Category is required.");
-133:         assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
-134:         assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
-135:             .containsEntry("categoryId", "Prompt Category must exist.");
-136:     }
-137: 
-138:     @Test
-139:     void myPromptsReturnsOnlyPromptsOwnedByTheCurrentUserIncludingPrivatePrompts() throws Exception {
-140:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-141:         TestUser owner = createUser();
-142:         TestUser otherUser = createUser();
-143:         HttpClient ownerClient = authenticatedClient(owner);
-144:         HttpClient otherClient = authenticatedClient(otherUser);
-145: 
-146:         Map<String, Object> firstPrompt = readJson(createPrompt(ownerClient, Map.of(
-147:             "title", "Owner private one",
-148:             "text", "Owned text one",
-149:             "categoryId", category.getId()
-150:         )).body());
-151:         Map<String, Object> secondPrompt = readJson(createPrompt(ownerClient, Map.of(
-152:             "title", "Owner private two",
-153:             "text", "Owned text two",
-154:             "categoryId", category.getId()
-155:         )).body());
-156:         createPrompt(otherClient, Map.of(
-157:             "title", "Other private prompt",
-158:             "text", "Other text",
-159:             "categoryId", category.getId()
-160:         ));
-161: 
-162:         HttpResponse<String> response = listMyPrompts(ownerClient, owner.entity().getId());
-163:         HttpResponse<String> otherUserListResponse = listMyPrompts(ownerClient, otherUser.entity().getId());
-164: 
-165:         assertThat(response.statusCode()).isEqualTo(200);
-166:         assertThat(otherUserListResponse.statusCode()).isEqualTo(403);
-167:         List<Map<String, Object>> prompts = readList(response.body());
-168:         assertThat(prompts).extracting(prompt -> prompt.get("id"))
-169:             .contains(((Number) firstPrompt.get("id")).intValue(), ((Number) secondPrompt.get("id")).intValue());
-170:         assertThat(prompts).allSatisfy(prompt -> {
-171:             assertThat(prompt).containsEntry("ownerUserId", owner.entity().getId().intValue());
-172:             assertThat(prompt).containsEntry("visibility", "PRIVATE");
-173:         });
-174:         assertThat(prompts).extracting(prompt -> prompt.get("title"))
-175:             .doesNotContain("Other private prompt");
-176:     }
-177: 
-178:     @Test
-179:     void promptOwnersCanShareAndUnshareOwnedPrompts() throws Exception {
-180:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-181:         TestUser owner = createUser();
-182:         HttpClient ownerClient = authenticatedClient(owner);
-183: 
-184:         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-185:             "title", "Shareable prompt",
-186:             "text", "Shareable text",
-187:             "categoryId", category.getId()
-188:         )).body());
-189:         Long promptId = ((Number) createdPrompt.get("id")).longValue();
-190: 
-191:         HttpResponse<String> shareResponse = updatePromptVisibility(ownerClient, promptId, "PUBLIC");
-192:         HttpResponse<String> listSharedResponse = listMyPrompts(ownerClient, owner.entity().getId());
-193:         HttpResponse<String> unshareResponse = updatePromptVisibility(ownerClient, promptId, "PRIVATE");
-194:         HttpResponse<String> listUnsharedResponse = listMyPrompts(ownerClient, owner.entity().getId());
-195: 
-196:         assertThat(shareResponse.statusCode()).isEqualTo(200);
-197:         Map<String, Object> sharedPrompt = readJson(shareResponse.body());
-198:         assertThat(sharedPrompt).containsEntry("id", promptId.intValue())
-199:             .containsEntry("visibility", "PUBLIC")
-200:             .containsEntry("ownerUserId", owner.entity().getId().intValue());
-201:         assertThat(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")))
-202:             .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
-203:         assertThat(readList(listSharedResponse.body()))
-204:             .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
-205:             .extracting(prompt -> prompt.get("visibility"))
-206:             .containsExactly("PUBLIC");
-207: 
-208:         assertThat(unshareResponse.statusCode()).isEqualTo(200);
-209:         Map<String, Object> unsharedPrompt = readJson(unshareResponse.body());
-210:         assertThat(unsharedPrompt).containsEntry("id", promptId.intValue())
-211:             .containsEntry("visibility", "PRIVATE")
-212:             .containsEntry("ownerUserId", owner.entity().getId().intValue());
-213:         assertThat(OffsetDateTime.parse((String) unsharedPrompt.get("updatedAt")))
-214:             .isAfter(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")));
-215:         assertThat(readList(listUnsharedResponse.body()))
-216:             .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
-217:             .extracting(prompt -> prompt.get("visibility"))
-218:             .containsExactly("PRIVATE");
-219: 
-220:         PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
-221:         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
-222:     }
-223: 
-224:     @Test
-225:     void nonOwnersAndAdminsCannotShareOrUnsharePromptsOwnedByOtherUsers() throws Exception {
-226:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-227:         TestUser owner = createUser();
-228:         TestUser otherUser = createUser();
-229:         TestUser admin = createAdmin();
-230:         HttpClient ownerClient = authenticatedClient(owner);
-231:         HttpClient otherClient = authenticatedClient(otherUser);
-232:         HttpClient adminClient = authenticatedClient(admin);
-233: 
-234:         Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-235:             "title", "Owner controlled prompt",
-236:             "text", "Private text",
-237:             "categoryId", category.getId()
-238:         )).body()).get("id")).longValue();
-239: 
-240:         HttpResponse<String> otherUserShareResponse = updatePromptVisibility(otherClient, promptId, "PUBLIC");
-241:         HttpResponse<String> adminShareResponse = updatePromptVisibility(adminClient, promptId, "PUBLIC");
-242:         HttpResponse<String> ownerShareResponse = updatePromptVisibility(ownerClient, promptId, "PUBLIC");
-243:         HttpResponse<String> otherUserUnshareResponse = updatePromptVisibility(otherClient, promptId, "PRIVATE");
-244:         HttpResponse<String> adminUnshareResponse = updatePromptVisibility(adminClient, promptId, "PRIVATE");
-245: 
-246:         assertThat(otherUserShareResponse.statusCode()).isEqualTo(404);
-247:         assertThat(adminShareResponse.statusCode()).isEqualTo(404);
-248:         assertThat(ownerShareResponse.statusCode()).isEqualTo(200);
-249:         assertThat(otherUserUnshareResponse.statusCode()).isEqualTo(404);
-250:         assertThat(adminUnshareResponse.statusCode()).isEqualTo(404);
-251:         assertThat(otherUserShareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
-252:         assertThat(adminShareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
-253:         assertThat(otherUserUnshareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
-254:         assertThat(adminUnshareResponse.body()).doesNotContain("Owner controlled prompt", "Private text");
-255: 
-256:         PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
-257:         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
-258:         assertThat(persistedPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
-259:     }
-260: 
-261:     @Test
-262:     void promptOwnersCanRetrieveAndUpdateOwnedPromptDetails() throws Exception {
-263:         List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
-264:         PromptCategoryEntity originalCategory = categories.getFirst();
-265:         PromptCategoryEntity updatedCategory = categories.getLast();
-266:         TestUser owner = createUser();
-267:         TestUser otherUser = createUser();
-268:         HttpClient ownerClient = authenticatedClient(owner);
-269:         HttpClient otherClient = authenticatedClient(otherUser);
-270: 
-271:         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-272:             "title", "Original title",
-273:             "text", "Original text",
-274:             "categoryId", originalCategory.getId()
-275:         )).body());
-276:         Long promptId = ((Number) createdPrompt.get("id")).longValue();
-277: 
-278:         HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
-279:         HttpResponse<String> otherUserDetailResponse = getPrompt(otherClient, promptId);
-280:         HttpResponse<String> otherUserUpdateResponse = updatePrompt(otherClient, promptId, Map.of(
-281:             "title", "Other user title",
-282:             "text", "Other user text",
-283:             "categoryId", updatedCategory.getId()
-284:         ));
-285:         HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
-286:             "title", "  Updated title  ",
-287:             "text", "  Updated text\n\n  still here  ",
-288:             "categoryId", updatedCategory.getId()
-289:         ));
-290: 
-291:         assertThat(detailResponse.statusCode()).isEqualTo(200);
-292:         assertThat(readJson(detailResponse.body())).containsEntry("id", promptId.intValue())
-293:             .containsEntry("title", "Original title")
-294:             .containsEntry("text", "Original text")
-295:             .containsEntry("categoryId", originalCategory.getId().intValue())
-296:             .containsEntry("ownerUserId", owner.entity().getId().intValue());
-297:         assertThat(otherUserDetailResponse.statusCode()).isEqualTo(404);
-298:         assertThat(otherUserDetailResponse.body()).doesNotContain("Original title", "Original text");
-299:         assertThat(otherUserUpdateResponse.statusCode()).isEqualTo(404);
-300:         assertThat(otherUserUpdateResponse.body()).doesNotContain("Original title", "Original text");
-301:         assertThat(updateResponse.statusCode()).isEqualTo(200);
-302: 
-303:         Map<String, Object> updatedPrompt = readJson(updateResponse.body());
-304:         assertThat(updatedPrompt).containsEntry("id", promptId.intValue())
-305:             .containsEntry("title", "Updated title")
-306:             .containsEntry("text", "Updated text\n\n  still here")
-307:             .containsEntry("categoryId", updatedCategory.getId().intValue())
-308:             .containsEntry("ownerUserId", owner.entity().getId().intValue());
-309:         assertThat(OffsetDateTime.parse((String) updatedPrompt.get("updatedAt")))
-310:             .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
-311: 
-312:         PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
-313:         assertThat(persistedPrompt.getTitle()).isEqualTo("Updated title");
-314:         assertThat(persistedPrompt.getText()).isEqualTo("Updated text\n\n  still here");
-315:         assertThat(persistedPrompt.getCategory().getId()).isEqualTo(updatedCategory.getId());
-316:     }
-317: 
-318:     @Test
-319:     void adminsCanManageTheirOwnPromptsButCannotManagePromptsOwnedByOtherUsers() throws Exception {
-320:         List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
-321:         PromptCategoryEntity originalCategory = categories.getFirst();
-322:         PromptCategoryEntity updatedCategory = categories.getLast();
-323:         TestUser admin = createAdmin();
-324:         TestUser owner = createUser();
-325:         HttpClient adminClient = authenticatedClient(admin);
-326:         HttpClient ownerClient = authenticatedClient(owner);
-327: 
-328:         Long adminPromptId = ((Number) readJson(createPrompt(adminClient, Map.of(
-329:             "title", "Admin private title",
-330:             "text", "Admin private text",
-331:             "categoryId", originalCategory.getId()
-332:         )).body()).get("id")).longValue();
-333:         Long ownerPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-334:             "title", "Owner secret title",
-335:             "text", "Owner secret text",
-336:             "categoryId", originalCategory.getId()
-337:         )).body()).get("id")).longValue();
-338: 
-339:         HttpResponse<String> adminOwnDetailResponse = getPrompt(adminClient, adminPromptId);
-340:         HttpResponse<String> adminOwnUpdateResponse = updatePrompt(adminClient, adminPromptId, Map.of(
-341:             "title", "Admin updated title",
-342:             "text", "Admin updated text",
-343:             "categoryId", updatedCategory.getId()
-344:         ));
-345:         HttpResponse<String> adminOtherDetailResponse = getPrompt(adminClient, ownerPromptId);
-346:         HttpResponse<String> adminOtherUpdateResponse = updatePrompt(adminClient, ownerPromptId, Map.of(
-347:             "title", "Admin takeover title",
-348:             "text", "Admin takeover text",
-349:             "categoryId", updatedCategory.getId()
-350:         ));
-351:         HttpResponse<String> adminOtherDeleteResponse = deletePrompt(adminClient, ownerPromptId);
-352:         HttpResponse<String> adminOwnDeleteResponse = deletePrompt(adminClient, adminPromptId);
-353: 
-354:         assertThat(adminOwnDetailResponse.statusCode()).isEqualTo(200);
-355:         assertThat(readJson(adminOwnDetailResponse.body()))
-356:             .containsEntry("id", adminPromptId.intValue())
-357:             .containsEntry("ownerUserId", admin.entity().getId().intValue())
-358:             .containsEntry("text", "Admin private text");
-359:         assertThat(adminOwnUpdateResponse.statusCode()).isEqualTo(200);
-360:         assertThat(readJson(adminOwnUpdateResponse.body()))
-361:             .containsEntry("id", adminPromptId.intValue())
-362:             .containsEntry("title", "Admin updated title")
-363:             .containsEntry("text", "Admin updated text")
-364:             .containsEntry("ownerUserId", admin.entity().getId().intValue());
-365:         assertThat(adminOwnDeleteResponse.statusCode()).isEqualTo(204);
-366:         assertThat(promptRepository.findById(adminPromptId)).isEmpty();
-367: 
-368:         assertThat(adminOtherDetailResponse.statusCode()).isEqualTo(404);
-369:         assertThat(adminOtherUpdateResponse.statusCode()).isEqualTo(404);
-370:         assertThat(adminOtherDeleteResponse.statusCode()).isEqualTo(404);
-371:         assertThat(adminOtherDetailResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
-372:         assertThat(adminOtherUpdateResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
-373:         assertThat(adminOtherDeleteResponse.body()).doesNotContain("Owner secret title", "Owner secret text");
-374: 
-375:         PromptEntity ownerPrompt = promptRepository.findById(ownerPromptId).orElseThrow();
-376:         assertThat(ownerPrompt.getTitle()).isEqualTo("Owner secret title");
-377:         assertThat(ownerPrompt.getText()).isEqualTo("Owner secret text");
-378:         assertThat(ownerPrompt.getCategory().getId()).isEqualTo(originalCategory.getId());
-379:         assertThat(ownerPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
-380:     }
-381: 
-382:     @Test
-383:     void promptUpdatesReturnValidationErrorsForTrimmedBlankOversizedMissingAndUnknownCategories() throws Exception {
-384:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-385:         HttpClient client = authenticatedClient(createUser());
-386:         Long promptId = ((Number) readJson(createPrompt(client, Map.of(
-387:             "title", "Valid title",
-388:             "text", "Valid text",
-389:             "categoryId", category.getId()
-390:         )).body()).get("id")).longValue();
-391: 
-392:         HttpResponse<String> blankResponse = updatePrompt(client, promptId, Map.of(
-393:             "title", "   ",
-394:             "text", "  ",
-395:             "categoryId", category.getId()
-396:         ));
-397:         HttpResponse<String> oversizedResponse = updatePrompt(client, promptId, Map.of(
-398:             "title", "t".repeat(121),
-399:             "text", "x".repeat(10001),
-400:             "categoryId", category.getId()
-401:         ));
-402:         HttpResponse<String> missingCategoryResponse = updatePromptJson(client, promptId, """
-403:             {"title":"Valid title","text":"Valid text"}
-404:             """);
-405:         HttpResponse<String> unknownCategoryResponse = updatePrompt(client, promptId, Map.of(
-406:             "title", "Valid title",
-407:             "text", "Valid text",
-408:             "categoryId", 999_999_999
-409:         ));
-410: 
-411:         assertThat(blankResponse.statusCode()).isEqualTo(400);
-412:         assertThat(extractFieldMessages(readJson(blankResponse.body())))
-413:             .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-414:             .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
-415:         assertThat(oversizedResponse.statusCode()).isEqualTo(400);
-416:         assertThat(extractFieldMessages(readJson(oversizedResponse.body())))
-417:             .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-418:             .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
-419:         assertThat(missingCategoryResponse.statusCode()).isEqualTo(400);
-420:         assertThat(extractFieldMessages(readJson(missingCategoryResponse.body())))
-421:             .containsEntry("categoryId", "Prompt Category is required.");
-422:         assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
-423:         assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
-424:             .containsEntry("categoryId", "Prompt Category must exist.");
-425:     }
-426: 
-427:     @Test
-428:     void promptOwnersCanDeleteOwnedPromptsWithoutDeletingOwnerOrCategory() throws Exception {
-429:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-430:         TestUser owner = createUser();
-431:         TestUser otherUser = createUser();
-432:         HttpClient ownerClient = authenticatedClient(owner);
-433:         HttpClient otherClient = authenticatedClient(otherUser);
-434:         Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-435:             "title", "Delete me",
-436:             "text", "Delete text",
-437:             "categoryId", category.getId()
-438:         )).body()).get("id")).longValue();
-439: 
-440:         HttpResponse<String> otherUserDeleteResponse = deletePrompt(otherClient, promptId);
-441:         HttpResponse<String> deleteResponse = deletePrompt(ownerClient, promptId);
-442:         HttpResponse<String> detailAfterDeleteResponse = getPrompt(ownerClient, promptId);
-443:         HttpResponse<String> listAfterDeleteResponse = listMyPrompts(ownerClient, owner.entity().getId());
-444: 
-445:         assertThat(otherUserDeleteResponse.statusCode()).isEqualTo(404);
-446:         assertThat(deleteResponse.statusCode()).isEqualTo(204);
-447:         assertThat(detailAfterDeleteResponse.statusCode()).isEqualTo(404);
-448:         assertThat(readList(listAfterDeleteResponse.body()))
-449:             .extracting(prompt -> prompt.get("id"))
-450:             .doesNotContain(promptId.intValue());
-451:         assertThat(promptRepository.findById(promptId)).isEmpty();
-452:         assertThat(promptCategoryRepository.findById(category.getId())).isPresent();
-453:         assertThat(userRepository.findById(owner.entity().getId())).isPresent();
-454:     }
-455: 
-456:     @Test
-457:     void missingPromptIdsReturnNotFoundForDetailUpdateAndDelete() throws Exception {
-458:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-459:         HttpClient client = authenticatedClient(createUser());
-460:         long missingPromptId = 999_999_999L;
-461: 
-462:         HttpResponse<String> detailResponse = getPrompt(client, missingPromptId);
-463:         HttpResponse<String> updateResponse = updatePrompt(client, missingPromptId, Map.of(
-464:             "title", "Valid title",
-465:             "text", "Valid text",
-466:             "categoryId", category.getId()
-467:         ));
-468:         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, missingPromptId, "PUBLIC");
-469:         HttpResponse<String> deleteResponse = deletePrompt(client, missingPromptId);
-470: 
-471:         assertThat(detailResponse.statusCode()).isEqualTo(404);
-472:         assertThat(updateResponse.statusCode()).isEqualTo(404);
-473:         assertThat(visibilityResponse.statusCode()).isEqualTo(404);
-474:         assertThat(deleteResponse.statusCode()).isEqualTo(404);
-475:     }
-476: 
-477:     @Test
-478:     void unauthenticatedCallersCannotCreateOrListPrompts() throws Exception {
-479:         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-480:         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
-481: 
-482:         HttpResponse<String> createResponse = createPrompt(client, Map.of(
-483:             "title", "Blocked",
-484:             "text", "Blocked text",
-485:             "categoryId", category.getId()
-486:         ));
-487:         HttpResponse<String> listResponse = listMyPrompts(client, 1L);
-488:         HttpResponse<String> detailResponse = getPrompt(client, 1L);
-489:         HttpResponse<String> updateResponse = updatePrompt(client, 1L, Map.of(
-490:             "title", "Blocked",
-491:             "text", "Blocked text",
-492:             "categoryId", category.getId()
-493:         ));
-494:         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, "PUBLIC");
-495:         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
-496: 
-497:         assertThat(createResponse.statusCode()).isEqualTo(401);
-498:         assertThat(listResponse.statusCode()).isEqualTo(401);
-499:         assertThat(detailResponse.statusCode()).isEqualTo(401);
-500:         assertThat(updateResponse.statusCode()).isEqualTo(401);
-501:         assertThat(visibilityResponse.statusCode()).isEqualTo(401);
-502:         assertThat(deleteResponse.statusCode()).isEqualTo(401);
-503:     }
-504: 
-505:     private TestUser createUser() {
-506:         return createUser(Role.USER);
-507:     }
-508: 
-509:     private TestUser createAdmin() {
-510:         return createUser(Role.ADMIN);
-511:     }
-512: 
-513:     private TestUser createUser(Role role) {
-514:         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-515:         String username = "user" + suffix;
-516:         String password = "password123";
-517: 
-518:         UserEntity user = new UserEntity();
-519:         user.setUsername(username);
-520:         user.setUsernameNormalized(username);
-521:         user.setEmailAddress(username + "@example.com");
-522:         user.setEmailAddressNormalized(username + "@example.com");
-523:         user.setPasswordHash(passwordEncoder.encode(password));
-524:         user.setRole(role);
-525:         user.setAccountStatus(AccountStatus.ENABLED);
-526:         return new TestUser(userRepository.save(user), password);
-527:     }
-528: 
-529:     private HttpClient authenticatedClient(TestUser user) throws Exception {
-530:         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
-531:         HttpResponse<String> loginResponse = login(client, user);
-532:         assertThat(loginResponse.statusCode()).isEqualTo(200);
-533:         return client;
-534:     }
-535: 
-536:     private HttpResponse<String> login(HttpClient client, TestUser user) throws Exception {
-537:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-538:             .header("Content-Type", "application/json")
-539:             .header("Accept", "application/json")
-540:             .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-541:                 "username", user.entity().getUsername(),
-542:                 "password", user.password()
-543:             ))))
-544:             .build();
-545:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-546:     }
-547: 
-548:     private HttpResponse<String> createPrompt(HttpClient client, Map<String, Object> payload) throws Exception {
-549:         return createPromptJson(client, objectMapper.writeValueAsString(payload));
-550:     }
-551: 
-552:     private HttpResponse<String> createPromptJson(HttpClient client, String payload) throws Exception {
-553:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts"))
-554:             .header("Content-Type", "application/json")
-555:             .header("Accept", "application/json")
-556:             .POST(HttpRequest.BodyPublishers.ofString(payload))
-557:             .build();
-558:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-559:     }
-560: 
-561:     private HttpResponse<String> listMyPrompts(HttpClient client, Long userId) throws Exception {
-562:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + userId + "/prompts"))
-563:             .header("Accept", "application/json")
-564:             .GET()
-565:             .build();
-566:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-567:     }
-568: 
-569:     private HttpResponse<String> getPrompt(HttpClient client, Long promptId) throws Exception {
-570:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-571:             .header("Accept", "application/json")
-572:             .GET()
-573:             .build();
-574:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-575:     }
-576: 
-577:     private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {
-578:         return updatePromptJson(client, promptId, objectMapper.writeValueAsString(payload));
-579:     }
-580: 
-581:     private HttpResponse<String> updatePromptJson(HttpClient client, Long promptId, String payload) throws Exception {
-582:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-583:             .header("Content-Type", "application/json")
-584:             .header("Accept", "application/json")
-585:             .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))
-586:             .build();
-587:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-588:     }
-589: 
-590:     private HttpResponse<String> updatePromptVisibility(HttpClient client, Long promptId, String visibility) throws Exception {
-591:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId + "/visibility"))
-592:             .header("Content-Type", "application/json")
-593:             .header("Accept", "application/json")
-594:             .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-595:                 "visibility", visibility
-596:             ))))
-597:             .build();
-598:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-599:     }
-600: 
-601:     private HttpResponse<String> deletePrompt(HttpClient client, Long promptId) throws Exception {
-602:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-603:             .DELETE()
-604:             .build();
-605:         return client.send(request, HttpResponse.BodyHandlers.ofString());
-606:     }
-607: 
-608:     private Map<String, Object> readJson(String body) throws Exception {
-609:         return objectMapper.readValue(body, new TypeReference<>() { });
-610:     }
-611: 
-612:     private List<Map<String, Object>> readList(String body) throws Exception {
-613:         return objectMapper.readValue(body, new TypeReference<>() { });
-614:     }
-615: 
-616:     @SuppressWarnings("unchecked")
-617:     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
-618:         return ((List<Map<String, String>>) body.get("fieldErrors"))
-619:             .stream()
-620:             .collect(Collectors.toMap(
-621:                 fieldError -> fieldError.get("field"),
-622:                 fieldError -> fieldError.get("message")
-623:             ));
-624:     }
-625: 
-626:     private record TestUser(UserEntity entity, String password) {
-627:     }
-628: }
-
-(End of file - total 628 lines)
-</content>
-```
+Should we go with **block deletion if in use**?
 
 ---
 
-## Assistant (Build · GPT-5.5 · 7.2s)
+## User
 
-_Thinking:_
-
-
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gh issue view 22 --repo alessandrojcm/prompt-vault --json number,title,body",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Fetches parent issue for context"
-}
-```
-
-**Output:**
-```
-{"body":"## Problem Statement\n\nPrompt Vault currently has authenticated users and admin user management, but it does not yet let users create and share the core domain object of the product: Prompts. Users need a backend-owned prompt domain where each Current User can save Prompt Text with a Prompt Title, classify it with a predefined Prompt Category, keep it private by default, and intentionally Share it so other enabled authenticated users can discover it. Users must be able to manage only their own Prompts, and Admins must not gain override edit/delete privileges over Prompts owned by other users.\n\nPrompt Categories must also exist as a minimal backend slice before full admin category management arrives, otherwise users cannot create valid Prompts because every Prompt must belong to exactly one existing Prompt Category.\n\n## Solution\n\nBuild the backend Prompt domain as an authenticated REST API slice. The slice will add a minimal Prompt Category catalog and full Prompt CRUD for authenticated users.\n\nUsers will be able to:\n\n- Fetch the predefined Prompt Category list.\n- Create a private Prompt with a Prompt Title, Prompt Text, and existing Prompt Category.\n- View My Prompts: all Prompts owned by the Current User, regardless of Prompt Visibility.\n- View Public Prompts: public Prompts owned by other enabled users.\n- Retrieve a Prompt detail when they own it or when it is visible as a Public Prompt.\n- Update only their own Prompts.\n- Delete only their own Prompts.\n- Share their own Prompt by making it public.\n- Unshare their own public Prompt by making it private again.\n\nAdmins remain Users for Prompt behavior: they can create, read, update, delete, Share, and Unshare their own Prompts, but they cannot edit/delete/change visibility of Prompts owned by other Users.\n\n## User Stories\n\n1. As a Current User, I want to create a Prompt, so that I can save Prompt Text for future use.\n2. As a Current User, I want every new Prompt to start private, so that Prompt Text is not accidentally exposed to other users.\n3. As a Current User, I want to give a Prompt a Prompt Title, so that I can identify it later.\n4. As a Current User, I want Prompt Titles to be display labels rather than unique identifiers, so that I can reuse titles when it makes sense.\n5. As a Current User, I want Prompt Title whitespace trimmed, so that accidental spacing does not create messy display labels.\n6. As a Current User, I want Prompt Text whitespace trimmed only at the edges, so that accidental surrounding whitespace is removed while internal formatting is preserved.\n7. As a Current User, I want Prompt Text to preserve internal whitespace and newlines, so that carefully formatted prompts remain intact.\n8. As a Current User, I want to select a Prompt Category from predefined options, so that my Prompt is consistently classified.\n9. As a Current User, I want Prompt creation to reject missing or invalid Prompt Categories, so that every Prompt belongs to a real category.\n10. As a Current User, I want Prompt creation to reject an empty Prompt Title, so that every Prompt can be displayed meaningfully.\n11. As a Current User, I want Prompt creation to reject an empty Prompt Text, so that saved Prompts are useful.\n12. As a Current User, I want Prompt creation to enforce reasonable maximum lengths, so that accidental oversized payloads are rejected.\n13. As a Current User, I want to see My Prompts, so that I can manage everything I own in one place.\n14. As a Current User, I want My Prompts to include both private and public Prompts, so that visibility does not hide my own work from me.\n15. As a Current User, I want to retrieve details for a Prompt I own, so that I can inspect or edit it.\n16. As a Current User, I want to update the Prompt Title of a Prompt I own, so that I can improve its display label.\n17. As a Current User, I want to update the Prompt Text of a Prompt I own, so that I can improve the prompt itself.\n18. As a Current User, I want to update the Prompt Category of a Prompt I own, so that I can reclassify it when needed.\n19. As a Current User, I want updates to validate the same title, text, and category rules as creation, so that Prompt data stays consistent.\n20. As a Current User, I want to delete a Prompt I own, so that I can permanently remove Prompts I no longer need.\n21. As a Current User, I want deleted Prompts to disappear from My Prompts and Public Prompts, so that removed Prompts are no longer visible.\n22. As a Current User, I want to Share a Prompt I own, so that other enabled authenticated users can see it.\n23. As a Current User, I want to Unshare a public Prompt I own, so that it becomes private again.\n24. As a Current User, I want Share and Unshare to update the Prompt's updated time, so that the Prompt reflects its latest owner-driven change.\n25. As a Current User, I want content edits to a public Prompt to be visible immediately, so that the public version stays current without a separate publishing workflow.\n26. As a Current User, I want to see Public Prompts owned by other enabled users, so that I can discover shared Prompt Text.\n27. As a Current User, I want Public Prompts to exclude my own public Prompts, so that Public Prompts and My Prompts do not duplicate the same rows.\n28. As a Current User, I want public Prompt detail access to follow the same visibility rules as public lists, so that I can inspect Prompts shared by other enabled users.\n29. As a Current User, I want public Prompts to show the Prompt Owner's Username, so that shared Prompts have attribution.\n30. As a Current User, I do not want public Prompts to expose the Prompt Owner's Email Address, so that private identity details remain protected.\n31. As a Prompt Owner, I want only myself to update my Prompt, so that other users cannot alter my saved work.\n32. As a Prompt Owner, I want only myself to delete my Prompt, so that other users cannot remove my saved work.\n33. As a Prompt Owner, I want only myself to Share or Unshare my Prompt, so that I control its Prompt Visibility.\n34. As a non-owner User, I want private Prompts owned by other users to be inaccessible, so that private Prompt Text remains private.\n35. As a non-owner User, I want attempts to modify another user's Prompt to fail, so that ownership boundaries are enforced.\n36. As an Admin, I want the same Prompt capabilities as any other User for my own Prompts, so that I can use the product normally.\n37. As an Admin, I do not want special edit/delete override powers over other users' Prompts, so that Prompt ownership remains simple and trustworthy.\n38. As an enabled authenticated User, I want public Prompts from disabled Prompt Owners to be hidden, so that suspended users' content is not showcased.\n39. As an Admin managing account status, I want disabling a User to hide that User's public Prompts from others while preserving their data, so that account disablement does not destroy Prompts.\n40. As a disabled User, I should not be able to access Prompt APIs through an active session, so that existing account status behavior remains consistent.\n41. As an unauthenticated visitor, I should not be able to access Prompt APIs, so that Prompt Vault remains session-authenticated.\n42. As a Current User, I want Prompt timestamps to record creation and update times, so that I can understand when a Prompt was created or changed.\n43. As a Current User, I want updated time to change for title, text, category, Share, and Unshare changes, so that it reflects any owner-driven change.\n44. As a Current User, I want the Prompt Category list to be available through the backend, so that clients can present valid category choices.\n45. As a Current User, I want Prompt Categories to have labels, so that categories are readable in user interfaces.\n46. As a Current User, I want Prompt Categories to have stable slugs, so that clients can use stable category identifiers when needed.\n47. As a Current User, I want Prompt Category labels and slugs to be unique, so that categories are not ambiguous.\n48. As a Current User, I want the baseline Prompt Categories Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity to exist, so that I can create Prompts before admin category management exists.\n49. As an Admin, I want seeded Prompt Categories attributed to the seeded Admin, so that category audit fields have a real User reference.\n50. As a future category manager, I want categories referenced by Prompts to remain available until Prompts are moved elsewhere, so that existing Prompts do not become uncategorized.\n51. As an API client, I want validation failures to return the existing contract-shaped validation error response, so that forms can show field-level errors consistently.\n52. As an API client, I want missing or inaccessible Prompts to return appropriate HTTP errors, so that clients can handle not-found/access-denied cases predictably.\n53. As an API client, I want Prompt and Prompt Category responses to follow the OpenAPI contract, so that generated clients remain reliable.\n54. As a frontend implementer later, I want backend endpoints and generated client types ready, so that frontend integration can be added without redefining the backend contract.\n\n## Implementation Decisions\n\n- Implement this as a backend-first slice; frontend integration is out of scope for this PRD.\n- Use the established OpenAPI-first contract as the source of truth for Prompt and Prompt Category APIs.\n- Generate backend interfaces and models from the OpenAPI contract, then implement generated interfaces with Spring Boot controllers.\n- Keep all Prompt APIs under authenticated API paths. Do not make public Prompt discovery accessible to unauthenticated visitors in this slice.\n- Rely on existing session-cookie authentication and Current User resolution rather than introducing a new auth mechanism.\n- Use Spring Data JPA for Prompt and Prompt Category persistence mapping.\n- Use Flyway migrations for Prompt and Prompt Category tables, constraints, indexes, and baseline seed data.\n- Keep Hibernate schema generation in validation mode; Flyway owns schema changes.\n- Add a Prompt table with at least Prompt Title, Prompt Text, Prompt Visibility, Prompt Owner, Prompt Category, created time, and updated time.\n- Add a Prompt Category table with at least id, label, slug, created time, created by, and updated time.\n- Seed baseline Prompt Categories: Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.\n- Attribute seeded Prompt Categories to the existing seeded Admin user.\n- Treat Prompt Category `createdBy` as audit attribution only; it does not grant ownership or special edit rights.\n- Enforce every Prompt having exactly one existing Prompt Category.\n- Enforce unique Prompt Category labels case-insensitively and globally unique Prompt Category slugs.\n- Use snake_case category slugs derived from labels, for example `Personal Productivity` becomes `personal_productivity`.\n- Treat Prompt Category as system-wide controlled vocabulary, not as a user-owned resource.\n- Prevent deletion/removal of categories that are referenced by Prompts when category management is later introduced.\n- New Prompts default to private.\n- Prompt Visibility has two durable states: private and public.\n- Share means changing a Prompt's visibility to public.\n- Unshare means changing a Prompt's visibility back to private.\n- Share and Unshare are reversible owner actions.\n- Only the Prompt Owner can update, delete, Share, or Unshare a Prompt.\n- Admins must not edit, delete, Share, or Unshare Prompts owned by other users.\n- Public Prompts are visible only to enabled authenticated users.\n- Public Prompts owned by disabled Users must be hidden from other users.\n- My Prompts means all Prompts owned by the Current User, regardless of Prompt Visibility.\n- Public Prompts means public Prompts owned by other enabled users and visible to the Current User; it excludes the Current User's own public Prompts.\n- Prompt detail access is allowed when the Current User owns the Prompt or when the Prompt is a Public Prompt visible to the Current User.\n- Public Prompt responses should identify the Prompt Owner by Username only, not by Email Address.\n- Prompt Titles are display labels, not unique identifiers; duplicate Prompt Titles are allowed.\n- Normalize Prompt Titles by trimming surrounding whitespace.\n- Normalize Prompt Text by trimming surrounding whitespace while preserving internal whitespace and newlines.\n- Enforce Prompt Title length of 1 to 120 characters after trimming.\n- Enforce Prompt Text length of 1 to 10,000 characters after trimming.\n- Map generated Bean Validation and domain validation errors into the existing validation error response shape.\n- Update the Prompt updated time for any owner-driven change: title, text, category, Share, or Unshare.\n- Deleting a Prompt is permanent from the product's point of view; there is no trash/restore concept in this slice.\n- Missing, private-to-another-user, or disabled-owner public Prompt access should not leak private content. The implementation should choose contract-consistent HTTP statuses that preserve privacy.\n- Keep generated artifacts out of version control, following existing repository conventions.\n\n## Testing Decisions\n\n- The primary testing seam is backend HTTP integration tests against the OpenAPI-shaped REST API.\n- Tests should run Spring Boot with real MySQL coverage through the existing Testcontainers/Compose setup.\n- Tests should authenticate using the existing session-cookie login flow and exercise endpoints as real API clients.\n- Tests should verify external behavior: HTTP status codes, response contract shape, visible/invisible resources, and persisted database state where relevant.\n- Tests should avoid asserting private service implementation details.\n- Add service-level or repository-level tests only if an edge case cannot be observed cleanly through the HTTP seam.\n- Use existing auth/current-user/admin endpoint integration tests as prior art for authenticated HTTP calls, cookie handling, and database setup.\n- Cover Prompt Category list behavior, including seeded categories, labels, slugs, and audit attribution where observable.\n- Cover Prompt creation, including private default visibility, category requirement, title/text normalization, validation limits, and persistence.\n- Cover My Prompts listing, including private and public owned Prompts.\n- Cover Public Prompts listing, including exclusion of the Current User's own public Prompts.\n- Cover Prompt detail access for owner, visible public Prompt, private Prompt owned by another user, and public Prompt owned by a disabled user.\n- Cover Prompt updates by owner, including title/text/category changes and updated time behavior.\n- Cover failed updates by non-owners, including Admins attempting to update another User's Prompt.\n- Cover Prompt deletion by owner and failed deletion by non-owners.\n- Cover Share and Unshare by owner and failed visibility changes by non-owners.\n- Cover unauthenticated access rejection for Prompt and Prompt Category APIs where applicable.\n- Cover disabled-user/session behavior consistently with existing account status rules.\n- Run the standard repository verification command after implementation.\n\n## Out of Scope\n\n- Frontend routes, forms, tables, and UI for Prompts or Prompt Categories.\n- Admin Prompt Category management beyond the minimal category table, entity, seed data, and list endpoint.\n- Moderation workflows for public Prompts.\n- Admin override editing/deleting of other users' Prompts.\n- Prompt versioning, drafts, review workflows, publishing approval, or immutable public revisions.\n- Trash, restore, soft-delete product behavior, or audit-history views for deleted Prompts.\n- Public unauthenticated Prompt discovery.\n- Keyword-triggered security alerts for Prompt Text.\n- Favorites, likes, comments, copying/forking, search, full-text indexing, or advanced filtering.\n- Multiple categories per Prompt or free-text tags.\n- Changing existing role/Account Status behavior.\n- CSRF hardening or authentication mechanism changes.\n\n## Further Notes\n\n- Domain glossary terms have been captured in the project context: Prompt, Prompt Text, Prompt Title, Prompt Visibility, Prompt Owner, Prompt Category, Share, Unshare, My Prompts, and Public Prompts.\n- Existing ADRs require session-cookie authentication, seeded Admins with immutable Roles, MySQL/Flyway for schema and seed data, and Spring Data JPA for persistence mapping.\n- The backend slice should preserve the existing architecture: OpenAPI contract first, generated interfaces/models, Spring Security session auth, Flyway migrations, JPA persistence, and Testcontainers-backed integration tests.\n","number":22,"title":"PRD: Backend prompt domain"}
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 11.9s)
-
-_Thinking:_
-
-**Evaluating Spring Data Query**
-
-I need to check if I should use the docs for Spring Data queries. It’s possible that changing external libraries won’t be necessary if I’m sticking with the established Spring Data query names. But if I’m adopting @EntityGraph, I’m unsure since there are no docs on that. I'm also considering whether I need to generate a backend, which involves using the open API generator. I’ll have to look at the build.gradle to understand how everything fits together.
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/build.gradle.kts",
-  "offset": 1,
-  "limit": 2000
-}
-```
-
-**Error:**
-```
-File not found: /Users/alessandrojcm/repos/prompt-vault/apps/api/build.gradle.kts
-
-Did you mean one of these?
-/Users/alessandrojcm/repos/prompt-vault/apps/api/build.gradle
-/Users/alessandrojcm/repos/prompt-vault/apps/api/build
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/UserEntity.java",
-  "offset": 1,
-  "limit": 1000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/user/UserEntity.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.user;
-2: 
-3: import java.time.Instant;
-4: 
-5: import jakarta.persistence.Column;
-6: import jakarta.persistence.Entity;
-7: import jakarta.persistence.EnumType;
-8: import jakarta.persistence.Enumerated;
-9: import jakarta.persistence.GeneratedValue;
-10: import jakarta.persistence.GenerationType;
-11: import jakarta.persistence.Id;
-12: import jakarta.persistence.PrePersist;
-13: import jakarta.persistence.Table;
-14: 
-15: @Entity
-16: @Table(name = "users")
-17: public class UserEntity {
-18: 
-19:     @Id
-20:     @GeneratedValue(strategy = GenerationType.IDENTITY)
-21:     private Long id;
-22: 
-23:     @Column(nullable = false, length = 30)
-24:     private String username;
-25: 
-26:     @Column(name = "username_normalized", nullable = false, length = 30)
-27:     private String usernameNormalized;
-28: 
-29:     @Column(name = "email_address", nullable = false)
-30:     private String emailAddress;
-31: 
-32:     @Column(name = "email_address_normalized", nullable = false)
-33:     private String emailAddressNormalized;
-34: 
-35:     @Column(name = "password_hash", nullable = false)
-36:     private String passwordHash;
-37: 
-38:     @Enumerated(EnumType.STRING)
-39:     @Column(nullable = false)
-40:     private Role role;
-41: 
-42:     @Enumerated(EnumType.STRING)
-43:     @Column(name = "account_status", nullable = false)
-44:     private AccountStatus accountStatus;
-45: 
-46:     @Column(name = "created_at", nullable = false, updatable = false)
-47:     private Instant createdAt;
-48: 
-49:     public Long getId() {
-50:         return id;
-51:     }
-52: 
-53:     public String getUsername() {
-54:         return username;
-55:     }
-56: 
-57:     public void setUsername(String username) {
-58:         this.username = username;
-59:     }
-60: 
-61:     public String getUsernameNormalized() {
-62:         return usernameNormalized;
-63:     }
-64: 
-65:     public void setUsernameNormalized(String usernameNormalized) {
-66:         this.usernameNormalized = usernameNormalized;
-67:     }
-68: 
-69:     public String getEmailAddress() {
-70:         return emailAddress;
-71:     }
-72: 
-73:     public void setEmailAddress(String emailAddress) {
-74:         this.emailAddress = emailAddress;
-75:     }
-76: 
-77:     public String getEmailAddressNormalized() {
-78:         return emailAddressNormalized;
-79:     }
-80: 
-81:     public void setEmailAddressNormalized(String emailAddressNormalized) {
-82:         this.emailAddressNormalized = emailAddressNormalized;
-83:     }
-84: 
-85:     public String getPasswordHash() {
-86:         return passwordHash;
-87:     }
-88: 
-89:     public void setPasswordHash(String passwordHash) {
-90:         this.passwordHash = passwordHash;
-91:     }
-92: 
-93:     public Role getRole() {
-94:         return role;
-95:     }
-96: 
-97:     public void setRole(Role role) {
-98:         this.role = role;
-99:     }
-100: 
-101:     public AccountStatus getAccountStatus() {
-102:         return accountStatus;
-103:     }
-104: 
-105:     public void setAccountStatus(AccountStatus accountStatus) {
-106:         this.accountStatus = accountStatus;
-107:     }
-108: 
-109:     public Instant getCreatedAt() {
-110:         return createdAt;
-111:     }
-112: 
-113:     @PrePersist
-114:     void onCreate() {
-115:         if (createdAt == null) {
-116:             createdAt = Instant.now();
-117:         }
-118:     }
-119: }
-
-(End of file - total 119 lines)
-</content>
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/config/SecurityConfig.java",
-  "offset": 1,
-  "limit": 1000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/config/SecurityConfig.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.config;
-2: 
-3: import java.time.Duration;
-4: import java.util.List;
-5: 
-6: import org.springframework.boot.context.properties.ConfigurationProperties;
-7: import org.springframework.boot.context.properties.EnableConfigurationProperties;
-8: import org.springframework.context.annotation.Bean;
-9: import org.springframework.context.annotation.Configuration;
-10: import org.springframework.http.HttpStatus;
-11: import org.springframework.security.authentication.AuthenticationManager;
-12: import org.springframework.security.config.Customizer;
-13: import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-14: import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-15: import org.springframework.security.crypto.password.PasswordEncoder;
-16: import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-17: import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-18: import org.springframework.security.core.session.SessionRegistry;
-19: import org.springframework.security.core.session.SessionRegistryImpl;
-20: import org.springframework.security.web.SecurityFilterChain;
-21: import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-22: import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-23: import org.springframework.security.web.context.SecurityContextRepository;
-24: import org.springframework.security.web.session.HttpSessionEventPublisher;
-25: import org.springframework.web.cors.CorsConfiguration;
-26: import org.springframework.web.cors.CorsConfigurationSource;
-27: import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-28: 
-29: @Configuration
-30: @EnableConfigurationProperties(SecurityConfig.CorsProperties.class)
-31: public class SecurityConfig {
-32: 
-33:     private final CorsProperties corsProperties;
-34: 
-35:     SecurityConfig(CorsProperties corsProperties) {
-36:         this.corsProperties = corsProperties;
-37:     }
-38: 
-39:     @Bean
-40:     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
-41:         http
-42:             .cors(Customizer.withDefaults())
-43:             .csrf(AbstractHttpConfigurer::disable)
-44:             .authorizeHttpRequests(authorize -> authorize
-45:                 .requestMatchers("/actuator/health", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/signup", "/api/login").permitAll()
-46:                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-47:                 .anyRequest().authenticated())
-48:             .httpBasic(AbstractHttpConfigurer::disable)
-49:             .formLogin(AbstractHttpConfigurer::disable)
-50:             .logout(Customizer.withDefaults())
-51:             .sessionManagement(sessions -> sessions
-52:                 .maximumSessions(-1)
-53:                 .sessionRegistry(sessionRegistry)
-54:                 .expiredSessionStrategy(event -> event.getResponse().sendError(HttpStatus.UNAUTHORIZED.value())))
-55:             .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
-56: 
-57:         return http.build();
-58:     }
-59: 
-60:     @Bean
-61:     PasswordEncoder passwordEncoder() {
-62:         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-63:     }
-64: 
-65:     @Bean
-66:     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-67:         return authenticationConfiguration.getAuthenticationManager();
-68:     }
-69: 
-70:     @Bean
-71:     SecurityContextRepository securityContextRepository() {
-72:         return new HttpSessionSecurityContextRepository();
-73:     }
-74: 
-75:     @Bean
-76:     SessionRegistry sessionRegistry() {
-77:         return new SessionRegistryImpl();
-78:     }
-79: 
-80:     @Bean
-81:     HttpSessionEventPublisher httpSessionEventPublisher() {
-82:         return new HttpSessionEventPublisher();
-83:     }
-84: 
-85:     @Bean
-86:     CorsConfigurationSource corsConfigurationSource() {
-87:         CorsConfiguration configuration = new CorsConfiguration();
-88:         configuration.setAllowedOrigins(corsProperties.allowedOrigins());
-89:         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-90:         configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "X-CSRF-TOKEN"));
-91:         configuration.setAllowCredentials(true);
-92:         configuration.setMaxAge(Duration.ofHours(1));
-93: 
-94:         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-95:         source.registerCorsConfiguration("/api/**", configuration);
-96:         return source;
-97:     }
-98: 
-99:     @ConfigurationProperties("prompt-vault.cors")
-100:     record CorsProperties(List<String> allowedOrigins) {
-101:         CorsProperties {
-102:             allowedOrigins = allowedOrigins == null ? List.of() : List.copyOf(allowedOrigins);
-103:         }
-104:     }
-105: }
-
-(End of file - total 105 lines)
-</content>
-```
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/admin/AdminUsersService.java",
-  "offset": 1,
-  "limit": 1000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/admin/AdminUsersService.java</path>
-<type>file</type>
-<content>
-1: package com.promptvault.api.admin;
-2: 
-3: import java.util.List;
-4: 
-5: import com.promptvault.api.auth.PromptVaultUserDetails;
-6: import com.promptvault.api.user.AccountStatus;
-7: import com.promptvault.api.user.Role;
-8: import com.promptvault.api.user.UserEntity;
-9: import com.promptvault.api.user.UserRepository;
-10: import com.promptvault.api.user.UserSummaryMapper;
-11: import com.promptvault.contract.model.UserRole;
-12: import com.promptvault.contract.model.UserSummary;
-13: import org.springframework.http.HttpStatus;
-14: import org.springframework.security.access.AccessDeniedException;
-15: import org.springframework.security.core.Authentication;
-16: import org.springframework.security.core.context.SecurityContextHolder;
-17: import org.springframework.security.core.session.SessionInformation;
-18: import org.springframework.security.core.session.SessionRegistry;
-19: import org.springframework.stereotype.Service;
-20: import org.springframework.transaction.annotation.Transactional;
-21: import org.springframework.web.server.ResponseStatusException;
-22: 
-23: @Service
-24: public class AdminUsersService {
-25: 
-26:     private final UserRepository userRepository;
-27:     private final SessionRegistry sessionRegistry;
-28: 
-29:     public AdminUsersService(UserRepository userRepository, SessionRegistry sessionRegistry) {
-30:         this.userRepository = userRepository;
-31:         this.sessionRegistry = sessionRegistry;
-32:     }
-33: 
-34:     @Transactional(readOnly = true)
-35:     public List<UserSummary> listUsers(UserRole role) {
-36:         if (role == null) {
-37:             return userRepository.findAllByOrderByUsernameAsc()
-38:                 .stream()
-39:                 .map(UserSummaryMapper::toSummary)
-40:                 .toList();
-41:         }
-42: 
-43:         return userRepository.findAllByRoleOrderByUsernameAsc(Role.valueOf(role.getValue()))
-44:             .stream()
-45:             .map(UserSummaryMapper::toSummary)
-46:             .toList();
-47:     }
-48: 
-49:     @Transactional
-50:     public UserSummary updateUserStatus(Long userId, com.promptvault.contract.model.AccountStatus requestedStatus) {
-51:         UserEntity target = userRepository.findById(userId)
-52:             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-53: 
-54:         if (target.getRole() == Role.ADMIN || target.getId().equals(currentUserId())) {
-55:             throw new AccessDeniedException("User account status cannot be managed by this operation");
-56:         }
-57: 
-58:         AccountStatus accountStatus = AccountStatus.valueOf(requestedStatus.getValue());
-59:         target.setAccountStatus(accountStatus);
-60: 
-61:         if (accountStatus == AccountStatus.DISABLED) {
-62:             revokeSessions(target.getId());
-63:         }
-64: 
-65:         return UserSummaryMapper.toSummary(target);
-66:     }
-67: 
-68:     private void revokeSessions(Long userId) {
-69:         sessionRegistry.getAllPrincipals().stream()
-70:             .filter(PromptVaultUserDetails.class::isInstance)
-71:             .map(PromptVaultUserDetails.class::cast)
-72:             .filter(userDetails -> userDetails.getUser().getId().equals(userId))
-73:             .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
-74:             .forEach(SessionInformation::expireNow);
-75:     }
-76: 
-77:     private Long currentUserId() {
-78:         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-79:         if (authentication != null && authentication.getPrincipal() instanceof PromptVaultUserDetails userDetails) {
-80:             return userDetails.getUser().getId();
-81:         }
-82: 
-83:         throw new IllegalStateException("Authenticated principal is not a Prompt Vault user");
-84:     }
-85: }
-
-(End of file - total 85 lines)
-</content>
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 3.5s)
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/build.gradle",
-  "offset": 1,
-  "limit": 2000
-}
-```
-
-**Output:**
-```
-<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/build.gradle</path>
-<type>file</type>
-<content>
-1: plugins {
-2:     id 'java'
-3:     id 'org.springframework.boot' version '4.0.7'
-4:     id 'io.spring.dependency-management' version '1.1.7'
-5:     id 'org.openapi.generator' version '7.23.0'
-6: }
-7: 
-8: group = 'com.promptvault'
-9: version = '0.1.0-SNAPSHOT'
-10: 
-11: java {
-12:     toolchain {
-13:         languageVersion = JavaLanguageVersion.of(26)
-14:     }
-15: }
-16: 
-17: sourceSets {
-18:     main {
-19:         java {
-20:             srcDir "$buildDir/generated/openapi/src/main/java"
-21:         }
-22:     }
-23: }
-24: 
-25: configurations {
-26:     compileOnly {
-27:         extendsFrom annotationProcessor
-28:     }
-29: }
-30: 
-31: dependencies {
-32:     implementation 'org.springframework.boot:spring-boot-starter-web'
-33:     implementation 'org.springframework.boot:spring-boot-starter-security'
-34:     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-35:     implementation 'org.springframework.boot:spring-boot-starter-validation'
-36:     implementation 'org.springframework.boot:spring-boot-starter-flyway'
-37:     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
-38:     implementation 'org.flywaydb:flyway-mysql'
-39:     implementation 'org.openapitools:jackson-databind-nullable:0.2.8'
-40: 
-41:     runtimeOnly 'com.mysql:mysql-connector-j'
-42: 
-43:     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-44:     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-45:     testImplementation 'org.springframework.security:spring-security-test'
-46:     testImplementation 'org.testcontainers:testcontainers:2.0.3'
-47:     testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.3'
-48: }
-49: 
-50: openApiGenerate {
-51:     generatorName.set('spring')
-52:     inputSpec.set("$rootDir/openapi/api.yaml")
-53:     outputDir.set("$buildDir/generated/openapi")
-54:     apiPackage.set('com.promptvault.contract.api')
-55:     modelPackage.set('com.promptvault.contract.model')
-56:     invokerPackage.set('com.promptvault.contract.invoker')
-57:     configOptions.set([
-58:         library              : 'spring-boot',
-59:         interfaceOnly        : 'true',
-60:         useSpringBoot4       : 'true',
-61:         useJakartaEe         : 'true',
-62:         useResponseEntity    : 'true',
-63:         useTags              : 'true',
-64:         documentationProvider: 'source'
-65:     ])
-66: }
-67: 
-68: tasks.named('compileJava') {
-69:     dependsOn tasks.named('openApiGenerate')
-70: }
-71: 
-72: tasks.named('processResources') {
-73:     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-74: }
-75: 
-76: tasks.named('test') {
-77:     dependsOn tasks.named('openApiGenerate')
-78:     useJUnitPlatform()
-79: }
-
-(End of file - total 79 lines)
-</content>
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 44.6s)
-
-_Thinking:_
-
-**Implementing prompt updates**
-
-I need to make sure that when the owner updates a public prompt, it reflects immediately in the list and anyone can see the new title text. That sounds good! So, my next step is to implement this with tests. I'll use something like `apply_patch` to ensure it works correctly. It feels important to ensure everything is functioning smoothly, especially when updates happen. Let’s get to it!
-
-**Tool: apply_patch**
-
-**Input:**
-```json
-{
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/openapi/api.yaml\n@@\n   /api/prompts:\n     post:\n@@\n         '401':\n           description: No authenticated session is present.\n+  /api/public-prompts:\n+    get:\n+      tags:\n+        - Prompts\n+      operationId: listPublicPrompts\n+      summary: List public prompts\n+      description: Returns public prompts owned by other enabled users.\n+      responses:\n+        '200':\n+          description: Public prompts visible to the current authenticated user.\n+          content:\n+            application/json:\n+              schema:\n+                type: array\n+                items:\n+                  $ref: '#/components/schemas/PublicPrompt'\n+        '401':\n+          description: No authenticated session is present.\n+  /api/public-prompts/{promptId}:\n+    get:\n+      tags:\n+        - Prompts\n+      operationId: getPublicPrompt\n+      summary: Get public prompt detail\n+      description: Returns public prompt detail when the prompt is owned by another enabled user.\n+      parameters:\n+        - name: promptId\n+          in: path\n+          required: true\n+          schema:\n+            type: integer\n+            format: int64\n+      responses:\n+        '200':\n+          description: Public prompt detail visible to the current authenticated user.\n+          content:\n+            application/json:\n+              schema:\n+                $ref: '#/components/schemas/PublicPrompt'\n+        '401':\n+          description: No authenticated session is present.\n+        '404':\n+          description: The prompt is not visible as a public prompt to the current user.\n   /api/prompts/{promptId}:\n     get:\n@@\n     Prompt:\n       type: object\n@@\n         updatedAt:\n           type: string\n           format: date-time\n+    PublicPrompt:\n+      type: object\n+      additionalProperties: false\n+      required:\n+        - id\n+        - title\n+        - text\n+        - visibility\n+        - categoryId\n+        - ownerUsername\n+        - createdAt\n+        - updatedAt\n+      properties:\n+        id:\n+          type: integer\n+          format: int64\n+        title:\n+          type: string\n+        text:\n+          type: string\n+        visibility:\n+          $ref: '#/components/schemas/PromptVisibility'\n+        categoryId:\n+          type: integer\n+          format: int64\n+        ownerUsername:\n+          type: string\n+        createdAt:\n+          type: string\n+          format: date-time\n+        updatedAt:\n+          type: string\n+          format: date-time\n     ValidationFieldError:\n*** End Patch"
-}
-```
-
-**Output:**
-```
-Success. Updated the following files:
-M openapi/api.yaml
-```
+we already established that those cant be deleted
 
 ---
 
@@ -2797,671 +889,589 @@ M openapi/api.yaml
 
 _Thinking:_
 
+**Considering questions and context**
 
+I need to keep asking questions to clarify things. It might help to update the context since I already have some lines noted down. I should check the code for endpoints and security to see if that answers can be derived from it. The user mentioned something about categories and deletions, so I need to ask them to specify what they mean by "those." Maybe it’s time to refine my follow-up questions for clarity. Let's keep moving forward!
 
-**Tool: apply_patch**
+Got it — we’ll preserve the existing rule:
 
-**Input:**
-```json
-{
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java\n@@\n import java.util.Optional;\n \n+import com.promptvault.api.user.AccountStatus;\n import org.springframework.data.jpa.repository.EntityGraph;\n import org.springframework.data.jpa.repository.JpaRepository;\n@@\n     @EntityGraph(attributePaths = { \"owner\", \"category\" })\n     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);\n+\n+    @EntityGraph(attributePaths = { \"owner\", \"category\" })\n+    List<PromptEntity> findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(\n+        PromptVisibility visibility,\n+        AccountStatus ownerStatus,\n+        Long excludedOwnerId\n+    );\n+\n+    @EntityGraph(attributePaths = { \"owner\", \"category\" })\n+    Optional<PromptEntity> findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(\n+        Long id,\n+        PromptVisibility visibility,\n+        AccountStatus ownerStatus,\n+        Long excludedOwnerId\n+    );\n }\n*** End Patch"
-}
-```
+**Prompt Categories referenced by prompts cannot be deleted.**
 
-**Output:**
-```
-Success. Updated the following files:
-M apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
-```
+Next sharp edge:
 
----
+**Question 2:** Are Prompt Category **slugs** admin-editable, or are they generated once and immutable?
 
-## Assistant (Build · GPT-5.5 · 15.0s)
+My recommended answer: **slug is generated on create and never changes.**  
+Reason: your glossary calls it a “unique stable slug,” so allowing admins to edit it would undermine “stable.” Admin update should probably only change the category’s user-facing **label**, while keeping the slug fixed.
 
-**Tool: apply_patch**
+So the admin CRUD model would be:
 
-**Input:**
-```json
-{
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java\n@@\n import com.promptvault.api.promptcategory.PromptCategoryEntity;\n import com.promptvault.api.promptcategory.PromptCategoryRepository;\n+import com.promptvault.api.user.AccountStatus;\n import com.promptvault.api.user.UserEntity;\n@@\n     public PromptEntity getOwnedPrompt(Long promptId, UserEntity owner) {\n         return requireOwnedPrompt(promptId, owner);\n     }\n+\n+    @Transactional(readOnly = true)\n+    public List<PromptEntity> listPublicPrompts(UserEntity currentUser) {\n+        return promptRepository.findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(\n+            PromptVisibility.PUBLIC,\n+            AccountStatus.ENABLED,\n+            currentUser.getId()\n+        );\n+    }\n+\n+    @Transactional(readOnly = true)\n+    public PromptEntity getPublicPrompt(Long promptId, UserEntity currentUser) {\n+        return promptRepository.findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(\n+            promptId,\n+            PromptVisibility.PUBLIC,\n+            AccountStatus.ENABLED,\n+            currentUser.getId()\n+        ).orElseThrow(() -> new ResponseStatusException(NOT_FOUND));\n+    }\n \n     @Transactional\n     public PromptEntity updateOwnedPrompt(Long promptId, UpdatePromptRequest request, UserEntity owner) {\n*** End Patch"
-}
-```
+- **Create**: admin provides label; API normalizes label and generates slug.
+- **Read/List**: authenticated users can list categories; admin may use the same list endpoint or admin-specific detail/list.
+- **Update**: admin can change label only.
+- **Delete**: admin can delete only unused categories.
 
-**Output:**
-```
-Success. Updated the following files:
-M apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
-```
+Do we agree that **slugs are immutable after category creation**?
 
 ---
 
-## Assistant (Build · GPT-5.5 · 11.6s)
+## User
 
-**Tool: apply_patch**
-
-**Input:**
-```json
-{
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java\n@@\n import java.time.ZoneOffset;\n \n import com.promptvault.contract.model.Prompt;\n+import com.promptvault.contract.model.PublicPrompt;\n@@\n     public static Prompt toContract(PromptEntity prompt) {\n         return new Prompt(\n@@\n             prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)\n         );\n     }\n+\n+    public static PublicPrompt toPublicContract(PromptEntity prompt) {\n+        return new PublicPrompt(\n+            prompt.getId(),\n+            prompt.getTitle(),\n+            prompt.getText(),\n+            com.promptvault.contract.model.PromptVisibility.fromValue(prompt.getVisibility().name()),\n+            prompt.getCategory().getId(),\n+            prompt.getOwner().getUsername(),\n+            prompt.getCreatedAt().atOffset(ZoneOffset.UTC),\n+            prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)\n+        );\n+    }\n }\n*** End Patch"
-}
-```
-
-**Output:**
-```
-Success. Updated the following files:
-M apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
-```
+no, slugs are auto generated
 
 ---
 
-## Assistant (Build · GPT-5.5 · 12.7s)
-
-**Tool: apply_patch**
-
-**Input:**
-```json
-{
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java\n@@\n import com.promptvault.contract.api.PromptsApi;\n import com.promptvault.contract.model.CreatePromptRequest;\n import com.promptvault.contract.model.Prompt;\n+import com.promptvault.contract.model.PublicPrompt;\n import com.promptvault.contract.model.UpdatePromptRequest;\n@@\n     public ResponseEntity<Prompt> getPrompt(Long promptId) {\n         return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));\n     }\n+\n+    @Override\n+    public ResponseEntity<List<PublicPrompt>> listPublicPrompts() {\n+        return ResponseEntity.ok(promptsService.listPublicPrompts(currentUser())\n+            .stream()\n+            .map(PromptMapper::toPublicContract)\n+            .toList());\n+    }\n+\n+    @Override\n+    public ResponseEntity<PublicPrompt> getPublicPrompt(Long promptId) {\n+        return ResponseEntity.ok(PromptMapper.toPublicContract(promptsService.getPublicPrompt(promptId, currentUser())));\n+    }\n \n     @Override\n*** End Patch"
-}
-```
-
-**Output:**
-```
-Success. Updated the following files:
-M apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 93.1s)
+## Assistant (Build · GPT-5.5 · 9.6s)
 
 _Thinking:_
 
-**Planning test updates**
+**Clarifying auto-generated questions**
 
-I need to work on a tests patch, which sounds long and involved. Maybe adding tests after the share would be a good idea. I believe I should update the helper function updateUserStatus as part of this. Also, there's a need to add public endpoints for the unauthenticated routes. I'll proceed by patching things carefully to ensure everything goes smoothly. It's important to stay organized while tackling this!
+I need to continue focusing on this question about "auto-generated" aspects. I wonder if it needs clarification regarding whether it's related to creation or updating processes. I'm thinking it would make sense to incorporate domain modeling during the update once it's resolved. But for now, I haven't quite made that leap. There's still some uncertainty here that I need to work through to get it right.
+
+Good correction: **slugs are auto-generated**, not manually supplied.
+
+But I need to pin down the lifecycle:
+
+**Question 3:** When an admin renames a Prompt Category label, should the slug be regenerated from the new label, or should the original generated slug stay unchanged?
+
+My recommended answer: **regenerate the slug when the label changes.**  
+Reason: if slugs are not external/public stable identifiers yet, keeping label and slug aligned is simpler for admins and avoids weird data like label “Legal & Compliance” with slug `hr`.
+
+If we choose this, the glossary should change from “unique stable slug” to something like:
+
+> categories have a unique user-facing label and unique auto-generated slug derived from the label.
+
+Should renaming a category **regenerate its slug**?
+
+---
+
+## User
+
+regenerate the slug, prompts refer to the category id anyway so it does not matter
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.1s)
+
+_Thinking:_
+
+
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/.agents/skills/domain-modeling/CONTEXT-FORMAT.md",
+  "offset": 1,
+  "limit": 160
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/.agents/skills/domain-modeling/CONTEXT-FORMAT.md</path>
+<type>file</type>
+<content>
+1: # CONTEXT.md Format
+2: 
+3: ## Structure
+4: 
+5: ```md
+6: # {Context Name}
+7: 
+8: {One or two sentence description of what this context is and why it exists.}
+9: 
+10: ## Language
+11: 
+12: **Order**:
+13: {A one or two sentence description of the term}
+14: _Avoid_: Purchase, transaction
+15: 
+16: **Invoice**:
+17: A request for payment sent to a customer after delivery.
+18: _Avoid_: Bill, payment request
+19: 
+20: **Customer**:
+21: A person or organization that places orders.
+22: _Avoid_: Client, buyer, account
+23: ```
+24: 
+25: ## Rules
+26: 
+27: - **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
+28: - **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
+29: - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
+30: - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
+31: 
+32: ## Single vs multi-context repos
+33: 
+34: **Single context (most repos):** One `CONTEXT.md` at the repo root.
+35: 
+36: **Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
+37: 
+38: ```md
+39: # Context Map
+40: 
+41: ## Contexts
+42: 
+43: - [Ordering](./src/ordering/CONTEXT.md) — receives and tracks customer orders
+44: - [Billing](./src/billing/CONTEXT.md) — generates invoices and processes payments
+45: - [Fulfillment](./src/fulfillment/CONTEXT.md) — manages warehouse picking and shipping
+46: 
+47: ## Relationships
+48: 
+49: - **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
+50: - **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
+51: - **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
+52: ```
+53: 
+54: The skill infers which structure applies:
+55: 
+56: - If `CONTEXT-MAP.md` exists, read it to find contexts
+57: - If only a root `CONTEXT.md` exists, single context
+58: - If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
+59: 
+60: When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+
+(End of file - total 60 lines)
+</content>
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.1s)
 
 **Tool: apply_patch**
 
 **Input:**
 ```json
 {
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java\n@@\n     void promptOwnersCanShareAndUnshareOwnedPrompts() throws Exception {\n@@\n         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);\n     }\n+\n+    @Test\n+    void authenticatedUsersCanListAndRetrievePublicPromptsFromOtherEnabledUsersOnly() throws Exception {\n+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();\n+        TestUser viewer = createUser();\n+        TestUser owner = createUser();\n+        TestUser privateOwner = createUser();\n+        HttpClient viewerClient = authenticatedClient(viewer);\n+        HttpClient ownerClient = authenticatedClient(owner);\n+        HttpClient privateOwnerClient = authenticatedClient(privateOwner);\n+\n+        Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(\n+            \"title\", \"Visible public prompt\",\n+            \"text\", \"Visible public text\",\n+            \"categoryId\", category.getId()\n+        )).body()).get(\"id\")).longValue();\n+        updatePromptVisibility(ownerClient, publicPromptId, \"PUBLIC\");\n+        Long ownPublicPromptId = ((Number) readJson(createPrompt(viewerClient, Map.of(\n+            \"title\", \"Viewer own public prompt\",\n+            \"text\", \"Viewer own public text\",\n+            \"categoryId\", category.getId()\n+        )).body()).get(\"id\")).longValue();\n+        updatePromptVisibility(viewerClient, ownPublicPromptId, \"PUBLIC\");\n+        Long privatePromptId = ((Number) readJson(createPrompt(privateOwnerClient, Map.of(\n+            \"title\", \"Private other prompt\",\n+            \"text\", \"Private other text\",\n+            \"categoryId\", category.getId()\n+        )).body()).get(\"id\")).longValue();\n+\n+        HttpResponse<String> listResponse = listPublicPrompts(viewerClient);\n+        HttpResponse<String> detailResponse = getPublicPrompt(viewerClient, publicPromptId);\n+        HttpResponse<String> ownPublicDetailResponse = getPublicPrompt(viewerClient, ownPublicPromptId);\n+        HttpResponse<String> privateDetailResponse = getPublicPrompt(viewerClient, privatePromptId);\n+\n+        assertThat(listResponse.statusCode()).isEqualTo(200);\n+        List<Map<String, Object>> prompts = readList(listResponse.body());\n+        assertThat(prompts).filteredOn(prompt -> prompt.get(\"id\").equals(publicPromptId.intValue()))\n+            .singleElement()\n+            .satisfies(prompt -> {\n+                assertThat(prompt).containsEntry(\"title\", \"Visible public prompt\")\n+                    .containsEntry(\"text\", \"Visible public text\")\n+                    .containsEntry(\"visibility\", \"PUBLIC\")\n+                    .containsEntry(\"categoryId\", category.getId().intValue())\n+                    .containsEntry(\"ownerUsername\", owner.entity().getUsername());\n+                assertThat(prompt).doesNotContainKeys(\"ownerUserId\", \"emailAddress\");\n+                assertThat(prompt).doesNotContainValue(owner.entity().getEmailAddress());\n+            });\n+        assertThat(prompts).extracting(prompt -> prompt.get(\"id\"))\n+            .doesNotContain(ownPublicPromptId.intValue(), privatePromptId.intValue());\n+        assertThat(listResponse.body()).doesNotContain(owner.entity().getEmailAddress(), \"emailAddress\");\n+\n+        assertThat(detailResponse.statusCode()).isEqualTo(200);\n+        assertThat(readJson(detailResponse.body()))\n+            .containsEntry(\"id\", publicPromptId.intValue())\n+            .containsEntry(\"ownerUsername\", owner.entity().getUsername())\n+            .doesNotContainKeys(\"ownerUserId\", \"emailAddress\");\n+        assertThat(detailResponse.body()).doesNotContain(owner.entity().getEmailAddress(), \"emailAddress\");\n+        assertThat(ownPublicDetailResponse.statusCode()).isEqualTo(404);\n+        assertThat(privateDetailResponse.statusCode()).isEqualTo(404);\n+        assertThat(privateDetailResponse.body()).doesNotContain(\"Private other prompt\", \"Private other text\");\n+    }\n+\n+    @Test\n+    void publicReadsHideDisabledOwnersPromptsWithoutDeletingThemAndShowOwnerEditsImmediately() throws Exception {\n+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();\n+        TestUser viewer = createUser();\n+        TestUser owner = createUser();\n+        TestUser admin = createAdmin();\n+        HttpClient viewerClient = authenticatedClient(viewer);\n+        HttpClient ownerClient = authenticatedClient(owner);\n+        HttpClient adminClient = authenticatedClient(admin);\n+\n+        Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(\n+            \"title\", \"Original public title\",\n+            \"text\", \"Original public text\",\n+            \"categoryId\", category.getId()\n+        )).body()).get(\"id\")).longValue();\n+        updatePromptVisibility(ownerClient, promptId, \"PUBLIC\");\n+        HttpResponse<String> initialDetailResponse = getPublicPrompt(viewerClient, promptId);\n+\n+        updatePrompt(ownerClient, promptId, Map.of(\n+            \"title\", \"Updated public title\",\n+            \"text\", \"Updated public text\",\n+            \"categoryId\", category.getId()\n+        ));\n+        HttpResponse<String> updatedDetailResponse = getPublicPrompt(viewerClient, promptId);\n+\n+        HttpResponse<String> disableOwnerResponse = updateUserStatus(adminClient, owner.entity().getId(), \"DISABLED\");\n+        HttpResponse<String> listAfterDisableResponse = listPublicPrompts(viewerClient);\n+        HttpResponse<String> detailAfterDisableResponse = getPublicPrompt(viewerClient, promptId);\n+        HttpResponse<String> disabledOwnerPromptApiResponse = listPublicPrompts(ownerClient);\n+\n+        assertThat(initialDetailResponse.statusCode()).isEqualTo(200);\n+        assertThat(readJson(initialDetailResponse.body())).containsEntry(\"title\", \"Original public title\");\n+        assertThat(updatedDetailResponse.statusCode()).isEqualTo(200);\n+        assertThat(readJson(updatedDetailResponse.body()))\n+            .containsEntry(\"title\", \"Updated public title\")\n+            .containsEntry(\"text\", \"Updated public text\");\n+\n+        assertThat(disableOwnerResponse.statusCode()).isEqualTo(200);\n+        assertThat(listAfterDisableResponse.statusCode()).isEqualTo(200);\n+        assertThat(readList(listAfterDisableResponse.body())).extracting(prompt -> prompt.get(\"id\"))\n+            .doesNotContain(promptId.intValue());\n+        assertThat(detailAfterDisableResponse.statusCode()).isEqualTo(404);\n+        assertThat(detailAfterDisableResponse.body()).doesNotContain(\"Updated public title\", \"Updated public text\");\n+        assertThat(disabledOwnerPromptApiResponse.statusCode()).isEqualTo(401);\n+\n+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();\n+        assertThat(persistedPrompt.getTitle()).isEqualTo(\"Updated public title\");\n+        assertThat(persistedPrompt.getText()).isEqualTo(\"Updated public text\");\n+        assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PUBLIC);\n+        assertThat(persistedPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());\n+    }\n \n     @Test\n     void nonOwnersAndAdminsCannotShareOrUnsharePromptsOwnedByOtherUsers() throws Exception {\n@@\n         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, \"PUBLIC\");\n         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);\n+        HttpResponse<String> publicListResponse = listPublicPrompts(client);\n+        HttpResponse<String> publicDetailResponse = getPublicPrompt(client, 1L);\n \n         assertThat(createResponse.statusCode()).isEqualTo(401);\n         assertThat(listResponse.statusCode()).isEqualTo(401);\n         assertThat(detailResponse.statusCode()).isEqualTo(401);\n         assertThat(updateResponse.statusCode()).isEqualTo(401);\n         assertThat(visibilityResponse.statusCode()).isEqualTo(401);\n         assertThat(deleteResponse.statusCode()).isEqualTo(401);\n+        assertThat(publicListResponse.statusCode()).isEqualTo(401);\n+        assertThat(publicDetailResponse.statusCode()).isEqualTo(401);\n     }\n@@\n     private HttpResponse<String> getPrompt(HttpClient client, Long promptId) throws Exception {\n@@\n         return client.send(request, HttpResponse.BodyHandlers.ofString());\n     }\n+\n+    private HttpResponse<String> listPublicPrompts(HttpClient client) throws Exception {\n+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve(\"/api/public-prompts\"))\n+            .header(\"Accept\", \"application/json\")\n+            .GET()\n+            .build();\n+        return client.send(request, HttpResponse.BodyHandlers.ofString());\n+    }\n+\n+    private HttpResponse<String> getPublicPrompt(HttpClient client, Long promptId) throws Exception {\n+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve(\"/api/public-prompts/\" + promptId))\n+            .header(\"Accept\", \"application/json\")\n+            .GET()\n+            .build();\n+        return client.send(request, HttpResponse.BodyHandlers.ofString());\n+    }\n \n     private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {\n@@\n     private HttpResponse<String> deletePrompt(HttpClient client, Long promptId) throws Exception {\n@@\n         return client.send(request, HttpResponse.BodyHandlers.ofString());\n     }\n+\n+    private HttpResponse<String> updateUserStatus(HttpClient client, Long userId, String accountStatus) throws Exception {\n+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve(\"/api/admin/users/\" + userId + \"/status\"))\n+            .header(\"Content-Type\", \"application/json\")\n+            .header(\"Accept\", \"application/json\")\n+            .method(\"PATCH\", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(\n+                \"accountStatus\", accountStatus\n+            ))))\n+            .build();\n+        return client.send(request, HttpResponse.BodyHandlers.ofString());\n+    }\n \n     private Map<String, Object> readJson(String body) throws Exception {\n*** End Patch"
+  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/CONTEXT.md\n@@\n-**Prompt Category**:\n-A predefined system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique stable slug, and are not owned resources.\n+**Prompt Category**:\n+A system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique auto-generated slug derived from the label, and are not owned resources.\n*** End Patch"
 }
 ```
 
 **Output:**
 ```
 Success. Updated the following files:
-M apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
+M CONTEXT.md
 ```
+
+---
+
+## Assistant (Build · GPT-5.5 · 15.1s)
+
+Captured that in `CONTEXT.md`: Prompt Category slugs are now defined as **unique auto-generated slugs derived from the label**, not stable slugs.
+
+Next edge:
+
+**Question 4:** If an admin creates or renames a category to a label whose generated slug already exists, what should the API do?
+
+Example: existing category label is `HR`, slug `hr`; admin creates `H.R.` or `HR!`, which may normalize/generate to the same slug.
+
+My recommended answer: **reject with `400 ValidationErrorResponse` on `label` saying the category label is already in use or conflicts with an existing category.**  
+Reason: admins only control the label, not the slug, so the form-level error should point at the label. Also, using the existing validation error shape keeps frontend forms consistent.
+
+Agree: **label/slug uniqueness conflicts return `400` field error on `label`**?
+
+---
+
+## User
+
+yeah agreed
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.3s)
+
+Good.
+
+**Question 5:** For category creation, should admin attribution use the **current admin user** or always the original seeded Admin?
+
+Current data model has `created_by_user_id`, and seeded baseline categories are attributed to the seeded Admin.
+
+My recommended answer: **new admin-created categories use the current admin user as `createdByUserId`.**  
+Reason: this matches the field name, gives truthful provenance, and doesn’t overload the seeded Admin as a system actor.
+
+For updates, I’d avoid adding “updated by” unless you want audit history now.
+
+Agree: **createdByUserId = the admin who created the category**?
+
+---
+
+## User
+
+obviously it should refer to the user that is creating it
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.6s)
+
+Agreed — `createdByUserId` refers to the **actual admin user who created the category**.
+
+Next:
+
+**Question 6:** Should normal authenticated users continue to read the category catalog via `GET /api/prompt-categories`, while only create/update/delete are admin-only?
+
+My recommended answer: **yes.**  
+Reason: prompt creation/editing still needs category choices for all authenticated users. “CRUD by admins only” should mean **management mutations** are admin-only, not that normal users lose read access to the catalog.
+
+So:
+- `GET /api/prompt-categories`: authenticated users
+- admin create/update/delete: admins only
+
+Agree?
+
+---
+
+## User
+
+yes api should be GET /prompt/categories though
+
+---
+
+## Assistant (Build · GPT-5.5 · 10.6s)
+
+_Thinking:_
+
+**Clarifying API path**
+
+I need to keep working on clarifying the API path for the user. They mentioned wanting to know about `/prompt/categories`, but I need to confirm if it includes the `/api` prefix or if that's just a detail. It's a little confusing because all current API paths use `/api`. I should ask if this means we’re expected to implement it under that prefix or if there's a specific route to follow. One question should suffice!
+
+There’s a naming/path conflict to resolve.
+
+Current contract uses `/api/prompt-categories`, while you’re saying `GET /prompt/categories`.
+
+**Question 7:** Do you mean the public HTTP path should become **`/api/prompt/categories`** to match the project’s existing `/api/**` convention, or literally **`/prompt/categories`** without the `/api` prefix?
+
+My recommended answer: **`/api/prompt/categories`**.  
+Reason: every current backend route is under `/api/**`, Spring Security CORS is configured for `/api/**`, and project patterns explicitly describe API auth/CORS around `/api/**`.
+
+So I’d rename the category catalog endpoint from:
+
+- old: `GET /api/prompt-categories`
+
+to:
+
+- new: `GET /api/prompt/categories`
+
+Is that what you meant?
+
+---
+
+## User
+
+yes
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.5s)
+
+Great: canonical category catalog path becomes **`GET /api/prompt/categories`**.
+
+Next:
+
+**Question 8:** What should the admin management paths be?
+
+My recommended answer: use the same resource path with admin-only authorization:
+
+- `POST /api/prompt/categories`
+- `PATCH /api/prompt/categories/{categoryId}`
+- `DELETE /api/prompt/categories/{categoryId}`
+
+Reason: category management is about the same domain resource; authorization, not path shape, distinguishes admins. This also keeps the API clean and avoids `/api/admin/prompt-categories` drift.
+
+Alternative: `/api/admin/prompt/categories` to make admin surface explicit, like `/api/admin/users`.
+
+Which do you want: **same resource path with admin-only mutations**, or **admin-prefixed paths**?
+
+---
+
+## User
+
+this is pretty standard REST not sure why youre asking
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.9s)
+
+Fair pushback. I asked because the repo already uses `/api/admin/users` for an admin-only resource, so there are two established possibilities. For categories, the RESTful choice is straightforward.
+
+We’ll use:
+
+- `GET /api/prompt/categories` — authenticated users
+- `POST /api/prompt/categories` — admins only
+- `PATCH /api/prompt/categories/{categoryId}` — admins only
+- `DELETE /api/prompt/categories/{categoryId}` — admins only, blocked if in use
+
+Next sharp edge:
+
+**Question 9:** For `PATCH /api/prompt/categories/{categoryId}`, is the only editable field `label`?
+
+My recommended answer: **yes, only `label`.**  
+Reason: `id`, `createdAt`, and `createdByUserId` are provenance/identity; slug is auto-derived from label; `updatedAt` is system-managed.
+
+Agree?
+
+---
+
+## User
+
+yup
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.8s)
+
+Good.
+
+**Question 10:** Should category labels be normalized the same way as prompt titles — edge-trimmed, internal whitespace preserved — with case-insensitive uniqueness?
+
+My recommended answer: **yes.**  
+Reason: existing category data already has `label_normalized`; prompt inputs already use edge trimming; preserving internal whitespace avoids surprising edits while still preventing `" Legal "` and `"legal"` duplicates.
+
+So:
+- `" Legal "` stores as `"Legal"`
+- `"legal"` conflicts with `"Legal"`
+- `"Legal   Compliance"` preserves internal spacing unless you want whitespace collapse
+
+Agree: **trim edges, preserve internal whitespace, compare case-insensitively**?
+
+---
+
+## User
+
+only edge trimmed
+
+---
+
+## Assistant (Build · GPT-5.5 · 5.9s)
+
+Yes — **only edge trimmed**. That means we’ll trim surrounding whitespace and otherwise leave the label exactly as entered.
+
+Next edge:
+
+**Question 11:** What are the label length and blank rules for create/update?
+
+My recommended answer: **reuse the existing database shape: required, after edge-trim must be non-blank, max 100 characters.**  
+Reason: `PromptCategoryEntity.label` is already `nullable = false, length = 100`, so the contract and validation should match persistence.
+
+Agree: **label required, trimmed non-blank, max 100 chars**?
+
+---
+
+## User
+
+sure
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.4s)
+
+Great.
+
+**Question 12:** What should the create/update response contain?
+
+Current `PromptCategory` includes:
+
+- `id`
+- `label`
+- `slug`
+- `createdAt`
+- `createdByUserId`
+- `updatedAt`
+
+My recommended answer: **return the full `PromptCategory` on create and update.**  
+Reason: the client immediately needs the generated slug/timestamps/id, and this matches existing list items.
+
+So:
+- `POST /api/prompt/categories` returns `201 PromptCategory`
+- `PATCH /api/prompt/categories/{categoryId}` returns `200 PromptCategory`
+- `DELETE` returns `204`
+
+Agree?
+
+---
+
+## User
+
+yeah that looks good
+
+---
+
+## Assistant (Build · GPT-5.5 · 4.5s)
+
+Good.
+
+**Question 13:** For admin-only create/update/delete, should a normal authenticated user get `403 Forbidden`?
+
+My recommended answer: **yes:**
+- unauthenticated → `401`
+- authenticated normal user → `403`
+- authenticated admin → allowed
+
+Reason: this matches standard auth semantics and existing admin-user-management behavior.
+
+Agree?
+
+---
+
+## User
+
+that is pretty obvious
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.6s)
+
+_Thinking:_
+
+**Considering response adjustments**
+
+I think we should continue refining our approach, possibly offering fewer obvious responses and keeping things concise. It might be helpful to ask about any missing or in-use answers that need addressing. Plus, I should update context once resolved; maybe we can drop the glossary if it’s unnecessary. It feels like taking one question at a time would streamline the process. Keeping things clear is essential for a better experience!
+
+Fair. I’ll stop spending questions on standard HTTP/auth semantics and focus only on domain/product decisions.
+
+Next non-obvious one:
+
+**Question 14:** Do we need a category detail endpoint (`GET /api/prompt/categories/{categoryId}`), or is the list endpoint enough for now?
+
+My recommendation: **skip detail for now** unless the UI needs a standalone category edit page.  
+Reason: admin category management can load the list, edit rows/modals, and use create/update/delete responses to refresh cache. Adding detail is easy later but not required for CRUD workflows.
+
+Decision: **no category detail endpoint for this slice**?
+
+---
+
+## User
+
+no, the prompt DTO is fairly small we dont need a detail one
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.3s)
+
+_Thinking:_
+
+**Continuing the discussion on admin UI**
+
+I realize that I need to keep the grilling session going. Maybe I should update the context, but I think I've already done that. Should I ask more about the user interface? The user mentioned wanting to build and add categories for CRUD operations specifically for admins. That might mean I need to discuss the admin UI route further. There’s a lot to consider here, so I want to make sure I cover everything!
+
+Agreed: **no category detail endpoint**.
+
+Next meaningful product decision:
+
+**Question 15:** Do you want an admin web UI for managing categories in this slice, or is this API-only for now?
+
+My recommendation: **include the admin UI** at something like `/dashboard/admin/categories`.  
+Reason: “CRUD by admins” is only practically usable if admins have a management surface, and the repo already has an admin dashboard pattern for users.
+
+So the slice would include:
+- OpenAPI changes
+- API implementation + tests
+- generated client update
+- admin category management route/page
+
+Should this include the **admin categories UI** now?
+
+---
+
+## User
+
+only api for now
+
+---
+
+## Assistant (Build · GPT-5.5 · 11.9s)
+
+_Thinking:_
+
+
+
+Good: **API-only for now**.
+
+Next actual design edge:
+
+**Question 16:** What slug format should auto-generation use?
+
+Current project notes say baseline categories use **stable snake_case slugs**. Since we’ve changed “stable” to “regenerated on label change,” the remaining question is the shape.
+
+My recommendation: **keep snake_case slugs**:
+- `Legal` → `legal`
+- `Personal Productivity` → `personal_productivity`
+- `HR & Compliance` → `hr_compliance`
+- trim/collapse separator characters in the slug only, not in the label
+
+Reason: existing seed data already uses snake_case, so this avoids churn.
+
+Agree: **auto-generated slugs use snake_case**?
+
+---
+
+## User
+
+obviously keep it
 
 ---
 
 ## Assistant (Build · GPT-5.5 · 7.9s)
 
-_Thinking:_
+Agreed: **keep snake_case slug generation**.
 
-**Running tests and compiling**
+Last domain edge I see:
 
-Alright, I need to generate and test my compile. First, I should probably read the generated method to get a better understanding. Using `./gradlew :apps:api:test` seems like it might take a while, especially with Testcontainers involved. So, I think it might be a good idea to compile first. I’ll go ahead and use bash for that process. Let’s see how it goes!
+**Question 17:** When renaming a category, if the generated slug would conflict with another category’s slug but the label itself is different, should we still reject the rename?
 
-**Tool: bash**
+Example:
+- Existing: `AI / ML` → `ai_ml`
+- Rename another category to `AI ML` → also `ai_ml`
 
-**Input:**
-```json
-{
-  "command": "./gradlew :apps:api:compileJava :apps:api:compileTestJava",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Compiles API source and tests"
-}
-```
+My recommendation: **yes, reject it as a label validation error.**  
+Reason: slug uniqueness is a domain invariant, and admins don’t edit slugs directly, so the actionable field is still `label`.
 
-**Output:**
-```
-Reusing configuration cache.
-> Task :apps:api:processResources UP-TO-DATE
-
-> Task :apps:api:openApiGenerate
-[openApiGenerate] Worker isolation: classloader (fast startup, but generator classes accumulate in Gradle daemon Metaspace - consider workerIsolation = "process" if you hit metaspace pressure)
-OpenAPI 3.1 support is still in beta. To report an issue related to 3.1 spec, please kindly open an issue in the Github repo: https://github.com/openAPITools/openapi-generator.
-OpenAPI 3.1 support is still in beta. To report an issue related to 3.1 spec, please kindly open an issue in the Github repo: https://github.com/openAPITools/openapi-generator.
-############################################################################################
-# Thanks for using OpenAPI Generator.                                                      #
-# We appreciate your support! Please consider donation to help us maintain this project.   #
-# https://opencollective.com/openapi_generator/donate                                      #
-############################################################################################
-Successfully generated code to /Users/alessandrojcm/repos/prompt-vault/apps/api/build/generated/openapi
-
-> Task :apps:api:compileJava
-
-> Task :apps:api:classes
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-> Task :apps:api:compileTestJava
-
-[Incubating] Problems report is available at: file:///Users/alessandrojcm/repos/prompt-vault/build/reports/problems/problems-report.html
-
-BUILD SUCCESSFUL in 1s
-4 actionable tasks: 3 executed, 1 up-to-date
-Configuration cache entry reused.
-
-```
+Agree?
 
 ---
 
-## Assistant (Build · GPT-5.5 · 20.6s)
+## User
 
-_Thinking:_
-
-**Considering testing issues**
-
-I’m thinking maybe the test is failing due to it being stale. It’s possible I need to run a targeted test to check for specific issues. This would help me identify if it’s an underlying problem or just something outdated. I want to ensure I’m covering all bases here, so I should approach the situation carefully and make sure to adjust my testing strategy if needed. That way, I can get a clearer result!
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "./gradlew :apps:api:test --tests com.promptvault.api.prompt.PromptsApiTest",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Runs prompt API integration tests"
-}
-```
-
-**Output:**
-```
-Reusing configuration cache.
-> Task :apps:api:processTestResources NO-SOURCE
-> Task :apps:api:processResources UP-TO-DATE
-> Task :apps:api:openApiGenerate UP-TO-DATE
-> Task :apps:api:compileJava UP-TO-DATE
-> Task :apps:api:classes UP-TO-DATE
-> Task :apps:api:compileTestJava UP-TO-DATE
-> Task :apps:api:testClasses UP-TO-DATE
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-2026-06-25T18:08:30.499+01:00  INFO 14519 --- [prompt-vault-api] [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-2026-06-25T18:08:30.501+01:00  INFO 14519 --- [prompt-vault-api] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-2026-06-25T18:08:30.503+01:00  INFO 14519 --- [prompt-vault-api] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-06-25T18:08:30.505+01:00  INFO 14519 --- [prompt-vault-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-06-25T18:08:30.512+01:00  INFO 14519 --- [prompt-vault-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-> Task :apps:api:test
-
-BUILD SUCCESSFUL in 14s
-5 actionable tasks: 1 executed, 4 up-to-date
-Configuration cache entry reused.
-
-```
+obviously
 
 ---
 
-## Assistant (Build · GPT-5.5 · 10.1s)
+## Assistant (Build · GPT-5.5 · 10.3s)
 
 _Thinking:_
 
-**Running full check**
 
-I think I need to run a complete check, even though it might take a while. But it feels necessary to make sure everything is in order. Plus, I’ll need to utilize the git diff command for comparing changes. That way, I can pinpoint any differences accurately. It’s all about making sure I’m thorough and precise in what I’m doing, right? Let's get started!
 
-**Tool: bash**
+Agreed.
 
-**Input:**
-```json
-{
-  "command": "git diff -- openapi/api.yaml apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows diff for implemented changes"
-}
-```
+One remaining domain wrinkle:
 
-**Output:**
-```
-diff --git a/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java b/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
-index 0ac8563..18f3d06 100644
---- a/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
-+++ b/apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
-@@ -3,6 +3,7 @@ package com.promptvault.api.prompt;
- import java.time.ZoneOffset;
- 
- import com.promptvault.contract.model.Prompt;
-+import com.promptvault.contract.model.PublicPrompt;
- 
- public final class PromptMapper {
- 
-@@ -21,4 +22,17 @@ public final class PromptMapper {
-             prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
-         );
-     }
-+
-+    public static PublicPrompt toPublicContract(PromptEntity prompt) {
-+        return new PublicPrompt(
-+            prompt.getId(),
-+            prompt.getTitle(),
-+            prompt.getText(),
-+            com.promptvault.contract.model.PromptVisibility.fromValue(prompt.getVisibility().name()),
-+            prompt.getCategory().getId(),
-+            prompt.getOwner().getUsername(),
-+            prompt.getCreatedAt().atOffset(ZoneOffset.UTC),
-+            prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
-+        );
-+    }
- }
-diff --git a/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java b/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
-index 6ed4a33..8c675da 100644
---- a/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
-+++ b/apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
-@@ -3,6 +3,7 @@ package com.promptvault.api.prompt;
- import java.util.List;
- import java.util.Optional;
- 
-+import com.promptvault.api.user.AccountStatus;
- import org.springframework.data.jpa.repository.EntityGraph;
- import org.springframework.data.jpa.repository.JpaRepository;
- 
-@@ -13,4 +14,19 @@ public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
- 
-     @EntityGraph(attributePaths = { "owner", "category" })
-     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);
-+
-+    @EntityGraph(attributePaths = { "owner", "category" })
-+    List<PromptEntity> findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
-+        PromptVisibility visibility,
-+        AccountStatus ownerStatus,
-+        Long excludedOwnerId
-+    );
-+
-+    @EntityGraph(attributePaths = { "owner", "category" })
-+    Optional<PromptEntity> findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(
-+        Long id,
-+        PromptVisibility visibility,
-+        AccountStatus ownerStatus,
-+        Long excludedOwnerId
-+    );
- }
-diff --git a/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java b/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
-index e07ca8e..eb7b76e 100644
---- a/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
-+++ b/apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
-@@ -7,6 +7,7 @@ import com.promptvault.api.user.UserEntity;
- import com.promptvault.contract.api.PromptsApi;
- import com.promptvault.contract.model.CreatePromptRequest;
- import com.promptvault.contract.model.Prompt;
-+import com.promptvault.contract.model.PublicPrompt;
- import com.promptvault.contract.model.UpdatePromptRequest;
- import com.promptvault.contract.model.UpdatePromptVisibilityRequest;
- import org.springframework.http.HttpStatus;
-@@ -48,6 +49,19 @@ public class PromptsController implements PromptsApi {
-         return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));
-     }
- 
-+    @Override
-+    public ResponseEntity<List<PublicPrompt>> listPublicPrompts() {
-+        return ResponseEntity.ok(promptsService.listPublicPrompts(currentUser())
-+            .stream()
-+            .map(PromptMapper::toPublicContract)
-+            .toList());
-+    }
-+
-+    @Override
-+    public ResponseEntity<PublicPrompt> getPublicPrompt(Long promptId) {
-+        return ResponseEntity.ok(PromptMapper.toPublicContract(promptsService.getPublicPrompt(promptId, currentUser())));
-+    }
-+
-     @Override
-     public ResponseEntity<Prompt> updatePrompt(Long promptId, UpdatePromptRequest updatePromptRequest) {
-         return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPrompt(
-diff --git a/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java b/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
-index 391bdf4..f487a44 100644
---- a/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
-+++ b/apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
-@@ -4,6 +4,7 @@ import java.util.List;
- 
- import com.promptvault.api.promptcategory.PromptCategoryEntity;
- import com.promptvault.api.promptcategory.PromptCategoryRepository;
-+import com.promptvault.api.user.AccountStatus;
- import com.promptvault.api.user.UserEntity;
- import com.promptvault.contract.model.CreatePromptRequest;
- import com.promptvault.contract.model.UpdatePromptRequest;
-@@ -48,6 +49,25 @@ public class PromptsService {
-         return requireOwnedPrompt(promptId, owner);
-     }
- 
-+    @Transactional(readOnly = true)
-+    public List<PromptEntity> listPublicPrompts(UserEntity currentUser) {
-+        return promptRepository.findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
-+            PromptVisibility.PUBLIC,
-+            AccountStatus.ENABLED,
-+            currentUser.getId()
-+        );
-+    }
-+
-+    @Transactional(readOnly = true)
-+    public PromptEntity getPublicPrompt(Long promptId, UserEntity currentUser) {
-+        return promptRepository.findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(
-+            promptId,
-+            PromptVisibility.PUBLIC,
-+            AccountStatus.ENABLED,
-+            currentUser.getId()
-+        ).orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
-+    }
-+
-     @Transactional
-     public PromptEntity updateOwnedPrompt(Long promptId, UpdatePromptRequest request, UserEntity owner) {
-         PromptEntity prompt = requireOwnedPrompt(promptId, owner);
-diff --git a/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java b/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
-index cff4159..7577730 100644
---- a/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
-+++ b/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
-@@ -221,6 +221,119 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
-         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
-     }
- 
-+    @Test
-+    void authenticatedUsersCanListAndRetrievePublicPromptsFromOtherEnabledUsersOnly() throws Exception {
-+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-+        TestUser viewer = createUser();
-+        TestUser owner = createUser();
-+        TestUser privateOwner = createUser();
-+        HttpClient viewerClient = authenticatedClient(viewer);
-+        HttpClient ownerClient = authenticatedClient(owner);
-+        HttpClient privateOwnerClient = authenticatedClient(privateOwner);
-+
-+        Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-+            "title", "Visible public prompt",
-+            "text", "Visible public text",
-+            "categoryId", category.getId()
-+        )).body()).get("id")).longValue();
-+        updatePromptVisibility(ownerClient, publicPromptId, "PUBLIC");
-+        Long ownPublicPromptId = ((Number) readJson(createPrompt(viewerClient, Map.of(
-+            "title", "Viewer own public prompt",
-+            "text", "Viewer own public text",
-+            "categoryId", category.getId()
-+        )).body()).get("id")).longValue();
-+        updatePromptVisibility(viewerClient, ownPublicPromptId, "PUBLIC");
-+        Long privatePromptId = ((Number) readJson(createPrompt(privateOwnerClient, Map.of(
-+            "title", "Private other prompt",
-+            "text", "Private other text",
-+            "categoryId", category.getId()
-+        )).body()).get("id")).longValue();
-+
-+        HttpResponse<String> listResponse = listPublicPrompts(viewerClient);
-+        HttpResponse<String> detailResponse = getPublicPrompt(viewerClient, publicPromptId);
-+        HttpResponse<String> ownPublicDetailResponse = getPublicPrompt(viewerClient, ownPublicPromptId);
-+        HttpResponse<String> privateDetailResponse = getPublicPrompt(viewerClient, privatePromptId);
-+
-+        assertThat(listResponse.statusCode()).isEqualTo(200);
-+        List<Map<String, Object>> prompts = readList(listResponse.body());
-+        assertThat(prompts).filteredOn(prompt -> prompt.get("id").equals(publicPromptId.intValue()))
-+            .singleElement()
-+            .satisfies(prompt -> {
-+                assertThat(prompt).containsEntry("title", "Visible public prompt")
-+                    .containsEntry("text", "Visible public text")
-+                    .containsEntry("visibility", "PUBLIC")
-+                    .containsEntry("categoryId", category.getId().intValue())
-+                    .containsEntry("ownerUsername", owner.entity().getUsername());
-+                assertThat(prompt).doesNotContainKeys("ownerUserId", "emailAddress");
-+                assertThat(prompt).doesNotContainValue(owner.entity().getEmailAddress());
-+            });
-+        assertThat(prompts).extracting(prompt -> prompt.get("id"))
-+            .doesNotContain(ownPublicPromptId.intValue(), privatePromptId.intValue());
-+        assertThat(listResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
-+
-+        assertThat(detailResponse.statusCode()).isEqualTo(200);
-+        assertThat(readJson(detailResponse.body()))
-+            .containsEntry("id", publicPromptId.intValue())
-+            .containsEntry("ownerUsername", owner.entity().getUsername())
-+            .doesNotContainKeys("ownerUserId", "emailAddress");
-+        assertThat(detailResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
-+        assertThat(ownPublicDetailResponse.statusCode()).isEqualTo(404);
-+        assertThat(privateDetailResponse.statusCode()).isEqualTo(404);
-+        assertThat(privateDetailResponse.body()).doesNotContain("Private other prompt", "Private other text");
-+    }
-+
-+    @Test
-+    void publicReadsHideDisabledOwnersPromptsWithoutDeletingThemAndShowOwnerEditsImmediately() throws Exception {
-+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-+        TestUser viewer = createUser();
-+        TestUser owner = createUser();
-+        TestUser admin = createAdmin();
-+        HttpClient viewerClient = authenticatedClient(viewer);
-+        HttpClient ownerClient = authenticatedClient(owner);
-+        HttpClient adminClient = authenticatedClient(admin);
-+
-+        Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-+            "title", "Original public title",
-+            "text", "Original public text",
-+            "categoryId", category.getId()
-+        )).body()).get("id")).longValue();
-+        updatePromptVisibility(ownerClient, promptId, "PUBLIC");
-+        HttpResponse<String> initialDetailResponse = getPublicPrompt(viewerClient, promptId);
-+
-+        updatePrompt(ownerClient, promptId, Map.of(
-+            "title", "Updated public title",
-+            "text", "Updated public text",
-+            "categoryId", category.getId()
-+        ));
-+        HttpResponse<String> updatedDetailResponse = getPublicPrompt(viewerClient, promptId);
-+
-+        HttpResponse<String> disableOwnerResponse = updateUserStatus(adminClient, owner.entity().getId(), "DISABLED");
-+        HttpResponse<String> listAfterDisableResponse = listPublicPrompts(viewerClient);
-+        HttpResponse<String> detailAfterDisableResponse = getPublicPrompt(viewerClient, promptId);
-+        HttpResponse<String> disabledOwnerPromptApiResponse = listPublicPrompts(ownerClient);
-+
-+        assertThat(initialDetailResponse.statusCode()).isEqualTo(200);
-+        assertThat(readJson(initialDetailResponse.body())).containsEntry("title", "Original public title");
-+        assertThat(updatedDetailResponse.statusCode()).isEqualTo(200);
-+        assertThat(readJson(updatedDetailResponse.body()))
-+            .containsEntry("title", "Updated public title")
-+            .containsEntry("text", "Updated public text");
-+
-+        assertThat(disableOwnerResponse.statusCode()).isEqualTo(200);
-+        assertThat(listAfterDisableResponse.statusCode()).isEqualTo(200);
-+        assertThat(readList(listAfterDisableResponse.body())).extracting(prompt -> prompt.get("id"))
-+            .doesNotContain(promptId.intValue());
-+        assertThat(detailAfterDisableResponse.statusCode()).isEqualTo(404);
-+        assertThat(detailAfterDisableResponse.body()).doesNotContain("Updated public title", "Updated public text");
-+        assertThat(disabledOwnerPromptApiResponse.statusCode()).isEqualTo(401);
-+
-+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
-+        assertThat(persistedPrompt.getTitle()).isEqualTo("Updated public title");
-+        assertThat(persistedPrompt.getText()).isEqualTo("Updated public text");
-+        assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
-+        assertThat(persistedPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
-+    }
-+
-     @Test
-     void nonOwnersAndAdminsCannotShareOrUnsharePromptsOwnedByOtherUsers() throws Exception {
-         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
-@@ -493,6 +606,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
-         ));
-         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, "PUBLIC");
-         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
-+        HttpResponse<String> publicListResponse = listPublicPrompts(client);
-+        HttpResponse<String> publicDetailResponse = getPublicPrompt(client, 1L);
- 
-         assertThat(createResponse.statusCode()).isEqualTo(401);
-         assertThat(listResponse.statusCode()).isEqualTo(401);
-@@ -500,6 +615,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
-         assertThat(updateResponse.statusCode()).isEqualTo(401);
-         assertThat(visibilityResponse.statusCode()).isEqualTo(401);
-         assertThat(deleteResponse.statusCode()).isEqualTo(401);
-+        assertThat(publicListResponse.statusCode()).isEqualTo(401);
-+        assertThat(publicDetailResponse.statusCode()).isEqualTo(401);
-     }
- 
-     private TestUser createUser() {
-@@ -574,6 +691,22 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
-         return client.send(request, HttpResponse.BodyHandlers.ofString());
-     }
- 
-+    private HttpResponse<String> listPublicPrompts(HttpClient client) throws Exception {
-+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts"))
-+            .header("Accept", "application/json")
-+            .GET()
-+            .build();
-+        return client.send(request, HttpResponse.BodyHandlers.ofString());
-+    }
-+
-+    private HttpResponse<String> getPublicPrompt(HttpClient client, Long promptId) throws Exception {
-+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts/" + promptId))
-+            .header("Accept", "application/json")
-+            .GET()
-+            .build();
-+        return client.send(request, HttpResponse.BodyHandlers.ofString());
-+    }
-+
-     private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {
-         return updatePromptJson(client, promptId, objectMapper.writeValueAsString(payload));
-     }
-@@ -605,6 +738,17 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
-         return client.send(request, HttpResponse.BodyHandlers.ofString());
-     }
- 
-+    private HttpResponse<String> updateUserStatus(HttpClient client, Long userId, String accountStatus) throws Exception {
-+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/users/" + userId + "/status"))
-+            .header("Content-Type", "application/json")
-+            .header("Accept", "application/json")
-+            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-+                "accountStatus", accountStatus
-+            ))))
-+            .build();
-+        return client.send(request, HttpResponse.BodyHandlers.ofString());
-+    }
-+
-     private Map<String, Object> readJson(String body) throws Exception {
-         return objectMapper.readValue(body, new TypeReference<>() { });
-     }
-diff --git a/openapi/api.yaml b/openapi/api.yaml
-index 9768f9d..7b7f19f 100644
---- a/openapi/api.yaml
-+++ b/openapi/api.yaml
-@@ -138,6 +138,49 @@ paths:
-                 $ref: '#/components/schemas/ValidationErrorResponse'
-         '401':
-           description: No authenticated session is present.
-+  /api/public-prompts:
-+    get:
-+      tags:
-+        - Prompts
-+      operationId: listPublicPrompts
-+      summary: List public prompts
-+      description: Returns public prompts owned by other enabled users.
-+      responses:
-+        '200':
-+          description: Public prompts visible to the current authenticated user.
-+          content:
-+            application/json:
-+              schema:
-+                type: array
-+                items:
-+                  $ref: '#/components/schemas/PublicPrompt'
-+        '401':
-+          description: No authenticated session is present.
-+  /api/public-prompts/{promptId}:
-+    get:
-+      tags:
-+        - Prompts
-+      operationId: getPublicPrompt
-+      summary: Get public prompt detail
-+      description: Returns public prompt detail when the prompt is owned by another enabled user.
-+      parameters:
-+        - name: promptId
-+          in: path
-+          required: true
-+          schema:
-+            type: integer
-+            format: int64
-+      responses:
-+        '200':
-+          description: Public prompt detail visible to the current authenticated user.
-+          content:
-+            application/json:
-+              schema:
-+                $ref: '#/components/schemas/PublicPrompt'
-+        '401':
-+          description: No authenticated session is present.
-+        '404':
-+          description: The prompt is not visible as a public prompt to the current user.
-   /api/prompts/{promptId}:
-     get:
-       tags:
-@@ -556,6 +599,39 @@ components:
-         updatedAt:
-           type: string
-           format: date-time
-+    PublicPrompt:
-+      type: object
-+      additionalProperties: false
-+      required:
-+        - id
-+        - title
-+        - text
-+        - visibility
-+        - categoryId
-+        - ownerUsername
-+        - createdAt
-+        - updatedAt
-+      properties:
-+        id:
-+          type: integer
-+          format: int64
-+        title:
-+          type: string
-+        text:
-+          type: string
-+        visibility:
-+          $ref: '#/components/schemas/PromptVisibility'
-+        categoryId:
-+          type: integer
-+          format: int64
-+        ownerUsername:
-+          type: string
-+        createdAt:
-+          type: string
-+          format: date-time
-+        updatedAt:
-+          type: string
-+          format: date-time
-     ValidationFieldError:
-       type: object
-       additionalProperties: false
+**Question 18:** Can admins delete the **baseline seeded categories** if they are unused, or are initial categories protected forever?
 
-```
+My recommendation: **admins can delete any unused category, including seeded baseline categories.**  
+Reason: once categories are admin-managed, “baseline” just means initial data, not permanent system taxonomy. The real protection rule is “cannot delete while referenced by prompts.”
 
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git status --short --branch",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows current branch and changes"
-}
-```
-
-**Output:**
-```
-## issue-28-read-public-prompts
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
- M apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
- M openapi/api.yaml
-
-```
+Agree?
 
 ---
 
-## Assistant (Build · GPT-5.5 · 3.3s)
+## User
+
+yes they can
+
+---
+
+## Assistant (Build · GPT-5.5 · 17.3s)
 
 _Thinking:_
 
+**Updating project documentation**
 
+I need to make some edits. Instead of referring to "AGENTS," I should write, "At the end, always update AGENTS.md with any new relevant project information when necessary; use skill." I’ll also load the skill at the end. We're close to finalizing the grilling process with document updates. I might need to update project-patterns or AGENTS. Let's remember to use that skill!
 
 **Tool: skill**
 
@@ -3571,20 +1581,20 @@ Note: file list is sampled.
 
 ---
 
-## Assistant (Build · GPT-5.5 · 11.2s)
+## Assistant (Build · GPT-5.5 · 9.9s)
 
 _Thinking:_
 
-**Updating project documentation**
+**Updating project patterns**
 
-I'm thinking about updating the documentation for agents or project patterns. However, I wonder if I shouldn't focus on the AGENTS section due to indexing issues. Maybe I'll just add bullet points with public prompts instead. This could help clarify the information and make it more accessible. There's definitely something important here, and I want to ensure the documentation is accurate and useful for everyone involved!
+I need to update line 69 in project-patterns, and my plan is to use the apply_patch function. It's important for me to make sure I'm doing this correctly, as it ensures everything runs smoothly. I might also want to double-check if there are any additional adjustments necessary after applying the patch. I just want to make sure I'm on the right track with this update!
 
 **Tool: apply_patch**
 
 **Input:**
 ```json
 {
-  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md\n@@\n - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.\n - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.\n+- Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.\n \n ## Testing patterns\n*** End Patch"
+  "patchText": "*** Begin Patch\n*** Update File: /Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md\n@@\n-- Prompt Category catalog is `GET /api/prompt-categories` for authenticated users; baseline categories are seeded by Flyway with stable snake_case slugs, case-insensitive label uniqueness via `label_normalized`, globally unique slugs, and `created_by_user_id` attribution to the seeded Admin.\n+- Prompt Category catalog is `GET /api/prompt/categories` for authenticated users; admin-only mutations on the same resource path create/update/delete categories; labels are edge-trimmed, unique case-insensitively via `label_normalized`, and drive auto-generated globally unique snake_case slugs that regenerate on label changes; `created_by_user_id` attributes the admin who created each category; categories cannot be deleted while referenced by prompts, but unused baseline seeded categories may be deleted.\n*** End Patch"
 }
 ```
 
@@ -3596,7 +1606,118 @@ M docs/agents/project-patterns.md
 
 ---
 
-## Assistant (Build · GPT-5.5 · 10.3s)
+## Assistant (Build · GPT-5.5 · 11.3s)
+
+_Thinking:_
+
+**Consolidating project updates**
+
+I need to clarify if AGENTS are required. It seems like they're linked to project patterns, but I don't want to overcomplicate things. I don’t think I need the "AGENTS.md" document—it feels unnecessary at this point. I should finalize my notes after reviewing the grilling process and updating the documentation. It could be useful to include an implementation brief and mention any relevant files. Let's keep things straightforward!
+
+Grilling outcome locked in.
+
+Decisions captured:
+
+- `GET /api/prompt/categories` remains available to authenticated users.
+- Admin-only mutations use same REST resource:
+  - `POST /api/prompt/categories`
+  - `PATCH /api/prompt/categories/{categoryId}`
+  - `DELETE /api/prompt/categories/{categoryId}`
+- API-only for now; no web UI.
+- No detail endpoint needed.
+- Create/update only accept `label`.
+- Labels are edge-trimmed, required, non-blank, max 100 chars.
+- Label uniqueness is case-insensitive.
+- Slugs are auto-generated snake_case from label.
+- Slugs regenerate when label changes.
+- Slug conflicts are rejected as `label` validation errors.
+- Create/update return full `PromptCategory`; delete returns `204`.
+- `createdByUserId` is the actual admin who created the category.
+- Admins may delete unused seeded baseline categories.
+- Categories referenced by prompts cannot be deleted.
+
+Updated docs:
+
+- `CONTEXT.md`
+- `docs/agents/project-patterns.md`
+
+---
+
+## User
+
+This skill takes the current conversation context and codebase understanding and produces a PRD. Do NOT interview the user — just synthesize what you already know.
+
+The issue tracker and triage label vocabulary should have been provided to you — run `/setup-matt-pocock-skills` if not.
+
+## Process
+
+1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the PRD, and respect any ADRs in the area you're touching.
+
+2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+
+Check with the user that these seams match their expectations.
+
+3. Write the PRD using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+
+<prd-template>
+
+## Problem Statement
+
+The problem that the user is facing, from the user's perspective.
+
+## Solution
+
+The solution to the problem, from the user's perspective.
+
+## User Stories
+
+A LONG, numbered list of user stories. Each user story should be in the format of:
+
+1. As an <actor>, I want a <feature>, so that <benefit>
+
+<user-story-example>
+1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
+</user-story-example>
+
+This list of user stories should be extremely extensive and cover all aspects of the feature.
+
+## Implementation Decisions
+
+A list of implementation decisions that were made. This can include:
+
+- The modules that will be built/modified
+- The interfaces of those modules that will be modified
+- Technical clarifications from the developer
+- Architectural decisions
+- Schema changes
+- API contracts
+- Specific interactions
+
+Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+
+Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+
+## Testing Decisions
+
+A list of testing decisions that were made. Include:
+
+- A description of what makes a good test (only test external behavior, not implementation details)
+- Which modules will be tested
+- Prior art for the tests (i.e. similar types of tests in the codebase)
+
+## Out of Scope
+
+A description of the things that are out of scope for this PRD.
+
+## Further Notes
+
+Any further notes about the feature.
+
+</prd-template>
+
+---
+
+## Assistant (Build · GPT-5.5 · 11.8s)
 
 _Thinking:_
 
@@ -3609,29 +1730,1057 @@ _Thinking:_
 {
   "todos": [
     {
-      "content": "Inspect issue 28 and current workspace state",
+      "content": "Review issue tracker instructions and relevant category patterns",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Confirm proposed testing seams with user",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Write PRD from current decisions",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Publish PRD issue with ready-for-agent label",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if new project info emerged",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Review issue tracker instructions and relevant category patterns",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Confirm proposed testing seams with user",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Write PRD from current decisions",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Publish PRD issue with ready-for-agent label",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if new project info emerged",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.2s)
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/issue-tracker.md",
+  "offset": 1,
+  "limit": 200
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/docs/agents/issue-tracker.md</path>
+<type>file</type>
+<content>
+1: # Issue tracker: GitHub
+2: 
+3: Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+4: 
+5: ## Conventions
+6: 
+7: - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
+8: - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
+9: - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
+10: - **Comment on an issue**: `gh issue comment <number> --body "..."`
+11: - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
+12: - **Close**: `gh issue close <number> --comment "..."`
+13: 
+14: Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
+15: 
+16: ## When a skill says "publish to the issue tracker"
+17: 
+18: Create a GitHub issue.
+19: 
+20: ## When a skill says "fetch the relevant ticket"
+21: 
+22: Run `gh issue view <number> --comments`.
+
+(End of file - total 22 lines)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/triage-labels.md",
+  "offset": 1,
+  "limit": 200
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/docs/agents/triage-labels.md</path>
+<type>file</type>
+<content>
+1: # Triage Labels
+2: 
+3: The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker.
+4: 
+5: | Label in mattpocock/skills | Label in our tracker | Meaning                                  |
+6: | -------------------------- | -------------------- | ---------------------------------------- |
+7: | `needs-triage`             | `needs-triage`       | Maintainer needs to evaluate this issue  |
+8: | `needs-info`               | `needs-info`         | Waiting on reporter for more information |
+9: | `ready-for-agent`          | `ready-for-agent`    | Fully specified, ready for an AFK agent  |
+10: | `ready-for-human`          | `ready-for-human`    | Requires human implementation            |
+11: | `wontfix`                  | `wontfix`            | Will not be actioned                     |
+12: 
+13: When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
+14: 
+15: Edit the right-hand column to match whatever vocabulary you actually use.
+
+(End of file - total 15 lines)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md",
+  "offset": 56,
+  "limit": 30
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md</path>
+<type>file</type>
+<content>
+56: ## Data and admin patterns
+57: 
+58: - Use MySQL via Docker Compose, Flyway migrations/seed data, and Spring Data JPA for persistence mapping.
+59: - Keep the shared `docker-compose.yml` compatible with Testcontainers Compose-based tests; do not set `container_name` on services used by automated tests.
+60: - The initial `users` Flyway table constrains `email_address` uniquely and stores `role` / `account_status` as MySQL `ENUM`s.
+61: - Case-insensitive username and email uniqueness are enforced with persisted normalized columns (`username_normalized`, `email_address_normalized`) so disabled users still reserve both identities.
+62: - Flyway `V3__seed_admin_user.sql` owns the baseline Admin seed; public signup must never create or promote admins.
+63: - The seeded local/dev admin user is `admin` with password `admin-password123`; keep the migration comment and login coverage updated if changing it.
+64: - User Management lives at `/dashboard/admin/users` under the authenticated dashboard layout and is admin-only; the route guard redirects unauthenticated visitors through the auth gate/login flow and authenticated normal users to `/dashboard`.
+65: - Admin User Management uses `GET /api/admin/users` with an optional `role` enum query parameter (`USER` / `ADMIN`).
+66: - Admin User Management updates account state with `PATCH /api/admin/users/{userId}/status` and a desired `accountStatus`; the endpoint is idempotent, returns the updated user, returns `404` for missing users, and returns `403` when targeting admins or the current user.
+67: - The `/dashboard/admin/users` UI initially requests `role=USER`, hides internal IDs and the role column, shows username/email address/account status/actions, labels enum values for humans, confirms disable actions with a small popover, enables immediately, updates rows in place, and shows toasts.
+68: - Disabling a normal user preserves their data and identity reservations, revokes existing sessions so subsequent current-user checks behave unauthenticated, and does not create audit records in the initial slice.
+69: - Prompt Category catalog is `GET /api/prompt/categories` for authenticated users; admin-only mutations on the same resource path create/update/delete categories; labels are edge-trimmed, unique case-insensitively via `label_normalized`, and drive auto-generated globally unique snake_case slugs that regenerate on label changes; `created_by_user_id` attributes the admin who created each category; categories cannot be deleted while referenced by prompts, but unused baseline seeded categories may be deleted.
+70: - Prompt creation is `POST /api/prompts` for authenticated users; requests include `title`, `text`, and `categoryId`, normalize title/text with edge trimming before validation, require an existing Prompt Category, allow duplicate titles, and persist new Prompts as `PRIVATE` with owner/category/timestamps.
+71: - My Prompts listing is `GET /api/users/{userId}/prompts` for authenticated users; `{userId}` must be the current authenticated user, and the response returns all Prompts owned by that user, including private Prompts.
+72: - Owned Prompt detail management uses `GET` / `PATCH` / `DELETE /api/prompts/{promptId}`; ownership is enforced by loading prompts through the current user's id, so missing or non-owned Prompt IDs return `404`.
+73: - Prompt ownership has no admin override: admins can create and manage their own Prompts, but non-owned Prompt detail/update/delete requests still return `404` and must not leak private Prompt content.
+74: - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.
+75: - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.
+76: - Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
+77: 
+78: ## Testing patterns
+79: 
+80: - Run the standard verification with `mise run check`.
+81: - API integration tests should prefer real MySQL coverage via Testcontainers.
+82: - The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
+83: - Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
+84: - Web tests use Vitest 4 Browser Mode with the Playwright Chromium provider; prefer `vitest-browser-react` locators/assertions for component tests instead of jsdom or Testing Library shims.
+85: - Use TanStack Table for web data tables that need client-side table behavior such as filtering; render the headless table model with Mantine table primitives.
+
+(End of file - total 85 lines)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md",
+  "offset": 60,
+  "limit": 15
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md</path>
+<type>file</type>
+<content>
+60: The user who created a prompt and is the only user allowed to change or delete it. Public prompts identify their owner by username; admins do not gain ownership privileges over prompts created by other users.
+61: _Avoid_: Author, creator
+62: 
+63: **Prompt Category**:
+64: A system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique auto-generated slug derived from the label, and are not owned resources.
+65: Initial categories are Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.
+66: Categories referenced by prompts remain available until those prompts are moved to another category.
+67: _Avoid_: Tag, topic
+68: 
+69: **Share**:
+70: The user action of making one of their prompts public.
+71: _Avoid_: Publish
+72: 
+73: **Unshare**:
+74: The user action of making one of their public prompts private again.
+
+(Showing lines 60-74 of 83. Use offset=75 to continue.)
+</content>
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.3s)
+
+_Thinking:_
+
+**Exploring prior art tests**
+
+I need to figure out how to discover tests related to prior art. I think using an indexer would be more effective than grep for this task. It feels like the right approach to exploring and finding what I need. Let's see where this leads me in terms of uncovering useful information and insights related to prior art testing! I'm curious to dive deeper into this and see what I can find.
+
+**Tool: task**
+
+**Input:**
+```json
+{
+  "description": "Find API test seams",
+  "prompt": "Explore the codebase for existing API integration tests and controller tests relevant to prompt categories, prompts, admin authorization, validation errors, and OpenAPI-generated controllers. Do not modify files. Return a concise summary of the highest-level test seams already used, representative test class names (no need for exhaustive list), and any conventions for auth/admin setup in tests.",
+  "subagent_type": "explore",
+  "task_id": "",
+  "command": "structural codebase exploration for PRD testing seams"
+}
+```
+
+**Error:**
+```
+no such column: replacement_seq
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 4.5s)
+
+_Thinking:_
+
+**Figuring out file search needs**
+
+It looks like my previous task didn’t work out as planned. I realize now that I need to use a glob or read method, rather than trying to grep directly. At least the file search aspect is still okay! So, I guess I’ll pivot and adjust my approach to find the information I need in a more effective way. Let’s get this sorted out!
+
+**Tool: glob**
+
+**Input:**
+```json
+{
+  "pattern": "apps/api/src/test/java/**/*.java",
+  "path": "/Users/alessandrojcm/repos/prompt-vault"
+}
+```
+
+**Output:**
+```
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/currentuser/CurrentUserSecurityTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/promptcategory/PromptCategoriesApiTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/support/AbstractMySqlIntegrationTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/config/CorsSecurityTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/admin/AdminUsersApiTest.java
+/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/signup/SignupApiTest.java
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 10.5s)
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/promptcategory/PromptCategoriesApiTest.java",
+  "offset": 1,
+  "limit": 260
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/promptcategory/PromptCategoriesApiTest.java</path>
+<type>file</type>
+<content>
+1: package com.promptvault.api.promptcategory;
+2: 
+3: import java.net.CookieManager;
+4: import java.net.URI;
+5: import java.net.http.HttpClient;
+6: import java.net.http.HttpRequest;
+7: import java.net.http.HttpResponse;
+8: import java.time.OffsetDateTime;
+9: import java.util.List;
+10: import java.util.Map;
+11: 
+12: import com.fasterxml.jackson.core.type.TypeReference;
+13: import com.fasterxml.jackson.databind.ObjectMapper;
+14: import com.promptvault.api.support.AbstractMySqlIntegrationTest;
+15: import com.promptvault.api.user.UserEntity;
+16: import com.promptvault.api.user.UserRepository;
+17: import org.junit.jupiter.api.Test;
+18: import org.springframework.beans.factory.annotation.Autowired;
+19: import org.springframework.beans.factory.annotation.Value;
+20: import org.springframework.boot.test.context.SpringBootTest;
+21: 
+22: import static org.assertj.core.api.Assertions.assertThat;
+23: 
+24: @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+25: class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
+26: 
+27:     private static final String SEEDED_ADMIN_USERNAME = "admin";
+28:     private static final String SEEDED_ADMIN_PASSWORD = "admin-password123";
+29: 
+30:     @Autowired
+31:     private UserRepository userRepository;
+32: 
+33:     private final ObjectMapper objectMapper = new ObjectMapper();
+34:     private final URI baseUri;
+35: 
+36:     PromptCategoriesApiTest(@Value("${local.server.port}") int port) {
+37:         this.baseUri = URI.create("http://127.0.0.1:" + port);
+38:     }
+39: 
+40:     @Test
+41:     void authenticatedUsersCanFetchSeededPromptCategories() throws Exception {
+42:         UserEntity seededAdmin = userRepository.findByUsernameNormalized(SEEDED_ADMIN_USERNAME).orElseThrow();
+43:         HttpClient client = authenticatedClient();
+44: 
+45:         HttpResponse<String> response = listPromptCategories(client);
+46: 
+47:         assertThat(response.statusCode()).isEqualTo(200);
+48:         List<Map<String, Object>> categories = readList(response.body());
+49:         assertThat(categories).hasSize(6);
+50:         assertThat(categories).extracting(category -> category.get("label"))
+51:             .containsExactly("Coding", "Cybersecurity", "HR", "Legal", "Personal Productivity", "Research");
+52:         assertThat(categories).extracting(category -> category.get("slug"))
+53:             .containsExactly("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research");
+54:         assertThat(categories).allSatisfy(category -> assertCategoryShape(category, seededAdmin));
+55:     }
+56: 
+57:     @Test
+58:     void unauthenticatedCallersCannotFetchPromptCategories() throws Exception {
+59:         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+60: 
+61:         HttpResponse<String> response = listPromptCategories(client);
+62: 
+63:         assertThat(response.statusCode()).isEqualTo(401);
+64:     }
+65: 
+66:     private HttpClient authenticatedClient() throws Exception {
+67:         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+68:         HttpResponse<String> loginResponse = login(client);
+69:         assertThat(loginResponse.statusCode()).isEqualTo(200);
+70:         return client;
+71:     }
+72: 
+73:     private HttpResponse<String> login(HttpClient client) throws Exception {
+74:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
+75:             .header("Content-Type", "application/json")
+76:             .header("Accept", "application/json")
+77:             .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+78:                 "username", SEEDED_ADMIN_USERNAME,
+79:                 "password", SEEDED_ADMIN_PASSWORD
+80:             ))))
+81:             .build();
+82:         return client.send(request, HttpResponse.BodyHandlers.ofString());
+83:     }
+84: 
+85:     private HttpResponse<String> listPromptCategories(HttpClient client) throws Exception {
+86:         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt-categories"))
+87:             .header("Accept", "application/json")
+88:             .GET()
+89:             .build();
+90:         return client.send(request, HttpResponse.BodyHandlers.ofString());
+91:     }
+92: 
+93:     private List<Map<String, Object>> readList(String body) throws Exception {
+94:         return objectMapper.readValue(body, new TypeReference<>() { });
+95:     }
+96: 
+97:     private void assertCategoryShape(Map<String, Object> category, UserEntity seededAdmin) {
+98:         assertThat(category).containsOnlyKeys("id", "label", "slug", "createdAt", "createdByUserId", "updatedAt");
+99:         assertThat(category.get("id")).isInstanceOf(Integer.class);
+100:         assertThat(category.get("label")).isInstanceOf(String.class);
+101:         assertThat(category.get("slug")).isInstanceOf(String.class);
+102:         assertThat(category).containsEntry("createdByUserId", seededAdmin.getId().intValue());
+103:         assertThat(OffsetDateTime.parse((String) category.get("createdAt"))).isNotNull();
+104:         assertThat(OffsetDateTime.parse((String) category.get("updatedAt"))).isNotNull();
+105:     }
+106: }
+
+(End of file - total 106 lines)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/admin/AdminUsersApiTest.java",
+  "offset": 1,
+  "limit": 220
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/admin/AdminUsersApiTest.java</path>
+<type>file</type>
+<content>
+1: package com.promptvault.api.admin;
+2: 
+3: import java.net.CookieManager;
+4: import java.net.URI;
+5: import java.net.http.HttpClient;
+6: import java.net.http.HttpRequest;
+7: import java.net.http.HttpResponse;
+8: import java.util.List;
+9: import java.util.Map;
+10: import java.util.UUID;
+11: 
+12: import com.fasterxml.jackson.core.type.TypeReference;
+13: import com.fasterxml.jackson.databind.ObjectMapper;
+14: import com.promptvault.api.support.AbstractMySqlIntegrationTest;
+15: import com.promptvault.api.user.AccountStatus;
+16: import com.promptvault.api.user.Role;
+17: import com.promptvault.api.user.UserEntity;
+18: import com.promptvault.api.user.UserRepository;
+19: import org.junit.jupiter.api.Test;
+20: import org.springframework.beans.factory.annotation.Autowired;
+21: import org.springframework.beans.factory.annotation.Value;
+22: import org.springframework.boot.test.context.SpringBootTest;
+23: import org.springframework.security.crypto.password.PasswordEncoder;
+24: 
+25: import static org.assertj.core.api.Assertions.assertThat;
+26: 
+27: @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+28: class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
+29: 
+30:     @Autowired
+31:     private UserRepository userRepository;
+32: 
+33:     @Autowired
+34:     private PasswordEncoder passwordEncoder;
+35: 
+36:     private final ObjectMapper objectMapper = new ObjectMapper();
+37:     private final URI baseUri;
+38: 
+39:     AdminUsersApiTest(@Value("${local.server.port}") int port) {
+40:         this.baseUri = URI.create("http://127.0.0.1:" + port);
+41:     }
+42: 
+43:     @Test
+44:     void adminsCanListNormalUsersWithSafeManagementFields() throws Exception {
+45:         String adminPassword = "admin-password123";
+46:         UserEntity admin = saveUser(uniqueUsername("admin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+47:         UserEntity enabledUser = saveUser(uniqueUsername("enabled"), "password123", Role.USER, AccountStatus.ENABLED);
+48:         UserEntity disabledUser = saveUser(uniqueUsername("disabled"), "password123", Role.USER, AccountStatus.DISABLED);
+49:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+50: 
+51:         HttpResponse<String> response = listUsers(adminClient, "USER");
+52: 
+53:         assertThat(response.statusCode()).isEqualTo(200);
+54:         List<Map<String, Object>> users = readList(response.body());
+55:         assertThat(users).anySatisfy(user -> assertUserSummary(user, enabledUser, Role.USER, AccountStatus.ENABLED));
+56:         assertThat(users).anySatisfy(user -> assertUserSummary(user, disabledUser, Role.USER, AccountStatus.DISABLED));
+57:         assertThat(users).noneSatisfy(user -> assertThat(user).containsEntry("username", admin.getUsername()));
+58:         assertThat(users).allSatisfy(user -> assertThat(user).doesNotContainKeys("password", "passwordHash"));
+59:     }
+60: 
+61:     @Test
+62:     void omittingRoleFilterReturnsAllRegisteredUsers() throws Exception {
+63:         String adminPassword = "admin-password123";
+64:         UserEntity admin = saveUser(uniqueUsername("allAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+65:         UserEntity normalUser = saveUser(uniqueUsername("allUser"), "password123", Role.USER, AccountStatus.ENABLED);
+66:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+67: 
+68:         HttpResponse<String> response = listUsers(adminClient, null);
+69: 
+70:         assertThat(response.statusCode()).isEqualTo(200);
+71:         List<Map<String, Object>> users = readList(response.body());
+72:         assertThat(users).anySatisfy(user -> assertUserSummary(user, admin, Role.ADMIN, AccountStatus.ENABLED));
+73:         assertThat(users).anySatisfy(user -> assertUserSummary(user, normalUser, Role.USER, AccountStatus.ENABLED));
+74:     }
+75: 
+76:     @Test
+77:     void invalidRoleFilterReturnsValidationErrorShape() throws Exception {
+78:         String adminPassword = "admin-password123";
+79:         UserEntity admin = saveUser(uniqueUsername("invalidRoleAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+80:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+81: 
+82:         HttpResponse<String> response = listUsers(adminClient, "OWNER");
+83: 
+84:         assertThat(response.statusCode()).isEqualTo(400);
+85:         Map<String, Object> body = readJson(response.body());
+86:         assertThat(body).containsEntry("message", "Signup validation failed.");
+87:         assertThat(extractFieldMessages(body)).containsEntry("role", "Role must be USER or ADMIN.");
+88:     }
+89: 
+90:     @Test
+91:     void unauthenticatedCallersCannotListUsers() throws Exception {
+92:         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+93: 
+94:         HttpResponse<String> response = listUsers(client, "USER");
+95: 
+96:         assertThat(response.statusCode()).isEqualTo(401);
+97:     }
+98: 
+99:     @Test
+100:     void normalUsersAreForbiddenFromListingUsers() throws Exception {
+101:         String password = "password123";
+102:         UserEntity user = saveUser(uniqueUsername("normalForbidden"), password, Role.USER, AccountStatus.ENABLED);
+103:         HttpClient userClient = authenticatedClient(user.getUsername(), password);
+104: 
+105:         HttpResponse<String> response = listUsers(userClient, "USER");
+106: 
+107:         assertThat(response.statusCode()).isEqualTo(403);
+108:     }
+109: 
+110:     @Test
+111:     void adminsCanDisableNormalUsers() throws Exception {
+112:         String adminPassword = "admin-password123";
+113:         UserEntity admin = saveUser(uniqueUsername("disableAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+114:         UserEntity user = saveUser(uniqueUsername("disableUser"), "password123", Role.USER, AccountStatus.ENABLED);
+115:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+116: 
+117:         HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "DISABLED");
+118: 
+119:         assertThat(response.statusCode()).isEqualTo(200);
+120:         assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.DISABLED);
+121:         UserEntity reloaded = userRepository.findById(user.getId()).orElseThrow();
+122:         assertThat(reloaded.getAccountStatus()).isEqualTo(AccountStatus.DISABLED);
+123:         assertThat(reloaded.getUsername()).isEqualTo(user.getUsername());
+124:         assertThat(reloaded.getUsernameNormalized()).isEqualTo(user.getUsernameNormalized());
+125:         assertThat(reloaded.getEmailAddress()).isEqualTo(user.getEmailAddress());
+126:         assertThat(reloaded.getEmailAddressNormalized()).isEqualTo(user.getEmailAddressNormalized());
+127:         assertThat(reloaded.getRole()).isEqualTo(Role.USER);
+128:         assertThat(reloaded.getId()).isEqualTo(user.getId());
+129:     }
+130: 
+131:     @Test
+132:     void disablingNormalUsersRevokesOnlyTheirExistingSessions() throws Exception {
+133:         String adminPassword = "admin-password123";
+134:         String targetPassword = "target-password123";
+135:         String otherPassword = "other-password123";
+136:         UserEntity admin = saveUser(uniqueUsername("revokeAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+137:         UserEntity target = saveUser(uniqueUsername("revokeTarget"), targetPassword, Role.USER, AccountStatus.ENABLED);
+138:         UserEntity otherUser = saveUser(uniqueUsername("revokeOther"), otherPassword, Role.USER, AccountStatus.ENABLED);
+139:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+140:         HttpClient targetClient = authenticatedClient(target.getUsername(), targetPassword);
+141:         HttpClient otherClient = authenticatedClient(otherUser.getUsername(), otherPassword);
+142:         assertThat(getCurrentUser(targetClient).statusCode()).isEqualTo(200);
+143:         assertThat(getCurrentUser(otherClient).statusCode()).isEqualTo(200);
+144: 
+145:         HttpResponse<String> response = updateUserStatus(adminClient, target.getId(), "DISABLED");
+146: 
+147:         assertThat(response.statusCode()).isEqualTo(200);
+148:         assertThat(getCurrentUser(targetClient).statusCode()).isEqualTo(401);
+149:         assertThat(login(target.getUsername(), targetPassword, targetClient).statusCode()).isEqualTo(403);
+150:         assertThat(getCurrentUser(otherClient).statusCode()).isEqualTo(200);
+151:         assertThat(getCurrentUser(adminClient).statusCode()).isEqualTo(200);
+152:     }
+153: 
+154:     @Test
+155:     void adminsCanEnableNormalUsers() throws Exception {
+156:         String adminPassword = "admin-password123";
+157:         UserEntity admin = saveUser(uniqueUsername("enableAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+158:         UserEntity user = saveUser(uniqueUsername("enableUser"), "password123", Role.USER, AccountStatus.DISABLED);
+159:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+160: 
+161:         HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "ENABLED");
+162: 
+163:         assertThat(response.statusCode()).isEqualTo(200);
+164:         assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.ENABLED);
+165:         assertThat(userRepository.findById(user.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+166:     }
+167: 
+168:     @Test
+169:     void enablingNormalUsersRestoresLoginEligibilityWithoutCreatingASession() throws Exception {
+170:         String adminPassword = "admin-password123";
+171:         String userPassword = "user-password123";
+172:         UserEntity admin = saveUser(uniqueUsername("enableSessionAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+173:         UserEntity user = saveUser(uniqueUsername("enableSessionUser"), userPassword, Role.USER, AccountStatus.DISABLED);
+174:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+175:         HttpClient userClient = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+176:         assertThat(login(user.getUsername(), userPassword, userClient).statusCode()).isEqualTo(403);
+177: 
+178:         HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "ENABLED");
+179: 
+180:         assertThat(response.statusCode()).isEqualTo(200);
+181:         assertThat(getCurrentUser(userClient).statusCode()).isEqualTo(401);
+182:         assertThat(login(user.getUsername(), userPassword, userClient).statusCode()).isEqualTo(200);
+183:         assertThat(getCurrentUser(userClient).statusCode()).isEqualTo(200);
+184:     }
+185: 
+186:     @Test
+187:     void settingCurrentStatusIsAnIdempotentNoOp() throws Exception {
+188:         String adminPassword = "admin-password123";
+189:         UserEntity admin = saveUser(uniqueUsername("noopAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+190:         UserEntity user = saveUser(uniqueUsername("noopUser"), "password123", Role.USER, AccountStatus.DISABLED);
+191:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+192: 
+193:         HttpResponse<String> response = updateUserStatus(adminClient, user.getId(), "DISABLED");
+194: 
+195:         assertThat(response.statusCode()).isEqualTo(200);
+196:         assertUserSummary(readJson(response.body()), user, Role.USER, AccountStatus.DISABLED);
+197:     }
+198: 
+199:     @Test
+200:     void missingTargetsReturnNotFound() throws Exception {
+201:         String adminPassword = "admin-password123";
+202:         UserEntity admin = saveUser(uniqueUsername("missingAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+203:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+204: 
+205:         HttpResponse<String> response = updateUserStatus(adminClient, 999_999_999L, "DISABLED");
+206: 
+207:         assertThat(response.statusCode()).isEqualTo(404);
+208:     }
+209: 
+210:     @Test
+211:     void adminsCannotUpdateAdminTargets() throws Exception {
+212:         String adminPassword = "admin-password123";
+213:         UserEntity admin = saveUser(uniqueUsername("actorAdmin"), adminPassword, Role.ADMIN, AccountStatus.ENABLED);
+214:         UserEntity targetAdmin = saveUser(uniqueUsername("targetAdmin"), "password123", Role.ADMIN, AccountStatus.ENABLED);
+215:         HttpClient adminClient = authenticatedClient(admin.getUsername(), adminPassword);
+216: 
+217:         HttpResponse<String> response = updateUserStatus(adminClient, targetAdmin.getId(), "DISABLED");
+218: 
+219:         assertThat(response.statusCode()).isEqualTo(403);
+220:         assertThat(userRepository.findById(targetAdmin.getId()).orElseThrow().getAccountStatus()).isEqualTo(AccountStatus.ENABLED);
+
+(Showing lines 1-220 of 342. Use offset=221 to continue.)
+</content>
+```
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/support/AbstractMySqlIntegrationTest.java",
+  "offset": 1,
+  "limit": 180
+}
+```
+
+**Output:**
+```
+<path>/Users/alessandrojcm/repos/prompt-vault/apps/api/src/test/java/com/promptvault/api/support/AbstractMySqlIntegrationTest.java</path>
+<type>file</type>
+<content>
+1: package com.promptvault.api.support;
+2: 
+3: import java.io.File;
+4: import java.nio.file.Path;
+5: import java.time.Duration;
+6: 
+7: import org.springframework.test.context.DynamicPropertyRegistry;
+8: import org.springframework.test.context.DynamicPropertySource;
+9: import org.testcontainers.containers.ComposeContainer;
+10: import org.testcontainers.containers.wait.strategy.Wait;
+11: 
+12: public abstract class AbstractMySqlIntegrationTest {
+13: 
+14:     protected static final String MYSQL_SERVICE = "mysql-1";
+15:     protected static final int MYSQL_PORT = 3306;
+16: 
+17:     static final ComposeContainer environment = new ComposeContainer(resolveComposeFile())
+18:         .withExposedService(
+19:             MYSQL_SERVICE,
+20:             MYSQL_PORT,
+21:             Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3))
+22:         );
+23: 
+24:     static {
+25:         environment.start();
+26:     }
+27: 
+28:     @DynamicPropertySource
+29:     static void registerDatabaseProperties(DynamicPropertyRegistry registry) {
+30:         registry.add("spring.datasource.url", () -> "jdbc:mysql://%s:%d/prompt_vault"
+31:             .formatted(environment.getServiceHost(MYSQL_SERVICE, MYSQL_PORT), environment.getServicePort(MYSQL_SERVICE, MYSQL_PORT)));
+32:         registry.add("spring.datasource.username", () -> "prompt_vault");
+33:         registry.add("spring.datasource.password", () -> "prompt_vault");
+34:         registry.add("spring.flyway.default-schema", () -> "prompt_vault");
+35:         registry.add("spring.flyway.schemas", () -> "prompt_vault");
+36:     }
+37: 
+38:     private static File resolveComposeFile() {
+39:         Path current = Path.of(System.getProperty("user.dir")).toAbsolutePath();
+40: 
+41:         while (current != null) {
+42:             Path candidate = current.resolve("docker-compose.yml");
+43: 
+44:             if (candidate.toFile().isFile()) {
+45:                 return candidate.toFile();
+46:             }
+47: 
+48:             current = current.getParent();
+49:         }
+50: 
+51:         throw new IllegalStateException("Unable to locate docker-compose.yml for Testcontainers");
+52:     }
+53: }
+
+(End of file - total 53 lines)
+</content>
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.5s)
+
+_Thinking:_
+
+
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Review issue tracker instructions and relevant category patterns",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Create a new Graphite stack entry for issue 28",
+      "content": "Confirm proposed testing seams with user",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Write PRD from current decisions",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Publish PRD issue with ready-for-agent label",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if new project info emerged",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Review issue tracker instructions and relevant category patterns",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Confirm proposed testing seams with user",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Write PRD from current decisions",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Publish PRD issue with ready-for-agent label",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if new project info emerged",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 12.2s)
+
+Before I publish the PRD, here are the proposed testing seams.
+
+**Recommended seam: API integration tests only**, centered on the existing `PromptCategoriesApiTest` style: full Spring Boot app on a random port, real MySQL via Testcontainers, HTTP client with session-cookie auth.
+
+That single seam should cover:
+
+- new canonical path `GET /api/prompt/categories`
+- authenticated catalog read
+- unauthenticated `401`
+- admin-only create/update/delete
+- normal user `403` on mutations
+- label validation and edge trimming
+- case-insensitive label conflicts
+- generated snake_case slug behavior
+- slug regeneration on rename
+- missing category `404`
+- delete unused category `204`
+- delete referenced category blocked
+- response shape for `PromptCategory`
+
+Prior art:
+- `PromptCategoriesApiTest` for category catalog behavior
+- `AdminUsersApiTest` for admin-vs-normal-user authorization
+- `PromptsApiTest` for prompt/category references and real persistence behavior
+
+No web tests, because this slice is API-only.
+
+Does this testing seam match your expectations?
+
+---
+
+## User
+
+yes
+
+---
+
+## Assistant (Build · GPT-5.5 · 10.4s)
+
+_Thinking:_
+
+
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Review issue tracker instructions and relevant category patterns",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Implement issue 28 following project patterns",
+      "content": "Confirm proposed testing seams with user",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Run relevant checks",
+      "content": "Write PRD from current decisions",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Publish PRD issue with ready-for-agent label",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if new project info emerged",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Review issue tracker instructions and relevant category patterns",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Confirm proposed testing seams with user",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Write PRD from current decisions",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Publish PRD issue with ready-for-agent label",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if new project info emerged",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 9.6s)
+
+_Thinking:_
+
+
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Review issue tracker instructions and relevant category patterns",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Confirm proposed testing seams with user",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Write PRD from current decisions",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Publish PRD issue with ready-for-agent label",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if new project info emerged",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Review issue tracker instructions and relevant category patterns",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Confirm proposed testing seams with user",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Write PRD from current decisions",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Publish PRD issue with ready-for-agent label",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if new project info emerged",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 89.5s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "gh issue create --title \"PRD: Admin-managed prompt categories API\" --label \"ready-for-agent\" --body $'## Problem Statement\\n\\nAdmins need a way to manage the system-wide Prompt Category catalog through the API. Today authenticated users can list the seeded Prompt Categories, but the catalog cannot be changed through supported endpoints. This prevents admins from adapting the classification options that every Prompt must use, while still preserving the rule that every Prompt belongs to exactly one existing Prompt Category.\\n\\n## Solution\\n\\nExpose RESTful Prompt Category management endpoints on the existing category resource path. Authenticated users can continue to read the catalog, while only Admin users can create, rename, and delete Prompt Categories. Prompt Category labels are edge-trimmed and unique case-insensitively. Slugs are auto-generated snake_case values derived from labels and regenerate when a label changes. Admins may delete any unused Prompt Category, including seeded baseline categories, but cannot delete a Prompt Category referenced by one or more Prompts.\\n\\n## User Stories\\n\\n1. As an authenticated user, I want to list Prompt Categories, so that I can choose a classification for a Prompt.\\n2. As an authenticated user, I want the Prompt Category catalog at `/api/prompt/categories`, so that the API path follows the Prompt resource hierarchy.\\n3. As an unauthenticated visitor, I want category catalog access to be rejected, so that catalog data remains behind authentication.\\n4. As an Admin, I want to create a Prompt Category with a label, so that users can classify Prompts with a new system-wide category.\\n5. As an Admin, I want category labels to be edge-trimmed on create, so that accidental surrounding whitespace does not create messy catalog entries.\\n6. As an Admin, I want blank category labels to be rejected, so that every Prompt Category has a meaningful user-facing label.\\n7. As an Admin, I want overly long category labels to be rejected, so that labels fit the established catalog constraints.\\n8. As an Admin, I want duplicate labels to be rejected case-insensitively, so that users do not see confusing duplicate categories.\\n9. As an Admin, I want a category slug to be generated automatically from the label, so that I do not need to manage technical identifiers manually.\\n10. As an Admin, I want generated slugs to use the existing snake_case format, so that new categories are consistent with seeded categories.\\n11. As an Admin, I want slug conflicts caused by different labels to be rejected as label validation errors, so that I can correct the only field I control.\\n12. As an Admin, I want the create response to include the full Prompt Category, so that I can immediately see the assigned id, generated slug, creator attribution, and timestamps.\\n13. As an Admin, I want newly created categories to attribute `createdByUserId` to me, so that category provenance reflects the actual creating user.\\n14. As an Admin, I want to rename a Prompt Category by changing only its label, so that I can correct or improve catalog language without changing Prompt ownership or Prompt content.\\n15. As an Admin, I want category labels to be edge-trimmed on update, so that accidental surrounding whitespace does not persist.\\n16. As an Admin, I want category renames to preserve internal label text as entered, so that the API does not unexpectedly rewrite my label beyond edge trimming.\\n17. As an Admin, I want category renames to regenerate the category slug from the new label, so that labels and slugs remain aligned.\\n18. As an Admin, I want a rename that conflicts with another category label or generated slug to be rejected, so that catalog uniqueness remains intact.\\n19. As an Admin, I want the update response to include the full Prompt Category, so that I can see the latest label, regenerated slug, and updated timestamp.\\n20. As an Admin, I want missing category updates to return not found, so that I know the target category does not exist.\\n21. As an Admin, I want to delete an unused Prompt Category, so that obsolete catalog entries can be removed.\\n22. As an Admin, I want to delete unused seeded baseline categories when appropriate, so that initial data does not become permanent taxonomy.\\n23. As an Admin, I want deletion of referenced Prompt Categories to be blocked, so that existing Prompts never lose their required category.\\n24. As an Admin, I want successful deletion to return no content, so that clients can treat deletion as complete without parsing a body.\\n25. As an Admin, I want missing category deletes to return not found, so that I know the target category does not exist.\\n26. As a Normal User, I want to be forbidden from creating Prompt Categories, so that catalog management remains an administrative capability.\\n27. As a Normal User, I want to be forbidden from renaming Prompt Categories, so that catalog language remains admin-controlled.\\n28. As a Normal User, I want to be forbidden from deleting Prompt Categories, so that shared classifications cannot be removed by non-admins.\\n29. As an unauthenticated visitor, I want Prompt Category mutations to be rejected as unauthenticated, so that category management requires a session.\\n30. As a Prompt owner, I want my Prompt to continue referencing its category by id, so that category slug regeneration does not affect my Prompt.\\n31. As an API client developer, I want category validation failures to use the existing validation error shape, so that forms can display field-level errors consistently.\\n32. As an API client developer, I want the OpenAPI contract to define category management requests and responses, so that generated clients stay aligned with server behavior.\\n\\n## Implementation Decisions\\n\\n- The canonical Prompt Category catalog endpoint is `GET /api/prompt/categories`; the previous `/api/prompt-categories` path should be replaced for this contract.\\n- Category mutations use the same REST resource path: `POST /api/prompt/categories`, `PATCH /api/prompt/categories/{categoryId}`, and `DELETE /api/prompt/categories/{categoryId}`.\\n- `GET /api/prompt/categories` is available to authenticated users.\\n- Category create, update, and delete are Admin-only operations. Unauthenticated callers receive `401`; authenticated Normal Users receive `403`.\\n- Category create accepts only a label. The server derives all other fields.\\n- Category update accepts only a label. The category id, created timestamp, creator attribution, and updated timestamp are system-managed.\\n- Category labels are required, edge-trimmed, non-blank after trimming, and limited to 100 characters. Internal whitespace and punctuation in labels are preserved as entered.\\n- Category labels remain unique case-insensitively through the normalized label column.\\n- Category slugs are auto-generated snake_case values derived from labels.\\n- Category slugs regenerate whenever the label changes. Prompts refer to categories by id, so slug regeneration does not affect Prompt-category relationships.\\n- Generated slugs must remain globally unique. If a create or update would conflict by label or generated slug, reject the request as a validation error on the `label` field.\\n- Category create returns `201` with the full Prompt Category response.\\n- Category update returns `200` with the full Prompt Category response.\\n- Category delete returns `204` with no response body.\\n- Missing category update/delete targets return `404`.\\n- Referenced Prompt Categories cannot be deleted. Return a conflict response when one or more Prompts still reference the category.\\n- Admins may delete unused seeded baseline categories; seeded status does not grant special protection.\\n- `createdByUserId` on newly created categories is the current Admin user, not always the seeded Admin.\\n- No category detail endpoint is included in this slice; the Prompt Category DTO is small and the list endpoint is sufficient.\\n- No admin web UI is included in this slice; this PRD is API-only.\\n- The OpenAPI contract remains the source of truth for request/response shapes and generated clients.\\n\\n## Testing Decisions\\n\\n- Use API integration tests as the primary seam: full Spring Boot app on a random port, real MySQL through the existing Testcontainers Compose setup, and HTTP requests with session-cookie authentication.\\n- Prefer external API behavior assertions over implementation detail assertions. Tests should verify status codes, response shapes, persisted observable state, authorization behavior, and catalog invariants.\\n- Extend the existing Prompt Category API test coverage for the canonical path, category creation, category update, category deletion, validation failures, slug generation, slug regeneration, and deletion blocking.\\n- Reuse admin authorization patterns from the existing Admin User Management API tests: Admin sessions are allowed, Normal User sessions are forbidden, unauthenticated requests are rejected.\\n- Reuse Prompt API test patterns for creating Prompts that reference categories when testing deletion of referenced categories.\\n- Test that `GET /api/prompt/categories` returns seeded categories to authenticated users and `401` to unauthenticated callers.\\n- Test that Admin create returns `201` with `id`, `label`, `slug`, `createdAt`, `createdByUserId`, and `updatedAt`.\\n- Test that create trims label edges, generates snake_case slugs, and attributes the creating Admin.\\n- Test that create rejects blank, overlong, duplicate-label, and generated-slug-conflict cases with validation errors on `label`.\\n- Test that Admin update returns `200`, trims label edges, regenerates the slug, advances `updatedAt`, and preserves creator attribution.\\n- Test that update rejects missing targets with `404` and label/slug conflicts with validation errors on `label`.\\n- Test that Admin delete returns `204` for unused categories and removes them from subsequent catalog reads.\\n- Test that Admin delete returns a conflict response for categories referenced by Prompts and leaves the category available.\\n- No frontend tests are needed because the slice intentionally excludes web UI changes.\\n\\n## Out of Scope\\n\\n- Admin web UI for Prompt Category management.\\n- Category detail endpoint.\\n- Manual slug editing.\\n- Soft deletion or hidden category lifecycle states.\\n- Automatic reassignment of Prompts when deleting a category.\\n- Orphaned Prompts without a category.\\n- Audit history beyond existing creator attribution and timestamps.\\n- Changing Prompt ownership or Prompt visibility behavior.\\n- Changing the seeded baseline category list except as allowed through normal Admin deletion after implementation.\\n\\n## Further Notes\\n\\n- The domain glossary now defines Prompt Categories as system-wide classifications with unique user-facing labels and unique auto-generated slugs derived from labels.\\n- Categories referenced by Prompts remain available until those Prompts are moved to another category.\\n- The project patterns now record `/api/prompt/categories` as the canonical category catalog and management path.\\n'",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Create GitHub PRD issue"
+}
+```
+
+**Output:**
+```
+https://github.com/alessandrojcm/prompt-vault/issues/36
+
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.0s)
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Review issue tracker instructions and relevant category patterns",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Confirm proposed testing seams with user",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Write PRD from current decisions",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Publish PRD issue with ready-for-agent label",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if new project info emerged",
       "status": "in_progress",
       "priority": "medium"
-    },
-    {
-      "content": "Update AGENTS.md if new project info is learned",
-      "status": "completed",
-      "priority": "medium"
     }
   ]
 }
@@ -3641,28 +2790,28 @@ _Thinking:_
 ```
 [
   {
-    "content": "Inspect issue 28 and current workspace state",
+    "content": "Review issue tracker instructions and relevant category patterns",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Create a new Graphite stack entry for issue 28",
+    "content": "Confirm proposed testing seams with user",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Implement issue 28 following project patterns",
+    "content": "Write PRD from current decisions",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Run relevant checks",
+    "content": "Publish PRD issue with ready-for-agent label",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if new project info emerged",
     "status": "in_progress",
-    "priority": "medium"
-  },
-  {
-    "content": "Update AGENTS.md if new project info is learned",
-    "status": "completed",
     "priority": "medium"
   }
 ]
@@ -3670,359 +2819,97 @@ _Thinking:_
 
 ---
 
-## Assistant (Build · GPT-5.5 · 46.7s)
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "mise run check",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Runs standard repository verification"
-}
-```
-
-**Output:**
-```
-[generate:client] $ pnpm --filter @prompt-vault/api-client generate
-[generate:backend] $ ./gradlew :apps:api:openApiGenerate
-[generate:client] $ openapi-ts
-[generate:backend] Reusing configuration cache.
-[generate:backend] > Task :apps:api:openApiGenerate UP-TO-DATE
-[generate:backend] 
-[generate:backend] BUILD SUCCESSFUL in 507ms
-[generate:backend] 1 actionable task: 1 up-to-date
-[generate:backend] Configuration cache entry reused.
-[generate:backend] Finished in 601.1ms
-[generate:client] [90m@hey-api/openapi-ts v0.99.0[39m
-[generate:client] 
-[generate:client] [90m[Job 1] [39m[90m~[39m [36mGenerating...[39m
-[generate:client] [90m[Job 1] [39m[36m  [1] [39m../../openapi/api.yaml
-[generate:client] [90m[Job 1] [39m[32m✓[39m [96m./packages/api-client/src/generated[39m [90m· 6 files · 82ms[39m
-[generate:client] Finished in 876.1ms
-[generate] $ true
-[generate] Finished in 6.1ms
-[check] $ ./gradlew :apps:api:test
-[check] Reusing configuration cache.
-[check] > Task :apps:api:processTestResources NO-SOURCE
-[check] > Task :apps:api:processResources UP-TO-DATE
-[check] > Task :apps:api:openApiGenerate UP-TO-DATE
-[check] > Task :apps:api:compileJava UP-TO-DATE
-[check] > Task :apps:api:classes UP-TO-DATE
-[check] > Task :apps:api:compileTestJava UP-TO-DATE
-[check] > Task :apps:api:testClasses UP-TO-DATE
-[check] OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[check] 2026-06-25T18:09:36.412+01:00  INFO 14902 --- [prompt-vault-api] [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-[check] 2026-06-25T18:09:36.413+01:00  INFO 14902 --- [prompt-vault-api] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-[check] 2026-06-25T18:09:36.416+01:00  INFO 14902 --- [prompt-vault-api] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-[check] 2026-06-25T18:09:36.417+01:00  INFO 14902 --- [prompt-vault-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-[check] 2026-06-25T18:09:36.426+01:00  INFO 14902 --- [prompt-vault-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-[check] > Task :apps:api:test
-[check] 
-[check] BUILD SUCCESSFUL in 22s
-[check] 5 actionable tasks: 1 executed, 4 up-to-date
-[check] Configuration cache entry reused.
-[check] $ pnpm --filter @prompt-vault/web lint
-[check] $ oxlint
-[check] Found 0 warnings and 0 errors.
-[check] Finished in 22ms on 21 files with 95 rules using 10 threads.
-[check] $ pnpm --filter @prompt-vault/web format:check
-[check] $ oxfmt --check
-[check] Checking formatting...
-[check] 
-[check] All matched files use the correct format.
-[check] Finished in 38ms on 25 files using 10 threads.
-[check] $ pnpm --filter @prompt-vault/web test
-[check] $ playwright install chromium && vitest run --passWithNoTests
-[check] 
-[check] [1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/alessandrojcm/repos/prompt-vault/apps/web[39m
-[check] 
-[check]  [32m✓[39m [30m[43m chromium [49m[39m src/features/login/login-screen.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
-[check]  [32m✓[39m [30m[43m chromium [49m[39m src/features/auth/current-user.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
-[check]  [32m✓[39m [30m[43m chromium [49m[39m src/features/admin/user-management.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 9015[2mms[22m[39m
-[check]      [33m[2m✓[22m[39m enables disabled users immediately and updates the row in place [33m 4560[2mms[22m[39m
-[check]      [33m[2m✓[22m[39m confirms before disabling users and updates the row in place [33m 4371[2mms[22m[39m
-[check] 
-[check] [2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
-[check] [2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
-[check] [2m   Start at [22m 18:09:39
-[check] [2m   Duration [22m 11.09s[2m (transform 0ms, setup 0ms, import 1.77s, tests 9.02s, environment 0ms)[22m
-[check] 
-[check] $ pnpm --filter @prompt-vault/web build
-[check] $ vite build
-[check] vite v8.1.0 building client environment for production...
-[check] [2Ktransforming...
-[check] [@tanstack/devtools-vite] Removed devtools code from: /src/routes/__root.tsx
-[check] 
-[check] ✓ 550 modules transformed.
-[check] rendering chunks...
-[check] computing gzip size...
-[check] dist/client/assets/index-Cs9uTg8M.css                   223.81 kB │ gzip:  33.04 kB
-[check] dist/client/assets/routes-BjPvlHnU.js                     0.19 kB │ gzip:   0.17 kB
-[check] dist/client/assets/use-uncontrolled-B56oM2BN.js           0.26 kB │ gzip:   0.22 kB
-[check] dist/client/assets/use-resolved-styles-api-BvCo15Rv.js    0.33 kB │ gzip:   0.20 kB
-[check] dist/client/assets/Anchor-BS6IQpBI.js                     0.43 kB │ gzip:   0.31 kB
-[check] dist/client/assets/signup.success-CYTgiUc1.js             0.64 kB │ gzip:   0.40 kB
-[check] dist/client/assets/Stack-C_Idrzf4.js                      0.94 kB │ gzip:   0.56 kB
-[check] dist/client/assets/dashboard.index-DIjoi1bk.js            1.15 kB │ gzip:   0.69 kB
-[check] dist/client/assets/Card-_zWDyaOR.js                       2.00 kB │ gzip:   0.91 kB
-[check] dist/client/assets/login.index-jG9ORlFy.js                2.33 kB │ gzip:   1.10 kB
-[check] dist/client/assets/Title-D_e_caVV.js                      2.58 kB │ gzip:   1.11 kB
-[check] dist/client/assets/signup.index-D24JIECJ.js               2.78 kB │ gzip:   1.20 kB
-[check] dist/client/assets/Button-YQLGVvji.js                    13.48 kB │ gzip:   4.09 kB
-[check] dist/client/assets/dashboard-CWrBAKht.js                 20.53 kB │ gzip:   5.96 kB
-[check] dist/client/assets/polymorphic-factory-mmSN09Si.js       39.78 kB │ gzip:  13.21 kB
-[check] dist/client/assets/useForm-syB1nBaQ.js                   83.55 kB │ gzip:  21.52 kB
-[check] dist/client/assets/users-T-dpOT7-.js                    128.92 kB │ gzip:  39.49 kB
-[check] dist/client/assets/index-OYqu55sq.js                    423.17 kB │ gzip: 132.89 kB
-[check] 
-[check] ✓ built in 419ms
-[check] vite v8.1.0 building ssr environment for production...
-[check] [2Ktransforming...
-[check] [@tanstack/devtools-vite] Removed devtools code from: /src/routes/__root.tsx
-[check] 
-[check] ✓ 126 modules transformed.
-[check] rendering chunks...
-[check] computing gzip size...
-[check] dist/server/assets/empty-plugin-adapters-DKUlnwwl.js         0.28 kB │ gzip:  0.18 kB
-[check] dist/server/assets/start-CCDVA45D.js                         0.29 kB │ gzip:  0.21 kB
-[check] dist/server/assets/routes-BdjhsBoZ.js                        0.46 kB │ gzip:  0.29 kB
-[check] dist/server/assets/current-user-C9dZP6j2.js                  0.71 kB │ gzip:  0.38 kB
-[check] dist/server/assets/signup.success-BpekgJ0d.js                0.90 kB │ gzip:  0.48 kB
-[check] dist/server/assets/dashboard-TKOMuM-W.js                     1.11 kB │ gzip:  0.58 kB
-[check] dist/server/assets/dashboard.index-D6u72nF2.js               1.87 kB │ gzip:  0.86 kB
-[check] dist/server/assets/dashboard-skJneH0r.js                     2.14 kB │ gzip:  0.85 kB
-[check] dist/server/assets/_tanstack-start-manifest_v-DSjeQBTu.js    2.66 kB │ gzip:  0.70 kB
-[check] dist/server/assets/login.index-CEL9H_Dg.js                   4.12 kB │ gzip:  1.45 kB
-[check] dist/server/assets/signup.index-DR1F9Prb.js                  4.76 kB │ gzip:  1.52 kB
-[check] dist/server/assets/router-BMablei2.js                        5.28 kB │ gzip:  1.59 kB
-[check] dist/server/assets/users-BemgQFXe.js                         5.83 kB │ gzip:  1.93 kB
-[check] dist/server/assets/src-C9Ucr6ek.js                          65.67 kB │ gzip: 14.93 kB
-[check] dist/server/server.js                                      170.79 kB │ gzip: 42.47 kB
-[check] 
-[check] ✓ built in 333ms
-[check] Finished in 38.36s
-Finished in 39.26s
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 4.3s)
+## Assistant (Build · GPT-5.5 · 15.2s)
 
 _Thinking:_
 
+**Checking AGENTS update**
 
+I’m considering whether I need to update AGENTS. I’ve already updated the documentation before, so it sounds like there might not be any new information this time. But I know the instruction is to update AGENTS when necessary, so it’s worth checking. Maybe I should also run `git status` to see what’s modified. I’ll just ensure everything is in order before marking it as completed!
 
 **Tool: bash**
 
 **Input:**
 ```json
 {
-  "command": "git status --short --branch",
+  "command": "git status --short",
   "timeout": 120000,
   "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows final workspace status"
+  "description": "Show changed files summary"
 }
 ```
 
 **Output:**
 ```
-## issue-28-read-public-prompts
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
- M apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
- M docs/agents/project-patterns.md
- M openapi/api.yaml
-
+(no output)
 ```
 
 ---
 
-## Assistant (Build · GPT-5.5 · 17.0s)
+## Assistant (Build · GPT-5.5 · 7.5s)
 
 _Thinking:_
 
-**Reviewing commits and documents**
+**Evaluating patch status**
 
-I'm not closing things until the pull request is sorted out. There's an issue with the existing commit messages; I might need to include instructions like "read public prompts." It seems I need to run a `git diff` to check the changes in full, not just massive updates before making any document updates. It’s important to inspect the document’s differences carefully. Let’s make sure everything is clear!
+I’m finding it intriguing that there seems to be no output. Earlier, I used apply_patch, so maybe it didn't change the files after all? The working tree might be unchanged, and I should check if any changes were persisted. The status shows “no changes,” which could mean those files were already committed. It could be that the apply_patch absolute modified things, but since the status is none, the files in the index seem the same. I’ll need to read through the lines to clarify!
 
-**Tool: bash**
+**Tool: read**
 
 **Input:**
 ```json
 {
-  "command": "git status --short --branch",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Checks status before committing changes"
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md",
+  "offset": 63,
+  "limit": 4
 }
 ```
 
 **Output:**
 ```
-## issue-28-read-public-prompts
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java
- M apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java
- M apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java
- M docs/agents/project-patterns.md
- M openapi/api.yaml
+<path>/Users/alessandrojcm/repos/prompt-vault/CONTEXT.md</path>
+<type>file</type>
+<content>
+63: **Prompt Category**:
+64: A system-wide classification that every prompt belongs to exactly once. Prompts can only use an existing prompt category; categories have a unique user-facing label and unique auto-generated slug derived from the label, and are not owned resources.
+65: Initial categories are Coding, Research, Cybersecurity, HR, Legal, and Personal Productivity.
+66: Categories referenced by prompts remain available until those prompts are moved to another category.
 
+(Showing lines 63-66 of 83. Use offset=67 to continue.)
+</content>
 ```
 
-**Tool: bash**
+**Tool: read**
 
 **Input:**
 ```json
 {
-  "command": "git diff --stat && git diff -- docs/agents/project-patterns.md",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Reviews diff summary and docs change"
+  "filePath": "/Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md",
+  "offset": 69,
+  "limit": 1
 }
 ```
 
 **Output:**
 ```
- .../com/promptvault/api/prompt/PromptMapper.java   |  14 ++
- .../promptvault/api/prompt/PromptRepository.java   |  16 +++
- .../promptvault/api/prompt/PromptsController.java  |  14 ++
- .../com/promptvault/api/prompt/PromptsService.java |  20 +++
- .../com/promptvault/api/prompt/PromptsApiTest.java | 144 +++++++++++++++++++++
- docs/agents/project-patterns.md                    |   1 +
- openapi/api.yaml                                   |  76 +++++++++++
- 7 files changed, 285 insertions(+)
-diff --git a/docs/agents/project-patterns.md b/docs/agents/project-patterns.md
-index 85a1a35..c2b53ab 100644
---- a/docs/agents/project-patterns.md
-+++ b/docs/agents/project-patterns.md
-@@ -73,6 +73,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
- - Prompt ownership has no admin override: admins can create and manage their own Prompts, but non-owned Prompt detail/update/delete requests still return `404` and must not leak private Prompt content.
- - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.
- - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.
-+- Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
- 
- ## Testing patterns
- 
+<path>/Users/alessandrojcm/repos/prompt-vault/docs/agents/project-patterns.md</path>
+<type>file</type>
+<content>
+69: - Prompt Category catalog is `GET /api/prompt/categories` for authenticated users; admin-only mutations on the same resource path create/update/delete categories; labels are edge-trimmed, unique case-insensitively via `label_normalized`, and drive auto-generated globally unique snake_case slugs that regenerate on label changes; `created_by_user_id` attributes the admin who created each category; categories cannot be deleted while referenced by prompts, but unused baseline seeded categories may be deleted.
 
-```
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git log --oneline -10",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows recent commits before committing"
-}
-```
-
-**Output:**
-```
-b4cf8d4 prompt sharing
-37eda9e enforce prompt ownership boundaries
-7281a11 manage owned prompt details
-6113451 prompt management service
-c73cb77 feat: add prompt category catalog
-afca52b prompt management context
-c220ffb feat: revoke disabled user sessions (#21)
-7850b13 feat: revoke disabled user sessions
-8381237 enable/disable user patch Closes #15 (#20)
-88442c4 enable/disable user patch Closes #15
-
+(Showing lines 69-69 of 85. Use offset=70 to continue.)
+</content>
 ```
 
 ---
 
-## Assistant (Build · GPT-5.5 · 8.5s)
+## Assistant (Build · GPT-5.5 · 8.0s)
 
 _Thinking:_
 
+**Assessing git status**
 
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git add openapi/api.yaml apps/api/src/main/java/com/promptvault/api/prompt/PromptMapper.java apps/api/src/main/java/com/promptvault/api/prompt/PromptRepository.java apps/api/src/main/java/com/promptvault/api/prompt/PromptsController.java apps/api/src/main/java/com/promptvault/api/prompt/PromptsService.java apps/api/src/test/java/com/promptvault/api/prompt/PromptsApiTest.java docs/agents/project-patterns.md && git commit -m \"read public prompts\"",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Commits issue 28 implementation changes"
-}
-```
-
-**Output:**
-```
-[issue-28-read-public-prompts 226959f] read public prompts
- 7 files changed, 285 insertions(+)
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 9.8s)
-
-_Thinking:_
-
-
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git status --short --branch",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows clean status after commit"
-}
-```
-
-**Output:**
-```
-## issue-28-read-public-prompts
-
-```
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "gt branch info",
-  "timeout": 120000,
-  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
-  "description": "Shows Graphite branch metadata"
-}
-```
-
-**Output:**
-```
-issue-28-read-public-prompts
-9 seconds ago
-
-Parent: issue-27-share-unshare-prompts
-
-[33mcommit 226959ffab892f38d7c0bdf82b751f84cf829d43[m
-Author: Alessandro Cuppari <me@alessandrojcm.dev>
-Date:   Thu Jun 25 18:10:22 2026 +0100
-
-    read public prompts
-
-```
-
----
-
-## Assistant (Build · GPT-5.5 · 9.0s)
+I'm trying to figure out the git status. If there are modified files but no output, that might mean there are changes that haven't been staged. The "status short" should show if anything is staged. Maybe the repo's HEAD already had some updates? I wonder if the user is checking the tool state. I definitely need to mark this down as something to look into later.
 
 **Tool: todowrite**
 
@@ -4031,27 +2918,27 @@ Date:   Thu Jun 25 18:10:22 2026 +0100
 {
   "todos": [
     {
-      "content": "Inspect issue 28 and current workspace state",
+      "content": "Review issue tracker instructions and relevant category patterns",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Create a new Graphite stack entry for issue 28",
+      "content": "Confirm proposed testing seams with user",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Implement issue 28 following project patterns",
+      "content": "Write PRD from current decisions",
       "status": "completed",
       "priority": "high"
     },
     {
-      "content": "Run relevant checks",
+      "content": "Publish PRD issue with ready-for-agent label",
       "status": "completed",
-      "priority": "medium"
+      "priority": "high"
     },
     {
-      "content": "Update AGENTS.md if new project info is learned",
+      "content": "Update agent docs if new project info emerged",
       "status": "completed",
       "priority": "medium"
     }
@@ -4063,27 +2950,27 @@ Date:   Thu Jun 25 18:10:22 2026 +0100
 ```
 [
   {
-    "content": "Inspect issue 28 and current workspace state",
+    "content": "Review issue tracker instructions and relevant category patterns",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Create a new Graphite stack entry for issue 28",
+    "content": "Confirm proposed testing seams with user",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Implement issue 28 following project patterns",
+    "content": "Write PRD from current decisions",
     "status": "completed",
     "priority": "high"
   },
   {
-    "content": "Run relevant checks",
+    "content": "Publish PRD issue with ready-for-agent label",
     "status": "completed",
-    "priority": "medium"
+    "priority": "high"
   },
   {
-    "content": "Update AGENTS.md if new project info is learned",
+    "content": "Update agent docs if new project info emerged",
     "status": "completed",
     "priority": "medium"
   }
@@ -4092,32 +2979,637 @@ Date:   Thu Jun 25 18:10:22 2026 +0100
 
 ---
 
-## Assistant (Build · GPT-5.5 · 12.1s)
+## Assistant (Build · GPT-5.5 · 11.8s)
 
-Implemented issue 28 on new Graphite stack entry:
+Published the PRD as a GitHub issue and applied `ready-for-agent`:
 
-- Branch: `issue-28-read-public-prompts`
-- Parent: `issue-27-share-unshare-prompts`
-- Commit: `226959f read public prompts`
+https://github.com/alessandrojcm/prompt-vault/issues/36
 
-What changed:
-- Added OpenAPI `PublicPrompt` contract.
-- Added:
-  - `GET /api/public-prompts`
-  - `GET /api/public-prompts/{promptId}`
-- Public prompts:
-  - include only other enabled users’ public prompts
-  - exclude current user’s own public prompts
-  - expose `ownerUsername` only, no email / owner id
-  - return `404` when not visible through the public boundary
-- Added integration coverage for list/detail visibility, private exclusion, own-prompt exclusion, disabled-owner hiding, owner edit reflection, no email leakage, and disabled-session prompt API rejection.
-- Updated `docs/agents/project-patterns.md`.
+Testing seam confirmed and included: API integration tests only, using the existing Spring Boot + Testcontainers + HTTP session-cookie pattern.
 
-Verification:
-- `./gradlew :apps:api:test --tests com.promptvault.api.prompt.PromptsApiTest` passed
-- `mise run check` passed
+---
 
-Workspace is clean.
+## User
+
+# To Issues
+
+Break a plan into independently-grabbable issues using vertical slices (tracer bullets).
+
+The issue tracker and triage label vocabulary should have been provided to you — run `/setup-matt-pocock-skills` if not.
+
+## Process
+
+### 1. Gather context
+
+Work from whatever is already in the conversation context. If the user passes an issue reference (issue number, URL, or path) as an argument, fetch it from the issue tracker and read its full body and comments.
+
+### 2. Explore the codebase (optional)
+
+If you have not already explored the codebase, do so to understand the current state of the code. Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
+
+Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
+
+### 3. Draft vertical slices
+
+Break the plan into **tracer bullet** issues. Each issue is a thin vertical slice that cuts through ALL integration layers end-to-end, NOT a horizontal slice of one layer.
+
+<vertical-slice-rules>
+
+- Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests)
+- A completed slice is demoable or verifiable on its own
+- Any prefactoring should be done first
+
+</vertical-slice-rules>
+
+### 4. Quiz the user
+
+Present the proposed breakdown as a numbered list. For each slice, show:
+
+- **Title**: short descriptive name
+- **Blocked by**: which other slices (if any) must complete first
+- **User stories covered**: which user stories this addresses (if the source material has them)
+
+Ask the user:
+
+- Does the granularity feel right? (too coarse / too fine)
+- Are the dependency relationships correct?
+- Should any slices be merged or split further?
+
+Iterate until the user approves the breakdown.
+
+### 5. Publish the issues to the issue tracker
+
+For each approved slice, publish a new issue to the issue tracker. Use the issue body template below. These issues are considered ready for AFK agents, so publish them with the correct triage label unless instructed otherwise.
+
+Publish issues in dependency order (blockers first) so you can reference real issue identifiers in the "Blocked by" field.
+
+<issue-template>
+## Parent
+
+A reference to the parent issue on the issue tracker (if the source was an existing issue, otherwise omit this section).
+
+## What to build
+
+A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
+
+Avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it here and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+
+## Acceptance criteria
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Blocked by
+
+- A reference to the blocking ticket (if any)
+
+Or "None - can start immediately" if no blockers.
+
+</issue-template>
+
+Do NOT close or modify any parent issue.
+
+
+convert it to issues
+
+---
+
+## Assistant (Build · GPT-5.5 · 7.2s)
+
+_Thinking:_
+
+**Considering PRD issue resolution**
+
+I need to convert PRD issue #36. First, I should propose a breakdown and seek approval before we publish anything. It feels like reading through the issue again could help clarify things. I already have the body prepared, but maybe I'll fetch it for more context. Of course, I'll have to remember to use my to-do list to keep everything organized! Let’s make sure we’re on track before moving forward.
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Fetch parent PRD issue context",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Draft vertical slice issue breakdown",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Get user approval on granularity and dependencies",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Publish approved issues in dependency order",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if needed",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Fetch parent PRD issue context",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Draft vertical slice issue breakdown",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Get user approval on granularity and dependencies",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Publish approved issues in dependency order",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if needed",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.6s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "gh issue view 36 --comments --json number,title,body,labels,comments",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Fetch parent PRD issue"
+}
+```
+
+**Output:**
+```
+{"body":"## Problem Statement\n\nAdmins need a way to manage the system-wide Prompt Category catalog through the API. Today authenticated users can list the seeded Prompt Categories, but the catalog cannot be changed through supported endpoints. This prevents admins from adapting the classification options that every Prompt must use, while still preserving the rule that every Prompt belongs to exactly one existing Prompt Category.\n\n## Solution\n\nExpose RESTful Prompt Category management endpoints on the existing category resource path. Authenticated users can continue to read the catalog, while only Admin users can create, rename, and delete Prompt Categories. Prompt Category labels are edge-trimmed and unique case-insensitively. Slugs are auto-generated snake_case values derived from labels and regenerate when a label changes. Admins may delete any unused Prompt Category, including seeded baseline categories, but cannot delete a Prompt Category referenced by one or more Prompts.\n\n## User Stories\n\n1. As an authenticated user, I want to list Prompt Categories, so that I can choose a classification for a Prompt.\n2. As an authenticated user, I want the Prompt Category catalog at `/api/prompt/categories`, so that the API path follows the Prompt resource hierarchy.\n3. As an unauthenticated visitor, I want category catalog access to be rejected, so that catalog data remains behind authentication.\n4. As an Admin, I want to create a Prompt Category with a label, so that users can classify Prompts with a new system-wide category.\n5. As an Admin, I want category labels to be edge-trimmed on create, so that accidental surrounding whitespace does not create messy catalog entries.\n6. As an Admin, I want blank category labels to be rejected, so that every Prompt Category has a meaningful user-facing label.\n7. As an Admin, I want overly long category labels to be rejected, so that labels fit the established catalog constraints.\n8. As an Admin, I want duplicate labels to be rejected case-insensitively, so that users do not see confusing duplicate categories.\n9. As an Admin, I want a category slug to be generated automatically from the label, so that I do not need to manage technical identifiers manually.\n10. As an Admin, I want generated slugs to use the existing snake_case format, so that new categories are consistent with seeded categories.\n11. As an Admin, I want slug conflicts caused by different labels to be rejected as label validation errors, so that I can correct the only field I control.\n12. As an Admin, I want the create response to include the full Prompt Category, so that I can immediately see the assigned id, generated slug, creator attribution, and timestamps.\n13. As an Admin, I want newly created categories to attribute `createdByUserId` to me, so that category provenance reflects the actual creating user.\n14. As an Admin, I want to rename a Prompt Category by changing only its label, so that I can correct or improve catalog language without changing Prompt ownership or Prompt content.\n15. As an Admin, I want category labels to be edge-trimmed on update, so that accidental surrounding whitespace does not persist.\n16. As an Admin, I want category renames to preserve internal label text as entered, so that the API does not unexpectedly rewrite my label beyond edge trimming.\n17. As an Admin, I want category renames to regenerate the category slug from the new label, so that labels and slugs remain aligned.\n18. As an Admin, I want a rename that conflicts with another category label or generated slug to be rejected, so that catalog uniqueness remains intact.\n19. As an Admin, I want the update response to include the full Prompt Category, so that I can see the latest label, regenerated slug, and updated timestamp.\n20. As an Admin, I want missing category updates to return not found, so that I know the target category does not exist.\n21. As an Admin, I want to delete an unused Prompt Category, so that obsolete catalog entries can be removed.\n22. As an Admin, I want to delete unused seeded baseline categories when appropriate, so that initial data does not become permanent taxonomy.\n23. As an Admin, I want deletion of referenced Prompt Categories to be blocked, so that existing Prompts never lose their required category.\n24. As an Admin, I want successful deletion to return no content, so that clients can treat deletion as complete without parsing a body.\n25. As an Admin, I want missing category deletes to return not found, so that I know the target category does not exist.\n26. As a Normal User, I want to be forbidden from creating Prompt Categories, so that catalog management remains an administrative capability.\n27. As a Normal User, I want to be forbidden from renaming Prompt Categories, so that catalog language remains admin-controlled.\n28. As a Normal User, I want to be forbidden from deleting Prompt Categories, so that shared classifications cannot be removed by non-admins.\n29. As an unauthenticated visitor, I want Prompt Category mutations to be rejected as unauthenticated, so that category management requires a session.\n30. As a Prompt owner, I want my Prompt to continue referencing its category by id, so that category slug regeneration does not affect my Prompt.\n31. As an API client developer, I want category validation failures to use the existing validation error shape, so that forms can display field-level errors consistently.\n32. As an API client developer, I want the OpenAPI contract to define category management requests and responses, so that generated clients stay aligned with server behavior.\n\n## Implementation Decisions\n\n- The canonical Prompt Category catalog endpoint is `GET /api/prompt/categories`; the previous `/api/prompt-categories` path should be replaced for this contract.\n- Category mutations use the same REST resource path: `POST /api/prompt/categories`, `PATCH /api/prompt/categories/{categoryId}`, and `DELETE /api/prompt/categories/{categoryId}`.\n- `GET /api/prompt/categories` is available to authenticated users.\n- Category create, update, and delete are Admin-only operations. Unauthenticated callers receive `401`; authenticated Normal Users receive `403`.\n- Category create accepts only a label. The server derives all other fields.\n- Category update accepts only a label. The category id, created timestamp, creator attribution, and updated timestamp are system-managed.\n- Category labels are required, edge-trimmed, non-blank after trimming, and limited to 100 characters. Internal whitespace and punctuation in labels are preserved as entered.\n- Category labels remain unique case-insensitively through the normalized label column.\n- Category slugs are auto-generated snake_case values derived from labels.\n- Category slugs regenerate whenever the label changes. Prompts refer to categories by id, so slug regeneration does not affect Prompt-category relationships.\n- Generated slugs must remain globally unique. If a create or update would conflict by label or generated slug, reject the request as a validation error on the `label` field.\n- Category create returns `201` with the full Prompt Category response.\n- Category update returns `200` with the full Prompt Category response.\n- Category delete returns `204` with no response body.\n- Missing category update/delete targets return `404`.\n- Referenced Prompt Categories cannot be deleted. Return a conflict response when one or more Prompts still reference the category.\n- Admins may delete unused seeded baseline categories; seeded status does not grant special protection.\n- `createdByUserId` on newly created categories is the current Admin user, not always the seeded Admin.\n- No category detail endpoint is included in this slice; the Prompt Category DTO is small and the list endpoint is sufficient.\n- No admin web UI is included in this slice; this PRD is API-only.\n- The OpenAPI contract remains the source of truth for request/response shapes and generated clients.\n\n## Testing Decisions\n\n- Use API integration tests as the primary seam: full Spring Boot app on a random port, real MySQL through the existing Testcontainers Compose setup, and HTTP requests with session-cookie authentication.\n- Prefer external API behavior assertions over implementation detail assertions. Tests should verify status codes, response shapes, persisted observable state, authorization behavior, and catalog invariants.\n- Extend the existing Prompt Category API test coverage for the canonical path, category creation, category update, category deletion, validation failures, slug generation, slug regeneration, and deletion blocking.\n- Reuse admin authorization patterns from the existing Admin User Management API tests: Admin sessions are allowed, Normal User sessions are forbidden, unauthenticated requests are rejected.\n- Reuse Prompt API test patterns for creating Prompts that reference categories when testing deletion of referenced categories.\n- Test that `GET /api/prompt/categories` returns seeded categories to authenticated users and `401` to unauthenticated callers.\n- Test that Admin create returns `201` with `id`, `label`, `slug`, `createdAt`, `createdByUserId`, and `updatedAt`.\n- Test that create trims label edges, generates snake_case slugs, and attributes the creating Admin.\n- Test that create rejects blank, overlong, duplicate-label, and generated-slug-conflict cases with validation errors on `label`.\n- Test that Admin update returns `200`, trims label edges, regenerates the slug, advances `updatedAt`, and preserves creator attribution.\n- Test that update rejects missing targets with `404` and label/slug conflicts with validation errors on `label`.\n- Test that Admin delete returns `204` for unused categories and removes them from subsequent catalog reads.\n- Test that Admin delete returns a conflict response for categories referenced by Prompts and leaves the category available.\n- No frontend tests are needed because the slice intentionally excludes web UI changes.\n\n## Out of Scope\n\n- Admin web UI for Prompt Category management.\n- Category detail endpoint.\n- Manual slug editing.\n- Soft deletion or hidden category lifecycle states.\n- Automatic reassignment of Prompts when deleting a category.\n- Orphaned Prompts without a category.\n- Audit history beyond existing creator attribution and timestamps.\n- Changing Prompt ownership or Prompt visibility behavior.\n- Changing the seeded baseline category list except as allowed through normal Admin deletion after implementation.\n\n## Further Notes\n\n- The domain glossary now defines Prompt Categories as system-wide classifications with unique user-facing labels and unique auto-generated slugs derived from labels.\n- Categories referenced by Prompts remain available until those Prompts are moved to another category.\n- The project patterns now record `/api/prompt/categories` as the canonical category catalog and management path.\n","comments":[],"labels":[{"id":"LA_kwDOTC_uAM8AAAACooIMbA","name":"ready-for-agent","description":"Fully specified, ready for an AFK agent","color":"0e8a16"}],"number":36,"title":"PRD: Admin-managed prompt categories API"}
+
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.1s)
+
+_Thinking:_
+
+**Drafting a list**
+
+I think I need to create a draft list for something, but I’m wondering if I really need to publish it yet. It feels like there’s no rush, so I’ll just focus on putting together the final ask for now. It’s important to take my time on this, ensuring everything is organized correctly before any publication happens. Maybe I’ll revisit this once I have a clearer vision!
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Fetch parent PRD issue context",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Draft vertical slice issue breakdown",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Get user approval on granularity and dependencies",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Publish approved issues in dependency order",
+      "status": "pending",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if needed",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Fetch parent PRD issue context",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Draft vertical slice issue breakdown",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Get user approval on granularity and dependencies",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Publish approved issues in dependency order",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if needed",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 25.0s)
+
+_Thinking:_
+
+
+
+Proposed vertical-slice breakdown for parent PRD #36:
+
+1. **Title**: Move Prompt Category catalog to canonical REST path  
+   **Blocked by**: None  
+   **User stories covered**: 1, 2, 3, 32  
+   **Slice**: Replace the existing catalog route with `GET /api/prompt/categories`, preserving authenticated-user access, unauthenticated `401`, response shape, OpenAPI generation, and integration coverage.
+
+2. **Title**: Allow Admins to create Prompt Categories  
+   **Blocked by**: Slice 1  
+   **User stories covered**: 4–13, 26, 29, 31, 32  
+   **Slice**: Add `POST /api/prompt/categories` end-to-end, including admin-only authorization, label validation/trimming, case-insensitive label uniqueness, snake_case slug generation, slug conflict validation, creator attribution, full `PromptCategory` response, OpenAPI/client generation, and API integration tests.
+
+3. **Title**: Allow Admins to rename Prompt Categories  
+   **Blocked by**: Slice 2  
+   **User stories covered**: 14–20, 27, 29, 30, 31, 32  
+   **Slice**: Add `PATCH /api/prompt/categories/{categoryId}` end-to-end, including admin-only authorization, label-only update, edge trimming, conflict validation, slug regeneration, missing-target `404`, preservation of Prompt references by category id, full response, OpenAPI/client generation, and API integration tests.
+
+4. **Title**: Allow Admins to delete unused Prompt Categories  
+   **Blocked by**: Slice 2  
+   **User stories covered**: 21–25, 28, 29, 32  
+   **Slice**: Add `DELETE /api/prompt/categories/{categoryId}` end-to-end, including admin-only authorization, missing-target `404`, successful `204` for unused categories including seeded baseline categories, conflict response for categories referenced by Prompts, OpenAPI/client generation, and API integration tests.
+
+This keeps each issue independently verifiable through the API, while avoiding a horizontal “OpenAPI only” or “repository only” task.
+
+Does the granularity feel right? Are the dependencies correct, or should any of these be merged/split before I publish them?
+
+---
+
+## User
+
+yeah looks good
+
+---
+
+## Assistant (Build · GPT-5.5 · 8.6s)
+
+_Thinking:_
+
+**Managing issue publications**
+
+I need to publish issues and gather necessary components. I’ll create four sequential issues while ensuring no edits to the parent are made. I’m planning to use bash heredocs without any file operations involved. Should I update the documentation? There's no new info since the last update, but it's important to always refresh the AGENTS if necessary. Maybe I need to check on skill updates; I think I already handled that earlier, but I’ll keep it in mind.
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Fetch parent PRD issue context",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Draft vertical slice issue breakdown",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Get user approval on granularity and dependencies",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Publish approved issues in dependency order",
+      "status": "in_progress",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if needed",
+      "status": "pending",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Fetch parent PRD issue context",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Draft vertical slice issue breakdown",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Get user approval on granularity and dependencies",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Publish approved issues in dependency order",
+    "status": "in_progress",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if needed",
+    "status": "pending",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 15.0s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "issue1=$(gh issue create --title \"Move Prompt Category catalog to canonical REST path\" --label \"ready-for-agent\" --body $'## Parent\\n\\nParent PRD: #36\\n\\n## What to build\\n\\nMove the Prompt Category catalog read endpoint to the canonical REST path `GET /api/prompt/categories`. Authenticated users should continue to receive the same catalog response shape, while unauthenticated callers remain rejected. The OpenAPI contract and generated clients should reflect the new path.\\n\\n## Acceptance criteria\\n\\n- [ ] `GET /api/prompt/categories` returns the Prompt Category catalog for authenticated users.\\n- [ ] The catalog response contains the established Prompt Category fields: `id`, `label`, `slug`, `createdAt`, `createdByUserId`, and `updatedAt`.\\n- [ ] Unauthenticated callers receive `401`.\\n- [ ] The old `/api/prompt-categories` contract path is replaced by the canonical `/api/prompt/categories` path.\\n- [ ] OpenAPI generation and API client generation are updated as needed.\\n- [ ] API integration tests cover the canonical path and unauthenticated rejection.\\n\\n## Blocked by\\n\\nNone - can start immediately\\n') && printf \"%s\" \"$issue1\"",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Create first slice issue"
+}
+```
+
+**Output:**
+```
+https://github.com/alessandrojcm/prompt-vault/issues/37
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 19.4s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "issue2=$(gh issue create --title \"Allow Admins to create Prompt Categories\" --label \"ready-for-agent\" --body $'## Parent\\n\\nParent PRD: #36\\n\\n## What to build\\n\\nAdd `POST /api/prompt/categories` so Admin users can create new system-wide Prompt Categories. The endpoint should accept a label, normalize only its edges, validate catalog uniqueness, generate the category slug automatically, attribute creation to the current Admin, and return the full Prompt Category response. Normal Users and unauthenticated callers must not be able to create categories.\\n\\n## Acceptance criteria\\n\\n- [ ] Admin users can create a Prompt Category with a label through `POST /api/prompt/categories`.\\n- [ ] Successful creation returns `201` with the full Prompt Category response.\\n- [ ] `createdByUserId` is the current Admin user.\\n- [ ] Labels are edge-trimmed, required, non-blank after trimming, and limited to 100 characters.\\n- [ ] Internal label whitespace and punctuation are preserved.\\n- [ ] Labels are unique case-insensitively.\\n- [ ] Slugs are auto-generated as globally unique snake_case values derived from labels.\\n- [ ] Label conflicts and generated slug conflicts return validation errors on the `label` field.\\n- [ ] Normal Users receive `403` when attempting to create a Prompt Category.\\n- [ ] Unauthenticated callers receive `401` when attempting to create a Prompt Category.\\n- [ ] OpenAPI generation and API client generation include the create operation and request shape.\\n- [ ] API integration tests cover success, validation failures, creator attribution, slug generation, Normal User authorization, and unauthenticated rejection.\\n\\n## Blocked by\\n\\n- #37\\n') && printf \"%s\" \"$issue2\"",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Create second slice issue"
+}
+```
+
+**Output:**
+```
+https://github.com/alessandrojcm/prompt-vault/issues/38
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 20.8s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "issue3=$(gh issue create --title \"Allow Admins to rename Prompt Categories\" --label \"ready-for-agent\" --body $'## Parent\\n\\nParent PRD: #36\\n\\n## What to build\\n\\nAdd `PATCH /api/prompt/categories/{categoryId}` so Admin users can rename existing Prompt Categories by changing only the label. Renames should preserve Prompt relationships by category id, regenerate the snake_case slug from the new label, validate conflicts, and return the full updated Prompt Category. Normal Users and unauthenticated callers must not be able to rename categories.\\n\\n## Acceptance criteria\\n\\n- [ ] Admin users can rename a Prompt Category through `PATCH /api/prompt/categories/{categoryId}` by sending only a label.\\n- [ ] Successful rename returns `200` with the full Prompt Category response.\\n- [ ] Labels are edge-trimmed, required, non-blank after trimming, and limited to 100 characters.\\n- [ ] Internal label whitespace and punctuation are preserved.\\n- [ ] Labels remain unique case-insensitively.\\n- [ ] The slug regenerates as a globally unique snake_case value derived from the updated label.\\n- [ ] Existing Prompts continue to reference the renamed category by id.\\n- [ ] Creator attribution is preserved and the updated timestamp advances.\\n- [ ] Missing category ids return `404`.\\n- [ ] Label conflicts and generated slug conflicts return validation errors on the `label` field.\\n- [ ] Normal Users receive `403` when attempting to rename a Prompt Category.\\n- [ ] Unauthenticated callers receive `401` when attempting to rename a Prompt Category.\\n- [ ] OpenAPI generation and API client generation include the update operation and request shape.\\n- [ ] API integration tests cover success, validation failures, slug regeneration, missing target behavior, Prompt relationship preservation, Normal User authorization, and unauthenticated rejection.\\n\\n## Blocked by\\n\\n- #38\\n') && printf \"%s\" \"$issue3\"",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Create third slice issue"
+}
+```
+
+**Output:**
+```
+https://github.com/alessandrojcm/prompt-vault/issues/39
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 18.7s)
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "issue4=$(gh issue create --title \"Allow Admins to delete unused Prompt Categories\" --label \"ready-for-agent\" --body $'## Parent\\n\\nParent PRD: #36\\n\\n## What to build\\n\\nAdd `DELETE /api/prompt/categories/{categoryId}` so Admin users can remove Prompt Categories that are not referenced by any Prompts. Deletion should work for any unused category, including seeded baseline categories. Deletion must be blocked when one or more Prompts still reference the category, preserving the rule that every Prompt belongs to exactly one existing Prompt Category.\\n\\n## Acceptance criteria\\n\\n- [ ] Admin users can delete an unused Prompt Category through `DELETE /api/prompt/categories/{categoryId}`.\\n- [ ] Successful deletion returns `204` with no response body.\\n- [ ] Deleted categories no longer appear in subsequent catalog reads.\\n- [ ] Unused seeded baseline categories can be deleted.\\n- [ ] Missing category ids return `404`.\\n- [ ] Categories referenced by one or more Prompts cannot be deleted and return a conflict response.\\n- [ ] A blocked deletion leaves the category available in subsequent catalog reads.\\n- [ ] Normal Users receive `403` when attempting to delete a Prompt Category.\\n- [ ] Unauthenticated callers receive `401` when attempting to delete a Prompt Category.\\n- [ ] OpenAPI generation and API client generation include the delete operation.\\n- [ ] API integration tests cover successful deletion, seeded category deletion, missing target behavior, referenced-category conflict behavior, Normal User authorization, and unauthenticated rejection.\\n\\n## Blocked by\\n\\n- #38\\n') && printf \"%s\" \"$issue4\"",
+  "timeout": 120000,
+  "workdir": "/Users/alessandrojcm/repos/prompt-vault",
+  "description": "Create fourth slice issue"
+}
+```
+
+**Output:**
+```
+https://github.com/alessandrojcm/prompt-vault/issues/40
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.1s)
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Fetch parent PRD issue context",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Draft vertical slice issue breakdown",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Get user approval on granularity and dependencies",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Publish approved issues in dependency order",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if needed",
+      "status": "in_progress",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Fetch parent PRD issue context",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Draft vertical slice issue breakdown",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Get user approval on granularity and dependencies",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Publish approved issues in dependency order",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if needed",
+    "status": "in_progress",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 11.7s)
+
+_Thinking:_
+
+**Evaluating updates and status**
+
+I need to check if I should update AGENTS, but it seems like there are no changes. Maybe I should load the skill, but it might already be loaded. I'm thinking about the git status — no files changed, which is weird since earlier docs were modified. So did the patch not persist? If it shows as changed but status indicates no output, maybe it was already committed? At least, I can confirm no doc updates are necessary beyond what's already captured. Task is complete!
+
+**Tool: todowrite**
+
+**Input:**
+```json
+{
+  "todos": [
+    {
+      "content": "Fetch parent PRD issue context",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Draft vertical slice issue breakdown",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Get user approval on granularity and dependencies",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Publish approved issues in dependency order",
+      "status": "completed",
+      "priority": "high"
+    },
+    {
+      "content": "Update agent docs if needed",
+      "status": "completed",
+      "priority": "medium"
+    }
+  ]
+}
+```
+
+**Output:**
+```
+[
+  {
+    "content": "Fetch parent PRD issue context",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Draft vertical slice issue breakdown",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Get user approval on granularity and dependencies",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Publish approved issues in dependency order",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "content": "Update agent docs if needed",
+    "status": "completed",
+    "priority": "medium"
+  }
+]
+```
+
+---
+
+## Assistant (Build · GPT-5.5 · 6.9s)
+
+Published the vertical-slice issues with `ready-for-agent`:
+
+1. #37 — Move Prompt Category catalog to canonical REST path  
+   https://github.com/alessandrojcm/prompt-vault/issues/37
+
+2. #38 — Allow Admins to create Prompt Categories  
+   https://github.com/alessandrojcm/prompt-vault/issues/38
+
+3. #39 — Allow Admins to rename Prompt Categories  
+   https://github.com/alessandrojcm/prompt-vault/issues/39
+
+4. #40 — Allow Admins to delete unused Prompt Categories  
+   https://github.com/alessandrojcm/prompt-vault/issues/40
 
 ---
 
