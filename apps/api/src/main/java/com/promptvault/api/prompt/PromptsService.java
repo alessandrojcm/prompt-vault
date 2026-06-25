@@ -65,6 +65,13 @@ public class PromptsService {
         promptRepository.delete(requireOwnedPrompt(promptId, owner));
     }
 
+    @Transactional
+    public PromptEntity updateOwnedPromptVisibility(Long promptId, PromptVisibility visibility, UserEntity owner) {
+        PromptEntity prompt = requireOwnedPrompt(promptId, owner);
+        prompt.setVisibility(visibility);
+        return promptRepository.save(prompt);
+    }
+
     private PromptEntity requireOwnedPrompt(Long promptId, UserEntity owner) {
         return promptRepository.findByIdAndOwnerId(promptId, owner.getId())
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
