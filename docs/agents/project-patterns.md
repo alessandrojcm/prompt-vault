@@ -67,6 +67,8 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - The `/dashboard/admin/users` UI initially requests `role=USER`, hides internal IDs and the role column, shows username/email address/account status/actions, labels enum values for humans, confirms disable actions with a small popover, enables immediately, updates rows in place, and shows toasts.
 - Disabling a normal user preserves their data and identity reservations, revokes existing sessions so subsequent current-user checks behave unauthenticated, and does not create audit records in the initial slice.
 - Prompt Category catalog is `GET /api/prompt-categories` for authenticated users; baseline categories are seeded by Flyway with stable snake_case slugs, case-insensitive label uniqueness via `label_normalized`, globally unique slugs, and `created_by_user_id` attribution to the seeded Admin.
+- Prompt creation is `POST /api/prompts` for authenticated users; requests include `title`, `text`, and `categoryId`, normalize title/text with edge trimming before validation, require an existing Prompt Category, allow duplicate titles, and persist new Prompts as `PRIVATE` with owner/category/timestamps.
+- My Prompts listing is `GET /api/users/{userId}/prompts` for authenticated users; `{userId}` must be the current authenticated user, and the response returns all Prompts owned by that user, including private Prompts.
 
 ## Testing patterns
 
