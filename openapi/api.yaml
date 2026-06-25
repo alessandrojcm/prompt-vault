@@ -92,6 +92,24 @@ paths:
                 $ref: '#/components/schemas/UserSummary'
         '401':
           description: No authenticated session is present.
+  /api/prompt-categories:
+    get:
+      tags:
+        - PromptCategories
+      operationId: listPromptCategories
+      summary: List prompt categories
+      description: Returns the predefined system-wide prompt category catalog.
+      responses:
+        '200':
+          description: Prompt categories available to authenticated users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromptCategory'
+        '401':
+          description: No authenticated session is present.
   /api/admin/users:
     get:
       tags:
@@ -246,6 +264,34 @@ components:
           $ref: '#/components/schemas/UserRole'
         accountStatus:
           $ref: '#/components/schemas/AccountStatus'
+    PromptCategory:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - label
+        - slug
+        - createdAt
+        - createdByUserId
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        slug:
+          type: string
+          description: Stable snake_case category identifier.
+        createdAt:
+          type: string
+          format: date-time
+        createdByUserId:
+          type: integer
+          format: int64
+        updatedAt:
+          type: string
+          format: date-time
     ValidationFieldError:
       type: object
       additionalProperties: false
