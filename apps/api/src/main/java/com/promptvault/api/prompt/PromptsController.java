@@ -7,6 +7,7 @@ import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.PromptsApi;
 import com.promptvault.contract.model.CreatePromptRequest;
 import com.promptvault.contract.model.Prompt;
+import com.promptvault.contract.model.PublicPrompt;
 import com.promptvault.contract.model.UpdatePromptRequest;
 import com.promptvault.contract.model.UpdatePromptVisibilityRequest;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,19 @@ public class PromptsController implements PromptsApi {
     @Override
     public ResponseEntity<Prompt> getPrompt(Long promptId) {
         return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));
+    }
+
+    @Override
+    public ResponseEntity<List<PublicPrompt>> listPublicPrompts() {
+        return ResponseEntity.ok(promptsService.listPublicPrompts(currentUser())
+            .stream()
+            .map(PromptMapper::toPublicContract)
+            .toList());
+    }
+
+    @Override
+    public ResponseEntity<PublicPrompt> getPublicPrompt(Long promptId) {
+        return ResponseEntity.ok(PromptMapper.toPublicContract(promptsService.getPublicPrompt(promptId, currentUser())));
     }
 
     @Override

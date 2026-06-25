@@ -138,6 +138,49 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         '401':
           description: No authenticated session is present.
+  /api/public-prompts:
+    get:
+      tags:
+        - Prompts
+      operationId: listPublicPrompts
+      summary: List public prompts
+      description: Returns public prompts owned by other enabled users.
+      responses:
+        '200':
+          description: Public prompts visible to the current authenticated user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicPrompt'
+        '401':
+          description: No authenticated session is present.
+  /api/public-prompts/{promptId}:
+    get:
+      tags:
+        - Prompts
+      operationId: getPublicPrompt
+      summary: Get public prompt detail
+      description: Returns public prompt detail when the prompt is owned by another enabled user.
+      parameters:
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Public prompt detail visible to the current authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPrompt'
+        '401':
+          description: No authenticated session is present.
+        '404':
+          description: The prompt is not visible as a public prompt to the current user.
   /api/prompts/{promptId}:
     get:
       tags:
@@ -550,6 +593,39 @@ components:
         ownerUserId:
           type: integer
           format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    PublicPrompt:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - text
+        - visibility
+        - categoryId
+        - ownerUsername
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        text:
+          type: string
+        visibility:
+          $ref: '#/components/schemas/PromptVisibility'
+        categoryId:
+          type: integer
+          format: int64
+        ownerUsername:
+          type: string
         createdAt:
           type: string
           format: date-time

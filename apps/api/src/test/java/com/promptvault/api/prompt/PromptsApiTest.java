@@ -222,6 +222,119 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void authenticatedUsersCanListAndRetrievePublicPromptsFromOtherEnabledUsersOnly() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser viewer = createUser();
+        TestUser owner = createUser();
+        TestUser privateOwner = createUser();
+        HttpClient viewerClient = authenticatedClient(viewer);
+        HttpClient ownerClient = authenticatedClient(owner);
+        HttpClient privateOwnerClient = authenticatedClient(privateOwner);
+
+        Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Visible public prompt",
+            "text", "Visible public text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        updatePromptVisibility(ownerClient, publicPromptId, "PUBLIC");
+        Long ownPublicPromptId = ((Number) readJson(createPrompt(viewerClient, Map.of(
+            "title", "Viewer own public prompt",
+            "text", "Viewer own public text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        updatePromptVisibility(viewerClient, ownPublicPromptId, "PUBLIC");
+        Long privatePromptId = ((Number) readJson(createPrompt(privateOwnerClient, Map.of(
+            "title", "Private other prompt",
+            "text", "Private other text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> listResponse = listPublicPrompts(viewerClient);
+        HttpResponse<String> detailResponse = getPublicPrompt(viewerClient, publicPromptId);
+        HttpResponse<String> ownPublicDetailResponse = getPublicPrompt(viewerClient, ownPublicPromptId);
+        HttpResponse<String> privateDetailResponse = getPublicPrompt(viewerClient, privatePromptId);
+
+        assertThat(listResponse.statusCode()).isEqualTo(200);
+        List<Map<String, Object>> prompts = readList(listResponse.body());
+        assertThat(prompts).filteredOn(prompt -> prompt.get("id").equals(publicPromptId.intValue()))
+            .singleElement()
+            .satisfies(prompt -> {
+                assertThat(prompt).containsEntry("title", "Visible public prompt")
+                    .containsEntry("text", "Visible public text")
+                    .containsEntry("visibility", "PUBLIC")
+                    .containsEntry("categoryId", category.getId().intValue())
+                    .containsEntry("ownerUsername", owner.entity().getUsername());
+                assertThat(prompt).doesNotContainKeys("ownerUserId", "emailAddress");
+                assertThat(prompt).doesNotContainValue(owner.entity().getEmailAddress());
+            });
+        assertThat(prompts).extracting(prompt -> prompt.get("id"))
+            .doesNotContain(ownPublicPromptId.intValue(), privatePromptId.intValue());
+        assertThat(listResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
+
+        assertThat(detailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(detailResponse.body()))
+            .containsEntry("id", publicPromptId.intValue())
+            .containsEntry("ownerUsername", owner.entity().getUsername())
+            .doesNotContainKeys("ownerUserId", "emailAddress");
+        assertThat(detailResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
+        assertThat(ownPublicDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(privateDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(privateDetailResponse.body()).doesNotContain("Private other prompt", "Private other text");
+    }
+
+    @Test
+    void publicReadsHideDisabledOwnersPromptsWithoutDeletingThemAndShowOwnerEditsImmediately() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser viewer = createUser();
+        TestUser owner = createUser();
+        TestUser admin = createAdmin();
+        HttpClient viewerClient = authenticatedClient(viewer);
+        HttpClient ownerClient = authenticatedClient(owner);
+        HttpClient adminClient = authenticatedClient(admin);
+
+        Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Original public title",
+            "text", "Original public text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        updatePromptVisibility(ownerClient, promptId, "PUBLIC");
+        HttpResponse<String> initialDetailResponse = getPublicPrompt(viewerClient, promptId);
+
+        updatePrompt(ownerClient, promptId, Map.of(
+            "title", "Updated public title",
+            "text", "Updated public text",
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> updatedDetailResponse = getPublicPrompt(viewerClient, promptId);
+
+        HttpResponse<String> disableOwnerResponse = updateUserStatus(adminClient, owner.entity().getId(), "DISABLED");
+        HttpResponse<String> listAfterDisableResponse = listPublicPrompts(viewerClient);
+        HttpResponse<String> detailAfterDisableResponse = getPublicPrompt(viewerClient, promptId);
+        HttpResponse<String> disabledOwnerPromptApiResponse = listPublicPrompts(ownerClient);
+
+        assertThat(initialDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(initialDetailResponse.body())).containsEntry("title", "Original public title");
+        assertThat(updatedDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(updatedDetailResponse.body()))
+            .containsEntry("title", "Updated public title")
+            .containsEntry("text", "Updated public text");
+
+        assertThat(disableOwnerResponse.statusCode()).isEqualTo(200);
+        assertThat(listAfterDisableResponse.statusCode()).isEqualTo(200);
+        assertThat(readList(listAfterDisableResponse.body())).extracting(prompt -> prompt.get("id"))
+            .doesNotContain(promptId.intValue());
+        assertThat(detailAfterDisableResponse.statusCode()).isEqualTo(404);
+        assertThat(detailAfterDisableResponse.body()).doesNotContain("Updated public title", "Updated public text");
+        assertThat(disabledOwnerPromptApiResponse.statusCode()).isEqualTo(401);
+
+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
+        assertThat(persistedPrompt.getTitle()).isEqualTo("Updated public title");
+        assertThat(persistedPrompt.getText()).isEqualTo("Updated public text");
+        assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
+        assertThat(persistedPrompt.getOwner().getId()).isEqualTo(owner.entity().getId());
+    }
+
+    @Test
     void nonOwnersAndAdminsCannotShareOrUnsharePromptsOwnedByOtherUsers() throws Exception {
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         TestUser owner = createUser();
@@ -493,6 +606,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         ));
         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, "PUBLIC");
         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
+        HttpResponse<String> publicListResponse = listPublicPrompts(client);
+        HttpResponse<String> publicDetailResponse = getPublicPrompt(client, 1L);
 
         assertThat(createResponse.statusCode()).isEqualTo(401);
         assertThat(listResponse.statusCode()).isEqualTo(401);
@@ -500,6 +615,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(updateResponse.statusCode()).isEqualTo(401);
         assertThat(visibilityResponse.statusCode()).isEqualTo(401);
         assertThat(deleteResponse.statusCode()).isEqualTo(401);
+        assertThat(publicListResponse.statusCode()).isEqualTo(401);
+        assertThat(publicDetailResponse.statusCode()).isEqualTo(401);
     }
 
     private TestUser createUser() {
@@ -574,6 +691,22 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    private HttpResponse<String> listPublicPrompts(HttpClient client) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts"))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> getPublicPrompt(HttpClient client, Long promptId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts/" + promptId))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {
         return updatePromptJson(client, promptId, objectMapper.writeValueAsString(payload));
     }
@@ -601,6 +734,17 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     private HttpResponse<String> deletePrompt(HttpClient client, Long promptId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
             .DELETE()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> updateUserStatus(HttpClient client, Long userId, String accountStatus) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/users/" + userId + "/status"))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                "accountStatus", accountStatus
+            ))))
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
