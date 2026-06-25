@@ -83,7 +83,7 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
     }
 
     private HttpResponse<String> listPromptCategories(HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt-categories"))
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories"))
             .header("Accept", "application/json")
             .GET()
             .build();
