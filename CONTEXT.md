@@ -81,3 +81,15 @@ _Avoid_: Owned prompts
 **Public Prompts**:
 The collection of public prompts owned by other enabled users and visible to the current user.
 _Avoid_: Prompt feed, shared prompts
+
+**Policy Keyword**:
+A keyword or phrase that admins manage to identify Prompt Text that may require review. Policy keywords are matched against Prompt Text when prompt text is created or changed.
+_Avoid_: Forbidden word, blocked term
+
+**Prompt Flag**:
+A durable record that a Prompt matched one or more Policy Keywords. A Prompt Flag captures snapshots of the matched keyword text as it existed when the Prompt Text was checked and when the current Prompt Text was flagged.
+_Avoid_: Alert, violation, moderation finding
+
+**Flagged Prompt**:
+A Prompt that has an associated Prompt Flag.
+_Avoid_: Flagged content, reported prompt
