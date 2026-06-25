@@ -139,6 +139,45 @@ paths:
           description: No authenticated session is present.
         '403':
           description: The authenticated user is not an administrator.
+  /api/prompt/categories/{categoryId}:
+    patch:
+      tags:
+        - PromptCategories
+      operationId: updatePromptCategory
+      summary: Rename a prompt category
+      description: Renames an existing system-wide prompt category. Admin users only.
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePromptCategoryRequest'
+      responses:
+        '200':
+          description: Prompt category renamed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptCategory'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+        '404':
+          description: Prompt category was not found.
   /api/prompts:
     post:
       tags:
@@ -538,6 +577,17 @@ components:
           type: string
           format: date-time
     CreatePromptCategoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+      properties:
+        label:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Prompt Category labels are edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
+    UpdatePromptCategoryRequest:
       type: object
       additionalProperties: false
       required:
