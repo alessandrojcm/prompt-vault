@@ -176,6 +176,148 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void promptOwnersCanRetrieveAndUpdateOwnedPromptDetails() throws Exception {
+        List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
+        PromptCategoryEntity originalCategory = categories.getFirst();
+        PromptCategoryEntity updatedCategory = categories.getLast();
+        TestUser owner = createUser();
+        TestUser otherUser = createUser();
+        HttpClient ownerClient = authenticatedClient(owner);
+        HttpClient otherClient = authenticatedClient(otherUser);
+
+        Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", "Original title",
+            "text", "Original text",
+            "categoryId", originalCategory.getId()
+        )).body());
+        Long promptId = ((Number) createdPrompt.get("id")).longValue();
+
+        HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
+        HttpResponse<String> otherUserDetailResponse = getPrompt(otherClient, promptId);
+        HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
+            "title", "  Updated title  ",
+            "text", "  Updated text\n\n  still here  ",
+            "categoryId", updatedCategory.getId()
+        ));
+
+        assertThat(detailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(detailResponse.body())).containsEntry("id", promptId.intValue())
+            .containsEntry("title", "Original title")
+            .containsEntry("text", "Original text")
+            .containsEntry("categoryId", originalCategory.getId().intValue())
+            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+        assertThat(otherUserDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(updateResponse.statusCode()).isEqualTo(200);
+
+        Map<String, Object> updatedPrompt = readJson(updateResponse.body());
+        assertThat(updatedPrompt).containsEntry("id", promptId.intValue())
+            .containsEntry("title", "Updated title")
+            .containsEntry("text", "Updated text\n\n  still here")
+            .containsEntry("categoryId", updatedCategory.getId().intValue())
+            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+        assertThat(OffsetDateTime.parse((String) updatedPrompt.get("updatedAt")))
+            .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
+
+        PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
+        assertThat(persistedPrompt.getTitle()).isEqualTo("Updated title");
+        assertThat(persistedPrompt.getText()).isEqualTo("Updated text\n\n  still here");
+        assertThat(persistedPrompt.getCategory().getId()).isEqualTo(updatedCategory.getId());
+    }
+
+    @Test
+    void promptUpdatesReturnValidationErrorsForTrimmedBlankOversizedMissingAndUnknownCategories() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        HttpClient client = authenticatedClient(createUser());
+        Long promptId = ((Number) readJson(createPrompt(client, Map.of(
+            "title", "Valid title",
+            "text", "Valid text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> blankResponse = updatePrompt(client, promptId, Map.of(
+            "title", "   ",
+            "text", "  ",
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> oversizedResponse = updatePrompt(client, promptId, Map.of(
+            "title", "t".repeat(121),
+            "text", "x".repeat(10001),
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> missingCategoryResponse = updatePromptJson(client, promptId, """
+            {"title":"Valid title","text":"Valid text"}
+            """);
+        HttpResponse<String> unknownCategoryResponse = updatePrompt(client, promptId, Map.of(
+            "title", "Valid title",
+            "text", "Valid text",
+            "categoryId", 999_999_999
+        ));
+
+        assertThat(blankResponse.statusCode()).isEqualTo(400);
+        assertThat(extractFieldMessages(readJson(blankResponse.body())))
+            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+        assertThat(oversizedResponse.statusCode()).isEqualTo(400);
+        assertThat(extractFieldMessages(readJson(oversizedResponse.body())))
+            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+        assertThat(missingCategoryResponse.statusCode()).isEqualTo(400);
+        assertThat(extractFieldMessages(readJson(missingCategoryResponse.body())))
+            .containsEntry("categoryId", "Prompt Category is required.");
+        assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
+        assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
+            .containsEntry("categoryId", "Prompt Category must exist.");
+    }
+
+    @Test
+    void promptOwnersCanDeleteOwnedPromptsWithoutDeletingOwnerOrCategory() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser owner = createUser();
+        TestUser otherUser = createUser();
+        HttpClient ownerClient = authenticatedClient(owner);
+        HttpClient otherClient = authenticatedClient(otherUser);
+        Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Delete me",
+            "text", "Delete text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> otherUserDeleteResponse = deletePrompt(otherClient, promptId);
+        HttpResponse<String> deleteResponse = deletePrompt(ownerClient, promptId);
+        HttpResponse<String> detailAfterDeleteResponse = getPrompt(ownerClient, promptId);
+        HttpResponse<String> listAfterDeleteResponse = listMyPrompts(ownerClient, owner.entity().getId());
+
+        assertThat(otherUserDeleteResponse.statusCode()).isEqualTo(404);
+        assertThat(deleteResponse.statusCode()).isEqualTo(204);
+        assertThat(detailAfterDeleteResponse.statusCode()).isEqualTo(404);
+        assertThat(readList(listAfterDeleteResponse.body()))
+            .extracting(prompt -> prompt.get("id"))
+            .doesNotContain(promptId.intValue());
+        assertThat(promptRepository.findById(promptId)).isEmpty();
+        assertThat(promptCategoryRepository.findById(category.getId())).isPresent();
+        assertThat(userRepository.findById(owner.entity().getId())).isPresent();
+    }
+
+    @Test
+    void missingPromptIdsReturnNotFoundForDetailUpdateAndDelete() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        HttpClient client = authenticatedClient(createUser());
+        long missingPromptId = 999_999_999L;
+
+        HttpResponse<String> detailResponse = getPrompt(client, missingPromptId);
+        HttpResponse<String> updateResponse = updatePrompt(client, missingPromptId, Map.of(
+            "title", "Valid title",
+            "text", "Valid text",
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> deleteResponse = deletePrompt(client, missingPromptId);
+
+        assertThat(detailResponse.statusCode()).isEqualTo(404);
+        assertThat(updateResponse.statusCode()).isEqualTo(404);
+        assertThat(deleteResponse.statusCode()).isEqualTo(404);
+    }
+
+    @Test
     void unauthenticatedCallersCannotCreateOrListPrompts() throws Exception {
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
@@ -186,9 +328,19 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             "categoryId", category.getId()
         ));
         HttpResponse<String> listResponse = listMyPrompts(client, 1L);
+        HttpResponse<String> detailResponse = getPrompt(client, 1L);
+        HttpResponse<String> updateResponse = updatePrompt(client, 1L, Map.of(
+            "title", "Blocked",
+            "text", "Blocked text",
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
 
         assertThat(createResponse.statusCode()).isEqualTo(401);
         assertThat(listResponse.statusCode()).isEqualTo(401);
+        assertThat(detailResponse.statusCode()).isEqualTo(401);
+        assertThat(updateResponse.statusCode()).isEqualTo(401);
+        assertThat(deleteResponse.statusCode()).isEqualTo(401);
     }
 
     private TestUser createUser() {
@@ -243,6 +395,34 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + userId + "/prompts"))
             .header("Accept", "application/json")
             .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> getPrompt(HttpClient client, Long promptId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {
+        return updatePromptJson(client, promptId, objectMapper.writeValueAsString(payload));
+    }
+
+    private HttpResponse<String> updatePromptJson(HttpClient client, Long promptId, String payload) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> deletePrompt(HttpClient client, Long promptId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
+            .DELETE()
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }

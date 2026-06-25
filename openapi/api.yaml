@@ -138,6 +138,87 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         '401':
           description: No authenticated session is present.
+  /api/prompts/{promptId}:
+    get:
+      tags:
+        - Prompts
+      operationId: getPrompt
+      summary: Get an owned prompt
+      description: Returns prompt detail when the prompt is owned by the current authenticated user.
+      parameters:
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Prompt detail for the current owner.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prompt'
+        '401':
+          description: No authenticated session is present.
+        '404':
+          description: The prompt does not exist for the current owner.
+    patch:
+      tags:
+        - Prompts
+      operationId: updatePrompt
+      summary: Update an owned prompt
+      description: Updates prompt content and category when the prompt is owned by the current authenticated user.
+      parameters:
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePromptRequest'
+      responses:
+        '200':
+          description: The updated prompt.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prompt'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '404':
+          description: The prompt does not exist for the current owner.
+    delete:
+      tags:
+        - Prompts
+      operationId: deletePrompt
+      summary: Delete an owned prompt
+      description: Permanently deletes a prompt when it is owned by the current authenticated user.
+      parameters:
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Prompt deleted successfully.
+        '401':
+          description: No authenticated session is present.
+        '404':
+          description: The prompt does not exist for the current owner.
   /api/users/{userId}/prompts:
     get:
       tags:
@@ -353,6 +434,28 @@ components:
         - PRIVATE
         - PUBLIC
     CreatePromptRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+        - text
+        - categoryId
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+          description: Prompt titles are trimmed before validation and persistence.
+        text:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          description: Prompt text is edge-trimmed before validation and persistence while preserving internal whitespace and newlines.
+        categoryId:
+          type: integer
+          format: int64
+          minimum: 1
+    UpdatePromptRequest:
       type: object
       additionalProperties: false
       required:

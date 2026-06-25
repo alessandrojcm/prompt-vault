@@ -2,6 +2,7 @@ package com.promptvault.api.prompt;
 
 import com.promptvault.api.validation.BeanValidationFieldMessageResolver;
 import com.promptvault.contract.model.CreatePromptRequest;
+import com.promptvault.contract.model.UpdatePromptRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
@@ -11,7 +12,9 @@ public class PromptBeanValidationMessageResolver implements BeanValidationFieldM
     @Override
     public boolean supports(FieldError fieldError) {
         return CreatePromptRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
-            || "createPromptRequest".equals(fieldError.getObjectName());
+            || "createPromptRequest".equals(fieldError.getObjectName())
+            || UpdatePromptRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
+            || "updatePromptRequest".equals(fieldError.getObjectName());
     }
 
     @Override
