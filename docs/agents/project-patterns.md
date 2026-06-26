@@ -74,6 +74,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Prompt updates use the same title/text trimming, length validation, and existing-category validation as creation, and owner-driven content/category changes advance `updatedAt`.
 - Prompt Visibility transitions use `PATCH /api/prompts/{promptId}/visibility` with a desired `visibility` (`PUBLIC` to Share, `PRIVATE` to Unshare); ownership is enforced like other Prompt mutations, including no admin override, and visibility changes advance `updatedAt`.
 - Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
+- Policy Keyword administration lives under `/api/admin/policy/keywords`; admins can create/list/update/delete keyword text, which is edge-trimmed, non-blank, unique case-insensitively through `keyword_normalized`, and responses include id, keyword, timestamps, and created-by admin id/username for later Prompt Flagging slices.
 
 ## Testing patterns
 
