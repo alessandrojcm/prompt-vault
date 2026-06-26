@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -224,6 +225,112 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(readJson(unflaggedDetailResponse.body()))
             .containsEntry("flaggedAt", null)
             .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+    }
+
+    @Test
+    void promptTextUpdatesCreateReplaceAndClearPromptFlags() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        String suffix = uniqueSuffix();
+        String alphaKeyword = "alpha " + suffix;
+        String betaKeyword = "beta " + suffix;
+        String gammaKeyword = "gamma " + suffix;
+        createPolicyKeyword(alphaKeyword, admin.entity());
+        createPolicyKeyword(betaKeyword, admin.entity());
+        createPolicyKeyword(gammaKeyword, admin.entity());
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", "Initially safe",
+            "text", "Safe body",
+            "categoryId", category.getId()
+        )).body());
+        Long promptId = ((Number) createdPrompt.get("id")).longValue();
+
+        HttpResponse<String> flagResponse = updatePrompt(ownerClient, promptId, Map.of(
+            "title", "Now flagged",
+            "text", "Contains " + alphaKeyword.toUpperCase(Locale.ROOT) + " and " + betaKeyword,
+            "categoryId", category.getId()
+        ));
+        PromptFlagEntity firstFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
+        Instant firstFlaggedAt = firstFlag.getFlaggedAt();
+        Thread.sleep(1_100);
+
+        HttpResponse<String> replaceResponse = updatePrompt(ownerClient, promptId, Map.of(
+            "title", "Still flagged",
+            "text", "Contains " + betaKeyword + " and " + gammaKeyword,
+            "categoryId", category.getId()
+        ));
+        PromptFlagEntity replacedFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
+        Instant replacedFlaggedAt = replacedFlag.getFlaggedAt();
+
+        HttpResponse<String> clearResponse = updatePrompt(ownerClient, promptId, Map.of(
+            "title", "Safe again",
+            "text", "No policy terms remain",
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
+
+        assertThat(flagResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(flagResponse.body())).satisfies(prompt -> {
+            assertThat(OffsetDateTime.parse((String) prompt.get("flaggedAt"))).isNotNull();
+            assertThat(prompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+        });
+        assertThat(firstFlag.getKeywordSnapshots())
+            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+            .containsExactly(alphaKeyword, betaKeyword);
+
+        assertThat(replaceResponse.statusCode()).isEqualTo(200);
+        assertThat(replacedFlaggedAt).isAfter(firstFlaggedAt);
+        assertThat(replacedFlag.getKeywordSnapshots())
+            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+            .containsExactly(betaKeyword, gammaKeyword);
+        assertThat(readJson(replaceResponse.body())).containsKey("flaggedAt")
+            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+
+        assertThat(clearResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(clearResponse.body())).containsEntry("flaggedAt", null);
+        assertThat(promptFlagRepository.findByPromptId(promptId)).isEmpty();
+        assertThat(detailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(detailResponse.body())).containsEntry("flaggedAt", null);
+    }
+
+    @Test
+    void promptUpdatesLeaveFlagsUnchangedWhenPromptTextDoesNotChange() throws Exception {
+        List<PromptCategoryEntity> categories = promptCategoryRepository.findAllByOrderByLabelAsc();
+        PromptCategoryEntity originalCategory = categories.getFirst();
+        PromptCategoryEntity updatedCategory = categories.getLast();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        String keyword = "stable " + uniqueSuffix();
+        createPolicyKeyword(keyword, admin.entity());
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", "Original flagged title",
+            "text", "Text contains " + keyword,
+            "categoryId", originalCategory.getId()
+        )).body());
+        Long promptId = ((Number) createdPrompt.get("id")).longValue();
+        PromptFlagEntity originalFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
+        Instant originalFlaggedAt = originalFlag.getFlaggedAt();
+
+        HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
+            "title", "Renamed only",
+            "text", "Text contains " + keyword,
+            "categoryId", updatedCategory.getId()
+        ));
+        PromptFlagEntity unchangedFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
+
+        assertThat(updateResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(updateResponse.body())).containsEntry("title", "Renamed only")
+            .containsEntry("categoryId", updatedCategory.getId().intValue())
+            .containsKey("flaggedAt");
+        assertThat(unchangedFlag.getFlaggedAt()).isEqualTo(originalFlaggedAt);
+        assertThat(unchangedFlag.getKeywordSnapshots())
+            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+            .containsExactly(keyword);
     }
 
     @Test

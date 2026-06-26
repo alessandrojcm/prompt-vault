@@ -29,7 +29,7 @@ public class PromptFlagEntity {
     @JoinColumn(name = "prompt_id", nullable = false, updatable = false)
     private PromptEntity prompt;
 
-    @Column(name = "flagged_at", nullable = false, updatable = false)
+    @Column(name = "flagged_at", nullable = false)
     private Instant flaggedAt;
 
     @OneToMany(mappedBy = "promptFlag", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,6 +53,12 @@ public class PromptFlagEntity {
 
     public List<PromptFlagKeywordSnapshotEntity> getKeywordSnapshots() {
         return keywordSnapshots;
+    }
+
+    public void replaceKeywordSnapshots(List<String> keywordTexts) {
+        flaggedAt = Instant.now();
+        keywordSnapshots.clear();
+        keywordTexts.forEach(this::addKeywordSnapshot);
     }
 
     public void addKeywordSnapshot(String keywordText) {

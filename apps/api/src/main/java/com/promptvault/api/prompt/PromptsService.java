@@ -82,10 +82,14 @@ public class PromptsService {
     public PromptEntity updateOwnedPrompt(Long promptId, UpdatePromptRequest request, UserEntity owner) {
         PromptEntity prompt = requireOwnedPrompt(promptId, owner);
         PromptCategoryEntity category = requireCategory(request.getCategoryId());
+        boolean textChanged = !prompt.getText().equals(request.getText());
 
         prompt.setTitle(request.getTitle());
         prompt.setText(request.getText());
         prompt.setCategory(category);
+        if (textChanged) {
+            refreshPromptFlagForCurrentText(prompt);
+        }
 
         return promptRepository.save(prompt);
     }
@@ -116,12 +120,7 @@ public class PromptsService {
     }
 
     private void attachPromptFlagForMatchingPolicyKeywords(PromptEntity prompt) {
-        String normalizedPromptText = prompt.getText().toLowerCase(Locale.ROOT);
-        List<String> matchedKeywords = policyKeywordRepository.findAllByOrderByKeywordAsc()
-            .stream()
-            .map(PolicyKeywordEntity::getKeyword)
-            .filter(keyword -> normalizedPromptText.contains(keyword.toLowerCase(Locale.ROOT)))
-            .toList();
+        List<String> matchedKeywords = matchingPolicyKeywords(prompt);
 
         if (matchedKeywords.isEmpty()) {
             return;
@@ -130,5 +129,30 @@ public class PromptsService {
         PromptFlagEntity flag = new PromptFlagEntity();
         matchedKeywords.forEach(flag::addKeywordSnapshot);
         prompt.setFlag(flag);
+    }
+
+    private void refreshPromptFlagForCurrentText(PromptEntity prompt) {
+        List<String> matchedKeywords = matchingPolicyKeywords(prompt);
+
+        if (matchedKeywords.isEmpty()) {
+            prompt.setFlag(null);
+            return;
+        }
+
+        if (prompt.getFlag() == null) {
+            attachPromptFlagForMatchingPolicyKeywords(prompt);
+            return;
+        }
+
+        prompt.getFlag().replaceKeywordSnapshots(matchedKeywords);
+    }
+
+    private List<String> matchingPolicyKeywords(PromptEntity prompt) {
+        String normalizedPromptText = prompt.getText().toLowerCase(Locale.ROOT);
+        return policyKeywordRepository.findAllByOrderByKeywordAsc()
+            .stream()
+            .map(PolicyKeywordEntity::getKeyword)
+            .filter(keyword -> normalizedPromptText.contains(keyword.toLowerCase(Locale.ROOT)))
+            .toList();
     }
 }

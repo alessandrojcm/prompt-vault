@@ -112,6 +112,9 @@ public class PromptEntity {
     }
 
     public void setFlag(PromptFlagEntity flag) {
+        if (this.flag != null && this.flag != flag) {
+            this.flag.setPrompt(null);
+        }
         this.flag = flag;
         if (flag != null) {
             flag.setPrompt(this);
