@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
 
-    @EntityGraph(attributePaths = { "owner", "category" })
+    @EntityGraph(attributePaths = { "owner", "category", "flag" })
     List<PromptEntity> findAllByOwnerIdOrderByCreatedAtDescIdDesc(Long ownerId);
 
-    @EntityGraph(attributePaths = { "owner", "category" })
+    @EntityGraph(attributePaths = { "owner", "category", "flag" })
     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);
 
     @EntityGraph(attributePaths = { "owner", "category" })

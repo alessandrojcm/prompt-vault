@@ -1,5 +1,6 @@
 package com.promptvault.api.prompt;
 
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import com.promptvault.contract.model.Prompt;
@@ -11,7 +12,7 @@ public final class PromptMapper {
     }
 
     public static Prompt toContract(PromptEntity prompt) {
-        return new Prompt(
+        Prompt contractPrompt = new Prompt(
             prompt.getId(),
             prompt.getTitle(),
             prompt.getText(),
@@ -21,6 +22,11 @@ public final class PromptMapper {
             prompt.getCreatedAt().atOffset(ZoneOffset.UTC),
             prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
         );
+        OffsetDateTime flaggedAt = flaggedAt(prompt);
+        if (flaggedAt != null) {
+            contractPrompt.setFlaggedAt(flaggedAt);
+        }
+        return contractPrompt;
     }
 
     public static PublicPrompt toPublicContract(PromptEntity prompt) {
@@ -34,5 +40,13 @@ public final class PromptMapper {
             prompt.getCreatedAt().atOffset(ZoneOffset.UTC),
             prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
         );
+    }
+
+    private static OffsetDateTime flaggedAt(PromptEntity prompt) {
+        if (prompt.getFlag() == null) {
+            return null;
+        }
+
+        return prompt.getFlag().getFlaggedAt().atOffset(ZoneOffset.UTC);
     }
 }

@@ -862,6 +862,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        flaggedAt:
+          type: string
+          format: date-time
+          description: Present when the Prompt was flagged by Policy Keyword matching. Matched keyword snapshots are not exposed in owner-facing responses.
     PublicPrompt:
       type: object
       additionalProperties: false

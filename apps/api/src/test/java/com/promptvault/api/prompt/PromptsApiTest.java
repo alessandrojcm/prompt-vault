@@ -7,12 +7,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.promptvault.api.policykeyword.PolicyKeywordEntity;
+import com.promptvault.api.policykeyword.PolicyKeywordRepository;
 import com.promptvault.api.promptcategory.PromptCategoryEntity;
 import com.promptvault.api.promptcategory.PromptCategoryRepository;
 import com.promptvault.api.support.AbstractMySqlIntegrationTest;
@@ -39,6 +42,12 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
     @Autowired
     private PromptRepository promptRepository;
+
+    @Autowired
+    private PromptFlagRepository promptFlagRepository;
+
+    @Autowired
+    private PolicyKeywordRepository policyKeywordRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -133,6 +142,88 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
             .containsEntry("categoryId", "Prompt Category must exist.");
+    }
+
+    @Test
+    void promptCreationRecordsFlagForAllMatchingPolicyKeywordsFromTextOnly() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        String suffix = uniqueSuffix();
+        createPolicyKeyword("secret " + suffix, admin.entity());
+        createPolicyKeyword("API secret " + suffix, admin.entity());
+        createPolicyKeyword("Internal   Phrase " + suffix, admin.entity());
+        createPolicyKeyword("title-only " + suffix, admin.entity());
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        HttpResponse<String> createResponse = createPrompt(ownerClient, Map.of(
+            "title", "title-only " + suffix + " should not be scanned",
+            "text", "This API SECRET " + suffix + " includes an Internal   Phrase " + suffix + ".",
+            "categoryId", category.getId()
+        ));
+
+        assertThat(createResponse.statusCode()).isEqualTo(201);
+        Map<String, Object> createdPrompt = readJson(createResponse.body());
+        Long promptId = ((Number) createdPrompt.get("id")).longValue();
+        assertThat(OffsetDateTime.parse((String) createdPrompt.get("flaggedAt"))).isNotNull();
+        assertThat(createdPrompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+
+        PromptFlagEntity flag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
+        assertThat(flag.getFlaggedAt()).isNotNull();
+        assertThat(flag.getKeywordSnapshots())
+            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+            .containsExactly("API secret " + suffix, "Internal   Phrase " + suffix, "secret " + suffix);
+    }
+
+    @Test
+    void promptCreationWithoutTextMatchesRecordsNoFlagAndOwnedReadsExposeFlaggedAtOnlyWhenFlagged() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        String keyword = "secret " + uniqueSuffix();
+        createPolicyKeyword(keyword, admin.entity());
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Map<String, Object> unflaggedPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", keyword + " appears only in the title",
+            "text", "Public-safe body",
+            "categoryId", category.getId()
+        )).body());
+        Map<String, Object> flaggedPrompt = readJson(createPrompt(ownerClient, Map.of(
+            "title", "Text match",
+            "text", "Body contains " + keyword.toUpperCase(Locale.ROOT) + " content",
+            "categoryId", category.getId()
+        )).body());
+        Long unflaggedPromptId = ((Number) unflaggedPrompt.get("id")).longValue();
+        Long flaggedPromptId = ((Number) flaggedPrompt.get("id")).longValue();
+
+        HttpResponse<String> listResponse = listMyPrompts(ownerClient, owner.entity().getId());
+        HttpResponse<String> flaggedDetailResponse = getPrompt(ownerClient, flaggedPromptId);
+        HttpResponse<String> unflaggedDetailResponse = getPrompt(ownerClient, unflaggedPromptId);
+
+        assertThat(promptFlagRepository.findByPromptId(unflaggedPromptId)).isEmpty();
+        assertThat(promptFlagRepository.findByPromptId(flaggedPromptId)).isPresent();
+        assertThat(listResponse.statusCode()).isEqualTo(200);
+        assertThat(readList(listResponse.body()))
+            .filteredOn(prompt -> prompt.get("id").equals(flaggedPromptId.intValue()))
+            .singleElement()
+            .satisfies(prompt -> {
+                assertThat(OffsetDateTime.parse((String) prompt.get("flaggedAt"))).isNotNull();
+                assertThat(prompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+            });
+        assertThat(readList(listResponse.body()))
+            .filteredOn(prompt -> prompt.get("id").equals(unflaggedPromptId.intValue()))
+            .singleElement()
+            .satisfies(prompt -> assertThat(prompt).containsEntry("flaggedAt", null)
+                .doesNotContainKeys("matchedKeywords", "keywordSnapshots"));
+
+        assertThat(flaggedDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(flaggedDetailResponse.body())).containsKey("flaggedAt")
+            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+        assertThat(unflaggedDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(unflaggedDetailResponse.body()))
+            .containsEntry("flaggedAt", null)
+            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
     }
 
     @Test
@@ -641,6 +732,18 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         user.setRole(role);
         user.setAccountStatus(AccountStatus.ENABLED);
         return new TestUser(userRepository.save(user), password);
+    }
+
+    private PolicyKeywordEntity createPolicyKeyword(String keyword, UserEntity createdBy) {
+        PolicyKeywordEntity policyKeyword = new PolicyKeywordEntity();
+        policyKeyword.setKeyword(keyword);
+        policyKeyword.setKeywordNormalized(keyword.toLowerCase(Locale.ROOT));
+        policyKeyword.setCreatedBy(createdBy);
+        return policyKeywordRepository.save(policyKeyword);
+    }
+
+    private String uniqueSuffix() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
 
     private HttpClient authenticatedClient(TestUser user) throws Exception {
