@@ -489,6 +489,116 @@ paths:
           description: The target cannot be managed by this operation.
         '404':
           description: The target user does not exist.
+  /api/admin/policy/keywords:
+    get:
+      tags:
+        - AdminPolicyKeywords
+      operationId: listPolicyKeywords
+      summary: List Policy Keywords
+      description: Returns the Policy Keyword catalog for administrators.
+      responses:
+        '200':
+          description: Policy Keywords available for administration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PolicyKeyword'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+    post:
+      tags:
+        - AdminPolicyKeywords
+      operationId: createPolicyKeyword
+      summary: Create a Policy Keyword
+      description: Creates a globally managed Policy Keyword. Admin users only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyKeywordRequest'
+      responses:
+        '201':
+          description: Policy Keyword created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyKeyword'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+  /api/admin/policy/keywords/{keywordId}:
+    patch:
+      tags:
+        - AdminPolicyKeywords
+      operationId: updatePolicyKeyword
+      summary: Update a Policy Keyword
+      description: Updates an existing globally managed Policy Keyword. Admin users only.
+      parameters:
+        - name: keywordId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyKeywordRequest'
+      responses:
+        '200':
+          description: Policy Keyword updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyKeyword'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+        '404':
+          description: Policy Keyword was not found.
+    delete:
+      tags:
+        - AdminPolicyKeywords
+      operationId: deletePolicyKeyword
+      summary: Delete a Policy Keyword
+      description: Deletes an existing globally managed Policy Keyword. Admin users only.
+      parameters:
+        - name: keywordId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Policy Keyword deleted successfully.
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
+        '404':
+          description: Policy Keyword was not found.
 components:
   schemas:
     LoginRequest:
@@ -600,6 +710,45 @@ components:
         updatedAt:
           type: string
           format: date-time
+    PolicyKeyword:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - keyword
+        - createdAt
+        - createdByUserId
+        - createdByUsername
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        keyword:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByUserId:
+          type: integer
+          format: int64
+        createdByUsername:
+          type: string
+          description: Username of the Admin who created the Policy Keyword.
+        updatedAt:
+          type: string
+          format: date-time
+    PolicyKeywordRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - keyword
+      properties:
+        keyword:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Policy Keyword text is edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
     CreatePromptCategoryRequest:
       type: object
       additionalProperties: false
