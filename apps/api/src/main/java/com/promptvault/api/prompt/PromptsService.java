@@ -61,7 +61,7 @@ public class PromptsService {
 
     @Transactional(readOnly = true)
     public List<PromptEntity> listPublicPrompts(UserEntity currentUser) {
-        return promptRepository.findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
+        return promptRepository.findAllByVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
             PromptVisibility.PUBLIC,
             AccountStatus.ENABLED,
             currentUser.getId()
@@ -70,7 +70,7 @@ public class PromptsService {
 
     @Transactional(readOnly = true)
     public PromptEntity getPublicPrompt(Long promptId, UserEntity currentUser) {
-        return promptRepository.findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(
+        return promptRepository.findByIdAndVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNot(
             promptId,
             PromptVisibility.PUBLIC,
             AccountStatus.ENABLED,
@@ -89,6 +89,9 @@ public class PromptsService {
         prompt.setCategory(category);
         if (textChanged) {
             refreshPromptFlagForCurrentText(prompt);
+            if (prompt.getFlag() != null) {
+                prompt.setVisibility(PromptVisibility.PRIVATE);
+            }
         }
 
         return promptRepository.save(prompt);
@@ -102,6 +105,12 @@ public class PromptsService {
     @Transactional
     public PromptEntity updateOwnedPromptVisibility(Long promptId, PromptVisibility visibility, UserEntity owner) {
         PromptEntity prompt = requireOwnedPrompt(promptId, owner);
+        if (visibility == PromptVisibility.PUBLIC && prompt.getFlag() != null) {
+            throw new PromptValidationException(List.of(new FieldValidationError(
+                "visibility",
+                "Flagged Prompts cannot be public."
+            )));
+        }
         prompt.setVisibility(visibility);
         return promptRepository.save(prompt);
     }

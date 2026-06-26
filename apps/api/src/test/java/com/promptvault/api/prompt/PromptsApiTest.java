@@ -420,6 +420,106 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void promptOwnersCannotShareFlaggedPromptsButCanStillShareUnflaggedPrompts() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser admin = createAdmin();
+        TestUser owner = createUser();
+        String keyword = "blocked " + uniqueSuffix();
+        createPolicyKeyword(keyword, admin.entity());
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Long flaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Flagged prompt",
+            "text", "Prompt text contains " + keyword,
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        Long unflaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Unflagged prompt",
+            "text", "Share-safe text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+
+        HttpResponse<String> flaggedShareResponse = updatePromptVisibility(ownerClient, flaggedPromptId, "PUBLIC");
+        HttpResponse<String> unflaggedShareResponse = updatePromptVisibility(ownerClient, unflaggedPromptId, "PUBLIC");
+        HttpResponse<String> flaggedDetailResponse = getPrompt(ownerClient, flaggedPromptId);
+
+        assertThat(flaggedShareResponse.statusCode()).isEqualTo(400);
+        assertThat(extractFieldMessages(readJson(flaggedShareResponse.body())))
+            .containsEntry("visibility", "Flagged Prompts cannot be public.");
+        assertThat(unflaggedShareResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(unflaggedShareResponse.body())).containsEntry("visibility", "PUBLIC");
+        assertThat(flaggedDetailResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(flaggedDetailResponse.body()))
+            .containsEntry("id", flaggedPromptId.intValue())
+            .containsEntry("visibility", "PRIVATE")
+            .containsKey("flaggedAt");
+
+        assertThat(promptRepository.findById(flaggedPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
+        assertThat(promptRepository.findById(unflaggedPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
+    }
+
+    @Test
+    void publicReadsExcludeFlaggedPromptsAndFlaggingPublicPromptMakesItPrivate() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser admin = createAdmin();
+        TestUser viewer = createUser();
+        TestUser owner = createUser();
+        String keyword = "policy " + uniqueSuffix();
+        createPolicyKeyword(keyword, admin.entity());
+        HttpClient viewerClient = authenticatedClient(viewer);
+        HttpClient ownerClient = authenticatedClient(owner);
+
+        Long forcedPublicFlaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Forced public flagged prompt",
+            "text", "Existing flagged text with " + keyword,
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        PromptEntity forcedPublicFlaggedPrompt = promptRepository.findById(forcedPublicFlaggedPromptId).orElseThrow();
+        forcedPublicFlaggedPrompt.setVisibility(PromptVisibility.PUBLIC);
+        promptRepository.save(forcedPublicFlaggedPrompt);
+
+        Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
+            "title", "Initially public prompt",
+            "text", "Initially safe text",
+            "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        updatePromptVisibility(ownerClient, publicPromptId, "PUBLIC");
+
+        HttpResponse<String> listBeforeUpdateResponse = listPublicPrompts(viewerClient);
+        HttpResponse<String> forcedPublicFlaggedDetailResponse = getPublicPrompt(viewerClient, forcedPublicFlaggedPromptId);
+        HttpResponse<String> flaggingUpdateResponse = updatePrompt(ownerClient, publicPromptId, Map.of(
+            "title", "Now flagged public prompt",
+            "text", "Updated text now contains " + keyword.toUpperCase(Locale.ROOT),
+            "categoryId", category.getId()
+        ));
+        HttpResponse<String> listAfterUpdateResponse = listPublicPrompts(viewerClient);
+        HttpResponse<String> detailAfterUpdateResponse = getPublicPrompt(viewerClient, publicPromptId);
+        HttpResponse<String> ownerDetailAfterUpdateResponse = getPrompt(ownerClient, publicPromptId);
+
+        assertThat(listBeforeUpdateResponse.statusCode()).isEqualTo(200);
+        assertThat(readList(listBeforeUpdateResponse.body())).extracting(prompt -> prompt.get("id"))
+            .contains(publicPromptId.intValue())
+            .doesNotContain(forcedPublicFlaggedPromptId.intValue());
+        assertThat(forcedPublicFlaggedDetailResponse.statusCode()).isEqualTo(404);
+        assertThat(forcedPublicFlaggedDetailResponse.body()).doesNotContain("Forced public flagged prompt", keyword);
+
+        assertThat(flaggingUpdateResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(flaggingUpdateResponse.body()))
+            .containsEntry("id", publicPromptId.intValue())
+            .containsEntry("visibility", "PRIVATE")
+            .containsKey("flaggedAt");
+        assertThat(readList(listAfterUpdateResponse.body())).extracting(prompt -> prompt.get("id"))
+            .doesNotContain(publicPromptId.intValue(), forcedPublicFlaggedPromptId.intValue());
+        assertThat(detailAfterUpdateResponse.statusCode()).isEqualTo(404);
+        assertThat(ownerDetailAfterUpdateResponse.statusCode()).isEqualTo(200);
+        assertThat(readJson(ownerDetailAfterUpdateResponse.body()))
+            .containsEntry("id", publicPromptId.intValue())
+            .containsEntry("visibility", "PRIVATE")
+            .containsKey("flaggedAt");
+        assertThat(promptRepository.findById(publicPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
+    }
+
+    @Test
     void authenticatedUsersCanListAndRetrievePublicPromptsFromOtherEnabledUsersOnly() throws Exception {
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         TestUser viewer = createUser();
