@@ -1,7 +1,10 @@
 package com.promptvault.api.prompt;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.promptvault.api.policykeyword.PolicyKeywordEntity;
+import com.promptvault.api.policykeyword.PolicyKeywordRepository;
 import com.promptvault.api.promptcategory.PromptCategoryEntity;
 import com.promptvault.api.promptcategory.PromptCategoryRepository;
 import com.promptvault.api.user.AccountStatus;
@@ -19,10 +22,16 @@ public class PromptsService {
 
     private final PromptRepository promptRepository;
     private final PromptCategoryRepository promptCategoryRepository;
+    private final PolicyKeywordRepository policyKeywordRepository;
 
-    public PromptsService(PromptRepository promptRepository, PromptCategoryRepository promptCategoryRepository) {
+    public PromptsService(
+        PromptRepository promptRepository,
+        PromptCategoryRepository promptCategoryRepository,
+        PolicyKeywordRepository policyKeywordRepository
+    ) {
         this.promptRepository = promptRepository;
         this.promptCategoryRepository = promptCategoryRepository;
+        this.policyKeywordRepository = policyKeywordRepository;
     }
 
     @Transactional
@@ -35,6 +44,7 @@ public class PromptsService {
         prompt.setVisibility(PromptVisibility.PRIVATE);
         prompt.setOwner(owner);
         prompt.setCategory(category);
+        attachPromptFlagForMatchingPolicyKeywords(prompt);
 
         return promptRepository.save(prompt);
     }
@@ -103,5 +113,22 @@ public class PromptsService {
                 "categoryId",
                 "Prompt Category must exist."
             ))));
+    }
+
+    private void attachPromptFlagForMatchingPolicyKeywords(PromptEntity prompt) {
+        String normalizedPromptText = prompt.getText().toLowerCase(Locale.ROOT);
+        List<String> matchedKeywords = policyKeywordRepository.findAllByOrderByKeywordAsc()
+            .stream()
+            .map(PolicyKeywordEntity::getKeyword)
+            .filter(keyword -> normalizedPromptText.contains(keyword.toLowerCase(Locale.ROOT)))
+            .toList();
+
+        if (matchedKeywords.isEmpty()) {
+            return;
+        }
+
+        PromptFlagEntity flag = new PromptFlagEntity();
+        matchedKeywords.forEach(flag::addKeywordSnapshot);
+        prompt.setFlag(flag);
     }
 }

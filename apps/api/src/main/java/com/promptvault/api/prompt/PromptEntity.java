@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.promptvault.api.promptcategory.PromptCategoryEntity;
 import com.promptvault.api.user.UserEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -49,6 +51,9 @@ public class PromptEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @OneToOne(mappedBy = "prompt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private PromptFlagEntity flag;
 
     public Long getId() {
         return id;
@@ -100,6 +105,17 @@ public class PromptEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public PromptFlagEntity getFlag() {
+        return flag;
+    }
+
+    public void setFlag(PromptFlagEntity flag) {
+        this.flag = flag;
+        if (flag != null) {
+            flag.setPrompt(this);
+        }
     }
 
     @PrePersist
