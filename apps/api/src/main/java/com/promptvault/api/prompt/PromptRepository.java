@@ -15,6 +15,9 @@ public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
     @EntityGraph(attributePaths = { "owner", "category", "flag" })
     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);
 
+    @EntityGraph(attributePaths = { "owner", "category", "flag.keywordSnapshots" })
+    List<PromptEntity> findAllByFlagIsNotNullOrderByCreatedAtDescIdDesc();
+
     @EntityGraph(attributePaths = { "owner", "category" })
     List<PromptEntity> findAllByVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
         PromptVisibility visibility,
