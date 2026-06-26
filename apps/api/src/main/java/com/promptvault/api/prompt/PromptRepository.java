@@ -16,14 +16,14 @@ public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
     Optional<PromptEntity> findByIdAndOwnerId(Long id, Long ownerId);
 
     @EntityGraph(attributePaths = { "owner", "category" })
-    List<PromptEntity> findAllByVisibilityAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
+    List<PromptEntity> findAllByVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
         PromptVisibility visibility,
         AccountStatus ownerStatus,
         Long excludedOwnerId
     );
 
     @EntityGraph(attributePaths = { "owner", "category" })
-    Optional<PromptEntity> findByIdAndVisibilityAndOwnerAccountStatusAndOwnerIdNot(
+    Optional<PromptEntity> findByIdAndVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNot(
         Long id,
         PromptVisibility visibility,
         AccountStatus ownerStatus,

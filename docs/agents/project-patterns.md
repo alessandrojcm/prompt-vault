@@ -76,7 +76,8 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Public Prompts are read via `GET /api/public-prompts` and `GET /api/public-prompts/{promptId}` for authenticated users; responses use `PublicPrompt` with `ownerUsername` only, exclude the current user's own public Prompts, require other enabled owners, and return `404` for prompts not visible through the public boundary.
 - Policy Keyword administration lives under `/api/admin/policy/keywords`; admins can create/list/update/delete keyword text, which is edge-trimmed, non-blank, unique case-insensitively through `keyword_normalized`, and responses include id, keyword, timestamps, and created-by admin id/username for later Prompt Flagging slices.
 - Prompt creation scans normalized Prompt Text only against current Policy Keywords using case-insensitive literal substring matching; matching creates one Prompt Flag with `flaggedAt` plus keyword text snapshots, while owner-facing `Prompt` responses expose only `flaggedAt` and never matched keyword snapshots.
-- Prompt text updates rescan against current Policy Keywords only when Prompt Text changes: matching creates or refreshes the single Prompt Flag, replaces keyword snapshots, and advances `flaggedAt`; no matches remove the Prompt Flag; title/category-only updates leave flag state unchanged.
+- Prompt text updates rescan against current Policy Keywords only when Prompt Text changes: matching creates or refreshes the single Prompt Flag, replaces keyword snapshots, advances `flaggedAt`, and forces the Prompt back to `PRIVATE`; no matches remove the Prompt Flag; title/category-only updates leave flag state unchanged.
+- Flagged Prompts cannot be shared as `PUBLIC`, are excluded from Public Prompts list/detail, and remain available through the owner-only Prompt APIs.
 
 ## Testing patterns
 
