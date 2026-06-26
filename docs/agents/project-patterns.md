@@ -78,6 +78,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Prompt creation scans normalized Prompt Text only against current Policy Keywords using case-insensitive literal substring matching; matching creates one Prompt Flag with `flaggedAt` plus keyword text snapshots, while owner-facing `Prompt` responses expose only `flaggedAt` and never matched keyword snapshots.
 - Prompt text updates rescan against current Policy Keywords only when Prompt Text changes: matching creates or refreshes the single Prompt Flag, replaces keyword snapshots, advances `flaggedAt`, and forces the Prompt back to `PRIVATE`; no matches remove the Prompt Flag; title/category-only updates leave flag state unchanged.
 - Flagged Prompts cannot be shared as `PUBLIC`, are excluded from Public Prompts list/detail, and remain available through the owner-only Prompt APIs.
+- Admin Flagged Prompts listing is `GET /api/admin/prompts/flagged`; it is admin-only, returns only current Prompt Flags, exposes prompt title, owner username, category label, stable matched keyword snapshots, and `submittedAt` as the Prompt creation timestamp, and does not provide detail/review workflow endpoints.
 
 ## Testing patterns
 

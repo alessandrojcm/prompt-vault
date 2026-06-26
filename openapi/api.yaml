@@ -418,6 +418,26 @@ paths:
           description: No authenticated session is present.
         '403':
           description: The requested user is not the current authenticated user.
+  /api/admin/prompts/flagged:
+    get:
+      tags:
+        - AdminPrompts
+      operationId: listAdminFlaggedPrompts
+      summary: List currently flagged prompts for administrators
+      description: Returns current Prompt Flags with prompt submission metadata and stable matched keyword snapshots. Admin users only.
+      responses:
+        '200':
+          description: Currently flagged prompts visible to administrators.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminFlaggedPrompt'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: The authenticated user is not an administrator.
   /api/admin/users:
     get:
       tags:
@@ -899,6 +919,34 @@ components:
         updatedAt:
           type: string
           format: date-time
+    AdminFlaggedPrompt:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - ownerUsername
+        - categoryLabel
+        - matchedKeywordSnapshots
+        - submittedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        ownerUsername:
+          type: string
+        categoryLabel:
+          type: string
+        matchedKeywordSnapshots:
+          type: array
+          items:
+            type: string
+        submittedAt:
+          type: string
+          format: date-time
+          description: The Prompt creation date, used as the date of submission.
     ValidationFieldError:
       type: object
       additionalProperties: false
