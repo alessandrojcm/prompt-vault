@@ -106,6 +106,28 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
     }
 
     @Test
+    void authenticatedUsersCanCreatePublicPrompts() throws Exception {
+        TestUser user = createUser();
+        HttpClient client = authenticatedClient(user);
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        HttpResponse<String> response = createPrompt(client, Map.of(
+            "title", "Public Prompt",
+            "text", "This is a public prompt.",
+            "visibility", "PUBLIC",
+            "categoryId", category.getId()
+        ));
+        assertThat(response.statusCode()).isEqualTo(201);
+        assertThat(response.body()).isNotBlank();
+
+        Map<String, Object> body = readJson(response.body());
+        assertThat(body).containsEntry("title", "Public Prompt")
+                .containsEntry("text", "This is a public prompt.")
+                .containsEntry("visibility", "PUBLIC")
+                .containsEntry("categoryId", category.getId().intValue())
+                .containsEntry("ownerUserId", user.entity().getId().intValue());
+    }
+
+    @Test
     void promptCreationReturnsValidationErrorsForTrimmedBlankOversizedMissingAndUnknownCategories() throws Exception {
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         HttpClient client = authenticatedClient(createUser());

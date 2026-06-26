@@ -41,7 +41,7 @@ public class PromptsService {
         PromptEntity prompt = new PromptEntity();
         prompt.setTitle(request.getTitle());
         prompt.setText(request.getText());
-        prompt.setVisibility(PromptVisibility.PRIVATE);
+        prompt.setVisibility(PromptVisibility.valueOf(request.getVisibility().getValue()));
         prompt.setOwner(owner);
         prompt.setCategory(category);
         attachPromptFlagForMatchingPolicyKeywords(prompt);

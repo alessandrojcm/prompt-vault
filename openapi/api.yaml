@@ -818,6 +818,12 @@ components:
           type: integer
           format: int64
           minimum: 1
+        visibility:
+          type: string
+          default: PRIVATE
+          enum:
+            - PUBLIC
+            - PRIVATE
     UpdatePromptRequest:
       type: object
       additionalProperties: false
