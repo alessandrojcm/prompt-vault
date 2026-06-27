@@ -12,7 +12,7 @@ public final class PromptMapper {
     }
 
     public static Prompt toContract(PromptEntity prompt) {
-        Prompt contractPrompt = new Prompt(
+        return new Prompt(
             prompt.getId(),
             prompt.getTitle(),
             prompt.getText(),
@@ -20,13 +20,9 @@ public final class PromptMapper {
             prompt.getCategory().getId(),
             prompt.getOwner().getId(),
             prompt.getCreatedAt().atOffset(ZoneOffset.UTC),
-            prompt.getUpdatedAt().atOffset(ZoneOffset.UTC)
+            prompt.getUpdatedAt().atOffset(ZoneOffset.UTC),
+            flaggedAt(prompt)
         );
-        OffsetDateTime flaggedAt = flaggedAt(prompt);
-        if (flaggedAt != null) {
-            contractPrompt.setFlaggedAt(flaggedAt);
-        }
-        return contractPrompt;
     }
 
     public static PublicPrompt toPublicContract(PromptEntity prompt) {
