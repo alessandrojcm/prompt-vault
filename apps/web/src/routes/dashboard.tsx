@@ -50,19 +50,36 @@ type AppNavigationLink = {
 
 const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
   {
-    label: "User management",
+    label: "Admin",
     roles: ["ADMIN"],
-    to: "/dashboard/admin/users",
+    children: [
+      {
+        label: "User management",
+        roles: ["ADMIN"],
+        to: "/dashboard/admin/users",
+      },
+      {
+        label: "Flagged prompts",
+        roles: ["ADMIN"],
+        to: "/dashboard/admin/flagged-prompts",
+      },
+    ],
   },
   {
-    label: "My prompts",
+    label: "Prompts",
     roles: ["ADMIN", "USER"],
-    to: "/dashboard/my-prompts",
-  },
-  {
-    label: "Public prompts",
-    to: "/dashboard/prompts",
-    roles: ["ADMIN", "USER"],
+    children: [
+      {
+        label: "My prompts",
+        roles: ["ADMIN", "USER"],
+        to: "/dashboard/my-prompts",
+      },
+      {
+        label: "Public prompts",
+        to: "/dashboard/prompts",
+        roles: ["ADMIN", "USER"],
+      },
+    ],
   },
 ];
 
@@ -235,7 +252,7 @@ function renderNavigationLinks(links: DashboardLoaderData["navigationLinks"]) {
       label: link.label,
     };
     return link?.children ? (
-      <NavLink key={link.label} {...props}>
+      <NavLink key={link.label} {...props} defaultOpened>
         {renderNavigationLinks(link.children)}
       </NavLink>
     ) : (
