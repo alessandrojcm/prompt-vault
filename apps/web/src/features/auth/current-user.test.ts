@@ -1,4 +1,3 @@
-import type { QueryFunctionContext } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import { isRedirect } from "@tanstack/react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -9,7 +8,7 @@ let currentUserError: unknown;
 vi.mock("@prompt-vault/api-client", () => ({
   getCurrentUserOptions: ({ signal }: { signal: AbortSignal }) => ({
     queryKey: ["currentUser"],
-    queryFn: async (_context: QueryFunctionContext) => {
+    queryFn: async () => {
       if (signal.aborted) {
         throw new Error("aborted");
       }
@@ -89,7 +88,9 @@ describe("requireAdminUser", () => {
       throw new Error("Expected requireAdminUser to redirect");
     } catch (error) {
       expect(isRedirect(error)).toBe(true);
-      expect(error).toMatchObject({ options: { replace: true, to: "/dashboard" } });
+      expect(error).toMatchObject({
+        options: { replace: true, to: "/dashboard" },
+      });
     }
   });
 });
@@ -111,7 +112,9 @@ describe("redirectRootToAuthDestination", () => {
       throw new Error("Expected redirectRootToAuthDestination to redirect");
     } catch (error) {
       expect(isRedirect(error)).toBe(true);
-      expect(error).toMatchObject({ options: { replace: true, to: "/dashboard" } });
+      expect(error).toMatchObject({
+        options: { replace: true, to: "/dashboard" },
+      });
     }
   });
 
