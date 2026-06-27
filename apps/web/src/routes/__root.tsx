@@ -16,6 +16,7 @@ import {
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { formDevtoolsPlugin } from "@tanstack/react-form-devtools";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -65,6 +66,7 @@ function PromptVaultDevtools() {
             name: "TanStack Router",
             render: <TanStackRouterDevtools router={router} />,
           },
+          formDevtoolsPlugin(),
         ]}
       />
     )

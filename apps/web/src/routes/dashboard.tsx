@@ -21,7 +21,7 @@ import {
 } from "@tanstack/react-router";
 
 import { requireCurrentUser } from "../features/auth/current-user";
-import { CreatePrompt } from "../features/prompts/create-prompt";
+import { CreatePrompt } from "../features/prompts/create-or-edit-prompt";
 import { useDisclosure } from "@mantine/hooks";
 
 type AppNavigationLink = {
