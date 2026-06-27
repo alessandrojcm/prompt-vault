@@ -7,7 +7,7 @@
       {
         "fix": {
           "imports": "fix",
-          "variables": "suggestion"
+          "variables": "fix"
         }
       }
     ]

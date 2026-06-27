@@ -25,7 +25,7 @@ import { useState } from "react";
 import { TrashIcon } from "@phosphor-icons/react";
 import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { useDisclosure } from "@mantine/hooks";
-import { CreatePrompt } from "../features/prompts/create-or-edit-prompt";
+import { CreatePrompt } from "./create-or-edit-prompt";
 
 type Props = (Prompt | PublicPrompt) & {
   categoryLabel: string;

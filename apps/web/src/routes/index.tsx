@@ -11,7 +11,7 @@ export async function redirectRootToAuthDestination(
   loaderContext: Parameters<typeof requireCurrentUser>[0],
 ) {
   await requireCurrentUser(loaderContext);
-  throw redirect({ replace: true, to: "/dashboard" });
+  throw redirect({ replace: true, to: "/dashboard/my-prompts" });
 }
 
 function RootAuthGate() {
