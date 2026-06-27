@@ -17,6 +17,7 @@ export default {
       name: "@tanstack/react-query",
       queryOptions: true,
       mutationOptions: true,
+      mutationKeys: true,
     },
   ],
 };
