@@ -1,8 +1,8 @@
-import { Stack } from "@mantine/core";
-import { listAdminFlaggedPromptsOptions } from "@prompt-vault/api-client";
-import { createFileRoute } from "@tanstack/react-router";
-import { FlaggedPromptsTable } from "../../../features/admin/flagged-prompts";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { Stack } from '@mantine/core';
+import { listAdminFlaggedPromptsOptions } from '@prompt-vault/api-client';
+import { createFileRoute } from '@tanstack/react-router';
+import { FlaggedPromptsTable } from '../../../features/admin/flagged-prompts';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute("/dashboard/admin/flagged-prompts")({
   component: RouteComponent,

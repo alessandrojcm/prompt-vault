@@ -7,6 +7,7 @@ import com.promptvault.api.promptcategory.PromptCategoryRepository;
 import com.promptvault.api.user.AccountStatus;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.model.CreatePromptRequest;
+import com.promptvault.contract.model.Prompt;
 import com.promptvault.contract.model.SubmitPromptRequest;
 import com.promptvault.contract.model.UpdatePromptRequest;
 import org.springframework.stereotype.Service;
@@ -131,8 +132,14 @@ public class PromptsService {
         return prompt.getSubmissions().getLast();
     }
 
+    @Transactional(readOnly = true)
     public List<PromptSubmissionHistoryEntity> listPromptSubmissions(Long promptId, UserEntity owner) {
         return promptSubmissionHistoryRepository.findAllByPromptIdAndPromptOwnerIdOrderByCreatedAtDescIdDesc(promptId, owner.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PromptEntity> listAllSubmittedPrompts(UserEntity owner) {
+        return promptRepository.findAllByOwnerIdWithSubmissionsOrderByCreatedAtDescIdDesc(owner.getId());
     }
 
     private PromptEntity requireOwnedPrompt(Long promptId, UserEntity owner) {

@@ -950,7 +950,7 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
                 "text", "Delete text",
                 "categoryId", category.getId()
         )).body()).get("id")).longValue();
-        HttpResponse<String> submissionResponse = createSubmission(client, Map.of("response", "this is a response"), promptId);
+        HttpResponse<String> submissionResponse = createSubmission(client, Map.of("response", "this is a response"), promptId, user.entity().getId());
         assertThat(submissionResponse.statusCode()).isEqualTo(200);
     }
 
@@ -965,10 +965,39 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
                 "text", "Delete text",
                 "categoryId", category.getId()
         )).body()).get("id")).longValue();
-        HttpResponse<String> submissionResponse1 = createSubmission(client, Map.of("response", "this is a response"), promptId);
-        HttpResponse<String> submissionResponse2 = createSubmission(client, Map.of("response", "this is a response"), promptId);
+        HttpResponse<String> submissionResponse1 = createSubmission(client, Map.of("response", "this is a response"), promptId, user.entity().getId());
+        HttpResponse<String> submissionResponse2 = createSubmission(client, Map.of("response", "this is a response"), promptId, user.entity().getId());
         assertThat(submissionResponse1.statusCode()).isEqualTo(200);
         assertThat(submissionResponse2.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void userCanRetrieveSubmittedPrompts() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser user = createUser();
+        HttpClient client = authenticatedClient(user);
+
+        Long promptId1 = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Prompt",
+                "text", "Prompt",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        Long promptId2 = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Prompt",
+                "text", "Prompt",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        createSubmission(client, Map.of("response", "this is a response"), promptId1, user.entity().getId());
+        createSubmission(client, Map.of("response", "this is a response"), promptId2, user.entity().getId());
+
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + user.entity.getId() + "/prompts/submissions"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(readList(response.body())).hasSize(2);
     }
 
     @Test
@@ -984,8 +1013,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
                 "text", "Delete text",
                 "categoryId", category.getId()
         )).body()).get("id")).longValue();
-        HttpResponse<String> submissionResponse = createSubmission(otherClient, Map.of("response", "this is a response"), promptId);
-        assertThat(submissionResponse.statusCode()).isEqualTo(404);
+        HttpResponse<String> submissionResponse = createSubmission(otherClient, Map.of("response", "this is a response"), promptId, user.entity().getId());
+        assertThat(submissionResponse.statusCode()).isEqualTo(403);
     }
 
     @Test
@@ -999,9 +1028,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
                 "text", "Delete text",
                 "categoryId", category.getId()
         )).body()).get("id")).longValue();
-        createSubmission(client, Map.of("response", "this is a response"), promptId);
-        createSubmission(client, Map.of("response", "this is a response"), promptId);
-        HttpResponse<String> readRequest = readSubmissions(client, promptId);
+        createSubmission(client, Map.of("response", "this is a response"), promptId, user.entity().getId());
+        createSubmission(client, Map.of("response", "this is a response"), promptId, user.entity().getId());
+        HttpResponse<String> readRequest = readSubmissions(client, promptId, user.entity().getId());
 
         assertThat(readRequest.statusCode()).isEqualTo(200);
         assertThat(readList(readRequest.body())).hasSize(2);
@@ -1066,8 +1095,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         return createPromptJson(client, objectMapper.writeValueAsString(payload));
     }
 
-    private HttpResponse<String> createSubmission(HttpClient client, Map<String, Object> payload, Long promptId) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId.toString() + "/submissions"))
+    private HttpResponse<String> createSubmission(HttpClient client, Map<String, Object> payload, Long promptId, Long userId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + userId.toString() + "/prompts/" + promptId.toString() + "/submissions"))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
@@ -1076,8 +1105,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private HttpResponse<String> readSubmissions(HttpClient client, Long promptId) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId.toString() + "/submissions"))
+    private HttpResponse<String> readSubmissions(HttpClient client, Long promptId, Long userId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + userId.toString() + "/prompts/" + promptId.toString() + "/submissions"))
                 .header("Accept", "application/json")
                 .GET()
                 .build();

@@ -3,6 +3,8 @@ package com.promptvault.api.prompt;
 import com.promptvault.api.user.AccountStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,22 @@ public interface PromptRepository extends JpaRepository<PromptEntity, Long> {
             PromptVisibility visibility,
             AccountStatus ownerStatus,
             Long excludedOwnerId
+    );
+
+    @EntityGraph(attributePaths = {"owner", "category"})
+    @Query("""
+            select p
+            from PromptEntity p
+            where p.owner.id = :ownerId
+              and exists (
+                  select 1
+                  from PromptSubmissionHistoryEntity h
+                  where h.prompt = p
+              )
+            order by p.createdAt desc, p.id desc
+            """)
+    List<PromptEntity> findAllByOwnerIdWithSubmissionsOrderByCreatedAtDescIdDesc(
+            @Param("ownerId") Long ownerId
     );
 
     boolean existsByCategoryId(Long categoryId);

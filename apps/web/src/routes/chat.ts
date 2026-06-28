@@ -1,6 +1,6 @@
-import { AGUIEvent, chat, EventType, toServerSentEventsResponse } from "@tanstack/ai";
-import { openRouterText } from "@tanstack/ai-openrouter";
-import { createFileRoute } from "@tanstack/react-router";
+import { AGUIEvent, chat, EventType, toServerSentEventsResponse } from '@tanstack/ai';
+import { openRouterText } from '@tanstack/ai-openrouter';
+import { createFileRoute } from '@tanstack/react-router';
 
 const SYSTEM_PROMPT = `
   "Your an LLM in Prompt Vault, a prompt management application.

@@ -1,14 +1,5 @@
-import { UseDisclosureReturnValue } from "@mantine/hooks";
-import {
-  Autocomplete,
-  Button,
-  Fieldset,
-  Modal,
-  Stack,
-  Switch,
-  Textarea,
-  TextInput,
-} from "@mantine/core";
+import { UseDisclosureReturnValue } from '@mantine/hooks';
+import { Autocomplete, Button, Fieldset, Modal, Stack, Switch, Textarea, TextInput, } from '@mantine/core';
 import {
   createPromptMutation,
   CreatePromptRequest,
@@ -20,12 +11,12 @@ import {
   ValidationErrorResponse,
   vCreatePromptRequest,
   vUpdatePromptRequest,
-} from "@prompt-vault/api-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { showNotification } from "@mantine/notifications";
-import { useForm } from "@tanstack/react-form";
-import { FieldInfo } from "../../components/field-info";
-import { useMemo } from "react";
+} from '@prompt-vault/api-client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { showNotification } from '@mantine/notifications';
+import { useForm } from '@tanstack/react-form';
+import { FieldInfo } from '../../components/field-info';
+import { useMemo } from 'react';
 
 type Props = {
   disclosure: UseDisclosureReturnValue;

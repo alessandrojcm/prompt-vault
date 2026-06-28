@@ -86,7 +86,23 @@ public class PromptsController implements PromptsApi {
     }
 
     @Override
-    public ResponseEntity<List<SubmitPromptResponse>> listPromptsSubmission(Long promptId) {
+    public ResponseEntity<List<Prompt>> getAllSubmissions(Long userId) {
+        if (userId != null && !userId.equals(currentUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(
+                promptsService.listAllSubmittedPrompts(currentUser())
+                        .stream()
+                        .map(PromptMapper::toContract)
+                        .toList()
+        );
+    }
+
+    @Override
+    public ResponseEntity<List<SubmitPromptResponse>> listPromptsSubmission(Long userId, Long promptId) {
+        if (userId != null && !userId.equals(currentUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(
                 promptsService.listPromptSubmissions(promptId, currentUser())
                         .stream()
@@ -96,7 +112,10 @@ public class PromptsController implements PromptsApi {
     }
 
     @Override
-    public ResponseEntity<SubmitPromptResponse> submitPromptRequest(Long promptId, SubmitPromptRequest submitPromptRequest) {
+    public ResponseEntity<SubmitPromptResponse> submitPromptRequest(Long userId, Long promptId, SubmitPromptRequest submitPromptRequest) {
+        if (userId != null && !userId.equals(currentUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(
                 PromptSubmissionHistoryMapper.toContract(
                         promptsService.submitPrompt(promptId, submitPromptRequest, currentUser())

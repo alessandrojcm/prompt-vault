@@ -1,19 +1,23 @@
-import { Button, Card, Container, ScrollArea, Stack, Text, Title } from "@mantine/core";
-import { getPublicPromptOptions, submitPromptRequestMutation } from "@prompt-vault/api-client";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
+import { Button, Card, Container, ScrollArea, Stack, Text, Title } from '@mantine/core';
+import { getPublicPromptOptions, submitPromptRequestMutation } from '@prompt-vault/api-client';
+import { useMutation } from '@tanstack/react-query';
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { fetchServerSentEvents, useChat } from '@tanstack/ai-react';
+import { showNotification } from '@mantine/notifications';
 
 export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
   component: RouteComponent,
   beforeLoad: async ({ params, context }) => {
     try {
+      debugger
       return await context.queryClient.ensureQueryData(
         getPublicPromptOptions({ path: { promptId: Number(params.promptId) } }),
       );
-    } catch {
-      throw redirect({
+    } catch (err) {
+      debugger
+      console.error(err);
+      redirect({
         statusCode: 404,
       });
     }
@@ -25,6 +29,7 @@ export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
 
     return {
       prompt: data,
+      userId: context.id
     };
   },
   notFoundComponent: () => (
@@ -36,8 +41,17 @@ export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
 
 function RouteComponent() {
   const params = Route.useParams();
-  const { prompt } = Route.useLoaderData();
-  const saveSubmission = useMutation(submitPromptRequestMutation());
+  const { prompt, userId } = Route.useLoaderData();
+  const saveSubmission = useMutation({
+    ...submitPromptRequestMutation(),
+    onError: () => {
+      showNotification({
+        color: "red",
+        message: "There was an error saving your submission"
+
+      })
+    }
+  });
   const { messages, sendMessage, reload } = useChat({
     connection: fetchServerSentEvents("/chat"),
     onFinish: () => {
@@ -45,6 +59,7 @@ function RouteComponent() {
       saveSubmission.mutate({
         path: {
           promptId: Number(params.promptId),
+          userId
         },
         body: {
           response: messages

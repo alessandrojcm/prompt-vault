@@ -230,64 +230,6 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         '401':
           description: No authenticated session is present.
-  /api/prompts/{promptId}/submissions:
-    post:
-      tags:
-        - Prompts
-      operationId: SubmitPromptRequest
-      summary: Create a submission for this prompt
-      description: Creates an entry in the prompt submission history
-      parameters:
-        - name: promptId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubmitPromptRequest'
-      responses:
-        '201':
-          description: Submission history
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubmitPromptResponse'
-        '401':
-          description: No authenticated session is present.
-        '403':
-          description: Not authorized to submit this prompt.
-    get:
-      tags:
-        - Prompts
-      operationId: listPromptsSubmission
-      summary: Get all the submission responses for a prompt
-      parameters:
-        - name: promptId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Submission history
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SubmitPromptResponse'
-        '400':
-          description: Validation failed
-        '401':
-          description: No authenticated session is present.
-        '403':
-          description: Not authorized to retrieve submissions.
   /api/public-prompts:
     get:
       tags:
@@ -476,6 +418,101 @@ paths:
           description: No authenticated session is present.
         '403':
           description: The requested user is not the current authenticated user.
+  /api/users/{userId}/prompts/submissions:
+    get:
+      tags:
+        - Prompts
+      operationId: getAllSubmissions
+      summary: Get all prompts that the user has submitted
+      description: This returns all the prompts that the user ever has submitted
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Prompts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicPrompt'
+        '401':
+          description: No authenticated session is present.
+  /api/users/{userId}/prompts/{promptId}/submissions:
+    get:
+      tags:
+        - Prompts
+      operationId: listPromptsSubmission
+      summary: Get all the submission responses for a prompt
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Submission history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmitPromptResponse'
+        '400':
+          description: Validation failed
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: Not authorized to retrieve submissions.
+    post:
+      tags:
+        - Prompts
+      operationId: SubmitPromptRequest
+      summary: Create a submission for this prompt
+      description: Creates an entry in the prompt submission history
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: promptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitPromptRequest'
+      responses:
+        '201':
+          description: Submission history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPromptResponse'
+        '401':
+          description: No authenticated session is present.
+        '403':
+          description: Not authorized to submit this prompt.
   /api/admin/prompts/flagged:
     get:
       tags:

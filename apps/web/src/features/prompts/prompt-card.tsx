@@ -1,16 +1,5 @@
-import {
-  ActionIcon,
-  Button,
-  ButtonGroup,
-  Card,
-  Chip,
-  Group,
-  Pill,
-  Popover,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
+import { ActionIcon, Button, ButtonGroup, Card, Chip, Group, Pill, Popover, Stack, Text, } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import {
   deletePromptMutation,
   getCurrentUserOptions,
@@ -19,14 +8,14 @@ import {
   Prompt,
   PublicPrompt,
   updatePromptVisibilityMutation,
-} from "@prompt-vault/api-client";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { TrashIcon } from "@phosphor-icons/react";
-import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
-import { useDisclosure } from "@mantine/hooks";
-import { CreatePrompt } from "./create-or-edit-prompt";
-import { Link } from "@tanstack/react-router";
+} from '@prompt-vault/api-client';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { TrashIcon } from '@phosphor-icons/react';
+import { PencilIcon } from '@phosphor-icons/react/dist/ssr';
+import { useDisclosure } from '@mantine/hooks';
+import { CreatePrompt } from './create-or-edit-prompt';
+import { Link } from '@tanstack/react-router';
 
 type Props = (Prompt | PublicPrompt) & {
   categoryLabel: string;

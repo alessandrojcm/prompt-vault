@@ -1,6 +1,6 @@
-import { Prompt, PublicPrompt } from "@prompt-vault/api-client";
-import { PromptCard } from "./prompt-card";
-import { SimpleGrid, Title } from "@mantine/core";
+import { Prompt, PublicPrompt } from '@prompt-vault/api-client';
+import { PromptCard } from './prompt-card';
+import { SimpleGrid, Title } from '@mantine/core';
 
 type Props = {
   categoriesMap: Map<number, string>;

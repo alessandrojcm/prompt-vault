@@ -1,24 +1,18 @@
 /// <reference types="vite/client" />
 
-import "@mantine/core/styles.css";
-import "@mantine/notifications/styles.css";
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
-import {
-  createRootRouteWithContext,
-  HeadContent,
-  Outlet,
-  Scripts,
-  useRouter,
-} from "@tanstack/react-router";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { formDevtoolsPlugin } from "@tanstack/react-form-devtools";
-import { ModalsProvider } from "@mantine/modals";
-import { KeywordsModal } from "../features/keywords-modal/keywords-modal";
+import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts, useRouter, } from '@tanstack/react-router';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { formDevtoolsPlugin } from '@tanstack/react-form-devtools';
+import { ModalsProvider } from '@mantine/modals';
+import { KeywordsModal } from '../features/keywords-modal/keywords-modal';
 
 const contextModals = {
   keywords: KeywordsModal,

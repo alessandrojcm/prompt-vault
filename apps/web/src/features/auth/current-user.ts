@@ -1,7 +1,7 @@
-import type { UserSummary } from "@prompt-vault/api-client";
-import { getCurrentUserOptions } from "@prompt-vault/api-client";
-import type { QueryClient } from "@tanstack/react-query";
-import { redirect } from "@tanstack/react-router";
+import type { UserSummary } from '@prompt-vault/api-client';
+import { getCurrentUserOptions } from '@prompt-vault/api-client';
+import type { QueryClient } from '@tanstack/react-query';
+import { redirect } from '@tanstack/react-router';
 
 type CurrentUserRouteContext = {
   context: {

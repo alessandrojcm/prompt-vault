@@ -1,8 +1,8 @@
-import { playwright } from "@vitest/browser-playwright";
-import { defineConfig } from "vitest/config";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { devtools } from "@tanstack/devtools-vite";
-import react from "@vitejs/plugin-react";
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import { devtools } from '@tanstack/devtools-vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   resolve: {
