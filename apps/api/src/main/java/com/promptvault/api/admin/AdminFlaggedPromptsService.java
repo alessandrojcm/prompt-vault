@@ -1,11 +1,11 @@
 package com.promptvault.api.admin;
 
-import java.util.List;
-
 import com.promptvault.api.prompt.PromptRepository;
 import com.promptvault.contract.model.AdminFlaggedPrompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class AdminFlaggedPromptsService {
@@ -19,8 +19,8 @@ public class AdminFlaggedPromptsService {
     @Transactional(readOnly = true)
     public List<AdminFlaggedPrompt> listFlaggedPrompts() {
         return promptRepository.findAllByFlagIsNotNullOrderByCreatedAtDescIdDesc()
-            .stream()
-            .map(AdminFlaggedPromptMapper::toContract)
-            .toList();
+                .stream()
+                .map(AdminFlaggedPromptMapper::toContract)
+                .toList();
     }
 }

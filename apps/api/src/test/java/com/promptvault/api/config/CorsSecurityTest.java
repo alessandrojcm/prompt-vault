@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CorsSecurityTest.ProbeController.class)
 @Import(SecurityConfig.class)
-@ImportAutoConfiguration({ SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class })
+@ImportAutoConfiguration({SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class})
 @TestPropertySource(properties = "prompt-vault.cors.allowed-origins=http://localhost:3000")
 class CorsSecurityTest {
 
@@ -31,11 +31,11 @@ class CorsSecurityTest {
     @Test
     void allowsConfiguredBrowserOriginToPreflightProtectedApiRoutes() throws Exception {
         mockMvc.perform(options("/api/user")
-                .header(HttpHeaders.ORIGIN, "http://localhost:3000")
-                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
-            .andExpect(status().isOk())
-            .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000"))
-            .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"));
+                        .header(HttpHeaders.ORIGIN, "http://localhost:3000")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"));
     }
 
     @RestController

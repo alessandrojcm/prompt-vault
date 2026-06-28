@@ -1,13 +1,13 @@
 package com.promptvault.api.support;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.time.Duration;
-
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.time.Duration;
 
 public abstract class AbstractMySqlIntegrationTest {
 
@@ -15,11 +15,11 @@ public abstract class AbstractMySqlIntegrationTest {
     protected static final int MYSQL_PORT = 3306;
 
     static final ComposeContainer environment = new ComposeContainer(resolveComposeFile())
-        .withExposedService(
-            MYSQL_SERVICE,
-            MYSQL_PORT,
-            Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3))
-        );
+            .withExposedService(
+                    MYSQL_SERVICE,
+                    MYSQL_PORT,
+                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3))
+            );
 
     static {
         environment.start();
@@ -28,7 +28,7 @@ public abstract class AbstractMySqlIntegrationTest {
     @DynamicPropertySource
     static void registerDatabaseProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", () -> "jdbc:mysql://%s:%d/prompt_vault"
-            .formatted(environment.getServiceHost(MYSQL_SERVICE, MYSQL_PORT), environment.getServicePort(MYSQL_SERVICE, MYSQL_PORT)));
+                .formatted(environment.getServiceHost(MYSQL_SERVICE, MYSQL_PORT), environment.getServicePort(MYSQL_SERVICE, MYSQL_PORT)));
         registry.add("spring.datasource.username", () -> "prompt_vault");
         registry.add("spring.datasource.password", () -> "prompt_vault");
         registry.add("spring.flyway.default-schema", () -> "prompt_vault");

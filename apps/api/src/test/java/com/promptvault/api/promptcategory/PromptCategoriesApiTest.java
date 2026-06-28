@@ -1,15 +1,5 @@
 package com.promptvault.api.promptcategory;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.prompt.PromptEntity;
@@ -24,6 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,9 +62,9 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200);
         List<Map<String, Object>> categories = readList(response.body());
         assertThat(categories).extracting(category -> category.get("label"))
-            .contains("Coding", "Cybersecurity", "HR", "Legal", "Personal Productivity", "Research");
+                .contains("Coding", "Cybersecurity", "HR", "Legal", "Personal Productivity", "Research");
         assertThat(categories).extracting(category -> category.get("slug"))
-            .contains("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research");
+                .contains("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research");
         assertThat(categories).allSatisfy(category -> assertCategoryShape(category, seededAdmin));
     }
 
@@ -172,9 +172,9 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200);
         Map<String, Object> category = readJson(response.body());
         assertThat(category)
-            .containsEntry("id", categoryId)
-            .containsEntry("label", newLabel)
-            .containsEntry("createdByUserId", seededAdmin.getId().intValue());
+                .containsEntry("id", categoryId)
+                .containsEntry("label", newLabel)
+                .containsEntry("createdByUserId", seededAdmin.getId().intValue());
         assertThat((String) category.get("label")).startsWith("Ops / R&D. ").doesNotStartWith(" ").doesNotEndWith(" ");
         assertThat((String) category.get("slug")).startsWith("ops_r_d_");
         PromptCategoryEntity updatedEntity = promptCategoryRepository.findById((long) categoryId).orElseThrow();
@@ -192,9 +192,9 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         Map<String, Object> category = readJson(createPromptCategory(adminClient, uniqueLabel("Relationship Source")).body());
         int categoryId = (Integer) category.get("id");
         Map<String, Object> prompt = readJson(createPrompt(userClient, Map.of(
-            "title", uniqueLabel("Prompt"),
-            "text", "Uses the category",
-            "categoryId", categoryId
+                "title", uniqueLabel("Prompt"),
+                "text", "Uses the category",
+                "categoryId", categoryId
         )).body());
 
         HttpResponse<String> response = updatePromptCategory(adminClient, categoryId, uniqueLabel("Relationship Target"));
@@ -295,18 +295,18 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.body()).isEmpty();
         assertThat(promptCategoryRepository.findById((long) categoryId)).isEmpty();
         assertThat(readList(listPromptCategories(adminClient).body()))
-            .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
+                .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
     }
 
     @Test
     void adminsCanDeleteUnusedSeededBaselinePromptCategories() throws Exception {
         HttpClient adminClient = authenticatedClient();
         PromptCategoryEntity seededCategory = promptCategoryRepository.findAllByOrderByLabelAsc()
-            .stream()
-            .filter(category -> List.of("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research").contains(category.getSlug()))
-            .filter(category -> !promptRepository.existsByCategoryId(category.getId()))
-            .findFirst()
-            .orElseThrow();
+                .stream()
+                .filter(category -> List.of("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research").contains(category.getSlug()))
+                .filter(category -> !promptRepository.existsByCategoryId(category.getId()))
+                .findFirst()
+                .orElseThrow();
         long categoryId = seededCategory.getId();
         String label = seededCategory.getLabel();
         String slug = seededCategory.getSlug();
@@ -317,9 +317,8 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
             assertThat(response.statusCode()).isEqualTo(204);
             assertThat(promptCategoryRepository.findById(categoryId)).isEmpty();
             assertThat(readList(listPromptCategories(adminClient).body()))
-                .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("slug", slug));
-        }
-        finally {
+                    .noneSatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("slug", slug));
+        } finally {
             restoreSeededCategoryIfMissing(label, slug);
         }
     }
@@ -342,9 +341,9 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         Map<String, Object> category = readJson(createPromptCategory(adminClient, uniqueLabel("Referenced Delete Target")).body());
         int categoryId = (Integer) category.get("id");
         assertThat(createPrompt(userClient, Map.of(
-            "title", uniqueLabel("Prompt"),
-            "text", "Uses the category",
-            "categoryId", categoryId
+                "title", uniqueLabel("Prompt"),
+                "text", "Uses the category",
+                "categoryId", categoryId
         )).statusCode()).isEqualTo(201);
 
         HttpResponse<String> response = deletePromptCategory(adminClient, categoryId);
@@ -352,7 +351,7 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(409);
         assertThat(promptCategoryRepository.findById((long) categoryId)).isPresent();
         assertThat(readList(listPromptCategories(adminClient).body()))
-            .anySatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
+                .anySatisfy(catalogCategory -> assertThat(catalogCategory).containsEntry("id", categoryId));
     }
 
     @Test
@@ -390,75 +389,77 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(HttpClient client, String username, String password) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", username,
-                "password", password
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listPromptCategories(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> createPromptCategory(HttpClient client, String label) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updatePromptCategory(HttpClient client, int categoryId, String label) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories/" + categoryId))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> deletePromptCategory(HttpClient client, int categoryId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories/" + categoryId))
-            .header("Accept", "application/json")
-            .DELETE()
-            .build();
+                .header("Accept", "application/json")
+                .DELETE()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> createPrompt(HttpClient client, Map<String, Object> payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private List<Map<String, Object>> readList(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
         return ((List<Map<String, String>>) body.get("fieldErrors"))
-            .stream()
-            .collect(java.util.stream.Collectors.toMap(
-                fieldError -> fieldError.get("field"),
-                fieldError -> fieldError.get("message")
-            ));
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        fieldError -> fieldError.get("field"),
+                        fieldError -> fieldError.get("message")
+                ));
     }
 
     private UserEntity saveUser(String username, String password, Role role, AccountStatus accountStatus) {

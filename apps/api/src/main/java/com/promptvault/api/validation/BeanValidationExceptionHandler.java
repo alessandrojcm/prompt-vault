@@ -21,7 +21,7 @@ public class BeanValidationExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(responseFactory.fromBeanValidationErrors(exception.getBindingResult().getFieldErrors()));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(responseFactory.fromBeanValidationErrors(exception.getBindingResult().getFieldErrors()));
     }
 }

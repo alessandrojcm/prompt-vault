@@ -22,11 +22,11 @@ public class SignupController implements AuthApi {
     private final HttpServletResponse httpServletResponse;
 
     public SignupController(
-        SignupService signupService,
-        LoginService loginService,
-        LogoutService logoutService,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse
+            SignupService signupService,
+            LoginService loginService,
+            LogoutService logoutService,
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse
     ) {
         this.signupService = signupService;
         this.loginService = loginService;

@@ -1,7 +1,5 @@
 package com.promptvault.api.policykeyword;
 
-import java.util.List;
-
 import com.promptvault.api.auth.PromptVaultUserDetails;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.AdminPolicyKeywordsApi;
@@ -13,10 +11,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class PolicyKeywordsController implements AdminPolicyKeywordsApi {
 
     private final PolicyKeywordsService policyKeywordsService;
+
     public PolicyKeywordsController(PolicyKeywordsService policyKeywordsService) {
         this.policyKeywordsService = policyKeywordsService;
     }
@@ -24,16 +25,16 @@ public class PolicyKeywordsController implements AdminPolicyKeywordsApi {
     @Override
     public ResponseEntity<List<PolicyKeyword>> listPolicyKeywords() {
         return ResponseEntity.ok(policyKeywordsService.listPolicyKeywords()
-            .stream()
-            .map(PolicyKeywordMapper::toContract)
-            .toList());
+                .stream()
+                .map(PolicyKeywordMapper::toContract)
+                .toList());
     }
 
     @Override
     public ResponseEntity<PolicyKeyword> createPolicyKeyword(PolicyKeywordRequest policyKeywordRequest) {
         PolicyKeyword policyKeyword = PolicyKeywordMapper.toContract(policyKeywordsService.createPolicyKeyword(
-            policyKeywordRequest,
-            currentUser()
+                policyKeywordRequest,
+                currentUser()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(policyKeyword);
     }

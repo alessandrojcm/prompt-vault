@@ -36,7 +36,7 @@ public class LoginService {
     public UserSummary login(LoginRequest request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken.unauthenticated(request.getUsername(), request.getPassword())
+                    UsernamePasswordAuthenticationToken.unauthenticated(request.getUsername(), request.getPassword())
             );
             SecurityContext context = securityContextHolderStrategy.createEmptyContext();
             context.setAuthentication(authentication);

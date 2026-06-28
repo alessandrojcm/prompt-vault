@@ -1,7 +1,5 @@
 package com.promptvault.api.validation;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.promptvault.contract.model.ValidationErrorResponse;
@@ -11,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 
 @RestControllerAdvice
 @ConditionalOnBean(ValidationErrorResponseFactory.class)
@@ -26,15 +26,15 @@ public class RequestBodyExceptionHandler {
     ResponseEntity<ValidationErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         RequestBodyValidationError validationError = validationErrorFor(exception);
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(responseFactory.fromDomainValidationErrors(List.of(validationError)));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(responseFactory.fromDomainValidationErrors(List.of(validationError)));
     }
 
     private RequestBodyValidationError validationErrorFor(HttpMessageNotReadableException exception) {
         InvalidFormatException invalidFormatException = invalidFormatExceptionFrom(exception);
         if (invalidFormatException != null
-            && invalidFormatException.getTargetType().isEnum()
-            && "AccountStatus".equals(invalidFormatException.getTargetType().getSimpleName())) {
+                && invalidFormatException.getTargetType().isEnum()
+                && "AccountStatus".equals(invalidFormatException.getTargetType().getSimpleName())) {
             return new RequestBodyValidationError(fieldName(invalidFormatException), "Account status must be ENABLED or DISABLED.");
         }
 
@@ -69,10 +69,10 @@ public class RequestBodyExceptionHandler {
 
     private String fieldName(InvalidFormatException exception) {
         return exception.getPath().stream()
-            .map(JsonMappingException.Reference::getFieldName)
-            .filter(fieldName -> fieldName != null && !fieldName.isBlank())
-            .reduce((ignored, fieldName) -> fieldName)
-            .orElse("body");
+                .map(JsonMappingException.Reference::getFieldName)
+                .filter(fieldName -> fieldName != null && !fieldName.isBlank())
+                .reduce((ignored, fieldName) -> fieldName)
+                .orElse("body");
     }
 
     private record RequestBodyValidationError(String field, String message) implements ContractFieldValidationError {

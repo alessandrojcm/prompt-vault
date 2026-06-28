@@ -1,20 +1,16 @@
 package com.promptvault.api.prompt;
 
-import java.util.List;
-
 import com.promptvault.api.auth.PromptVaultUserDetails;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.PromptsApi;
-import com.promptvault.contract.model.CreatePromptRequest;
-import com.promptvault.contract.model.Prompt;
-import com.promptvault.contract.model.PublicPrompt;
-import com.promptvault.contract.model.UpdatePromptRequest;
-import com.promptvault.contract.model.UpdatePromptVisibilityRequest;
+import com.promptvault.contract.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class PromptsController implements PromptsApi {
@@ -39,9 +35,9 @@ public class PromptsController implements PromptsApi {
         }
 
         return ResponseEntity.ok(promptsService.listMyPrompts(currentUser)
-            .stream()
-            .map(PromptMapper::toContract)
-            .toList());
+                .stream()
+                .map(PromptMapper::toContract)
+                .toList());
     }
 
     @Override
@@ -52,9 +48,9 @@ public class PromptsController implements PromptsApi {
     @Override
     public ResponseEntity<List<PublicPrompt>> listPublicPrompts() {
         return ResponseEntity.ok(promptsService.listPublicPrompts(currentUser())
-            .stream()
-            .map(PromptMapper::toPublicContract)
-            .toList());
+                .stream()
+                .map(PromptMapper::toPublicContract)
+                .toList());
     }
 
     @Override
@@ -65,9 +61,9 @@ public class PromptsController implements PromptsApi {
     @Override
     public ResponseEntity<Prompt> updatePrompt(Long promptId, UpdatePromptRequest updatePromptRequest) {
         return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPrompt(
-            promptId,
-            updatePromptRequest,
-            currentUser()
+                promptId,
+                updatePromptRequest,
+                currentUser()
         )));
     }
 
@@ -79,14 +75,33 @@ public class PromptsController implements PromptsApi {
 
     @Override
     public ResponseEntity<Prompt> updatePromptVisibility(
-        Long promptId,
-        UpdatePromptVisibilityRequest updatePromptVisibilityRequest
+            Long promptId,
+            UpdatePromptVisibilityRequest updatePromptVisibilityRequest
     ) {
         return ResponseEntity.ok(PromptMapper.toContract(promptsService.updateOwnedPromptVisibility(
-            promptId,
-            PromptVisibility.valueOf(updatePromptVisibilityRequest.getVisibility().getValue()),
-            currentUser()
+                promptId,
+                PromptVisibility.valueOf(updatePromptVisibilityRequest.getVisibility().getValue()),
+                currentUser()
         )));
+    }
+
+    @Override
+    public ResponseEntity<List<SubmitPromptResponse>> listPromptsSubmission(Long promptId) {
+        return ResponseEntity.ok(
+                promptsService.listPromptSubmissions(promptId, currentUser())
+                        .stream()
+                        .map(PromptSubmissionHistoryMapper::toContract)
+                        .toList()
+        );
+    }
+
+    @Override
+    public ResponseEntity<SubmitPromptResponse> submitPromptRequest(Long promptId, SubmitPromptRequest submitPromptRequest) {
+        return ResponseEntity.ok(
+                PromptSubmissionHistoryMapper.toContract(
+                        promptsService.submitPrompt(promptId, submitPromptRequest, currentUser())
+                )
+        );
     }
 
     private UserEntity currentUser() {

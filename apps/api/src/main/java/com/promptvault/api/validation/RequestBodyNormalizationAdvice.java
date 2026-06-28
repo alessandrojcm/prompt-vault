@@ -1,13 +1,13 @@
 package com.promptvault.api.validation;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 @ControllerAdvice
 public class RequestBodyNormalizationAdvice extends RequestBodyAdviceAdapter {
@@ -25,11 +25,11 @@ public class RequestBodyNormalizationAdvice extends RequestBodyAdviceAdapter {
 
     @Override
     public Object afterBodyRead(
-        Object body,
-        HttpInputMessage inputMessage,
-        MethodParameter parameter,
-        Type targetType,
-        Class<? extends HttpMessageConverter<?>> converterType
+            Object body,
+            HttpInputMessage inputMessage,
+            MethodParameter parameter,
+            Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType
     ) {
         Object normalizedBody = body;
         for (RequestBodyNormalizer normalizer : normalizers) {
@@ -43,11 +43,11 @@ public class RequestBodyNormalizationAdvice extends RequestBodyAdviceAdapter {
 
     @Override
     public Object handleEmptyBody(
-        Object body,
-        HttpInputMessage inputMessage,
-        MethodParameter parameter,
-        Type targetType,
-        Class<? extends HttpMessageConverter<?>> converterType
+            Object body,
+            HttpInputMessage inputMessage,
+            MethodParameter parameter,
+            Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType
     ) {
         return body;
     }

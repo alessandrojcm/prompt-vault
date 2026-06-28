@@ -12,9 +12,9 @@ public class PromptBeanValidationMessageResolver implements BeanValidationFieldM
     @Override
     public boolean supports(FieldError fieldError) {
         return CreatePromptRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
-            || "createPromptRequest".equals(fieldError.getObjectName())
-            || UpdatePromptRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
-            || "updatePromptRequest".equals(fieldError.getObjectName());
+                || "createPromptRequest".equals(fieldError.getObjectName())
+                || UpdatePromptRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
+                || "updatePromptRequest".equals(fieldError.getObjectName());
     }
 
     @Override

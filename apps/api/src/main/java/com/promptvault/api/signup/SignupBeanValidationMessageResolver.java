@@ -11,7 +11,7 @@ public class SignupBeanValidationMessageResolver implements BeanValidationFieldM
     @Override
     public boolean supports(FieldError fieldError) {
         return SignupRequest.class.getSimpleName().equalsIgnoreCase(fieldError.getObjectName())
-            || "signupRequest".equals(fieldError.getObjectName());
+                || "signupRequest".equals(fieldError.getObjectName());
     }
 
     @Override

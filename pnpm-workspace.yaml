@@ -2,6 +2,7 @@ packages:
   - apps/web
   - packages/*
 allowBuilds:
+  '@openrouter/sdk': true
   esbuild: true
 minimumReleaseAgeExclude:
   - '@tanstack/query-core@5.101.1'

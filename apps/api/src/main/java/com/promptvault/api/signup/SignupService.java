@@ -1,20 +1,16 @@
 package com.promptvault.api.signup;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
-import com.promptvault.api.user.AccountStatus;
-import com.promptvault.api.user.Role;
-import com.promptvault.api.user.UserEntity;
-import com.promptvault.api.user.UserRepository;
-import com.promptvault.api.user.UserSummaryMapper;
+import com.promptvault.api.user.*;
 import com.promptvault.contract.model.SignupRequest;
 import com.promptvault.contract.model.UserSummary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Service
 public class SignupService {

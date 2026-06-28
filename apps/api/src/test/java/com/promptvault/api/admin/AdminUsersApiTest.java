@@ -1,14 +1,5 @@
 package com.promptvault.api.admin;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.support.AbstractMySqlIntegrationTest;
@@ -21,6 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -256,32 +256,32 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(String username, String password, HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", username,
-                "password", password
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listUsers(HttpClient client, String role) throws Exception {
         URI uri = role == null
-            ? baseUri.resolve("/api/admin/users")
-            : baseUri.resolve("/api/admin/users?role=" + role);
+                ? baseUri.resolve("/api/admin/users")
+                : baseUri.resolve("/api/admin/users?role=" + role);
         HttpRequest request = HttpRequest.newBuilder(uri)
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> getCurrentUser(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/user"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
@@ -291,10 +291,10 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> updateUserStatusRaw(HttpClient client, Long userId, String body) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/users/" + userId + "/status"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
@@ -319,21 +319,23 @@ class AdminUsersApiTest extends AbstractMySqlIntegrationTest {
     }
 
     private List<Map<String, Object>> readList(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
         return ((List<Map<String, String>>) body.get("fieldErrors"))
-            .stream()
-            .collect(java.util.stream.Collectors.toMap(
-                fieldError -> fieldError.get("field"),
-                fieldError -> fieldError.get("message")
-            ));
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        fieldError -> fieldError.get("field"),
+                        fieldError -> fieldError.get("message")
+                ));
     }
 
     private String uniqueUsername(String prefix) {

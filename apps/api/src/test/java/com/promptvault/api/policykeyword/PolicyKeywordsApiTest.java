@@ -1,15 +1,5 @@
 package com.promptvault.api.policykeyword;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.support.AbstractMySqlIntegrationTest;
@@ -22,6 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,8 +58,8 @@ class PolicyKeywordsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(createResponse.statusCode()).isEqualTo(201);
         Map<String, Object> keyword = readJson(createResponse.body());
         assertThat(keyword).containsEntry("keyword", keywordText)
-            .containsEntry("createdByUserId", seededAdmin.getId().intValue())
-            .containsEntry("createdByUsername", SEEDED_ADMIN_USERNAME);
+                .containsEntry("createdByUserId", seededAdmin.getId().intValue())
+                .containsEntry("createdByUsername", SEEDED_ADMIN_USERNAME);
         assertPolicyKeywordShape(keyword);
 
         HttpResponse<String> listResponse = listPolicyKeywords(adminClient);
@@ -169,66 +169,68 @@ class PolicyKeywordsApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(HttpClient client, String username, String password) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", username,
-                "password", password
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listPolicyKeywords(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/policy/keywords"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> createPolicyKeyword(HttpClient client, String keyword) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/policy/keywords"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("keyword", keyword))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("keyword", keyword))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updatePolicyKeyword(HttpClient client, int keywordId, String keyword) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/policy/keywords/" + keywordId))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("keyword", keyword))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("keyword", keyword))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> deletePolicyKeyword(HttpClient client, int keywordId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/policy/keywords/" + keywordId))
-            .header("Accept", "application/json")
-            .DELETE()
-            .build();
+                .header("Accept", "application/json")
+                .DELETE()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private List<Map<String, Object>> readList(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
         return ((List<Map<String, String>>) body.get("fieldErrors"))
-            .stream()
-            .collect(java.util.stream.Collectors.toMap(
-                fieldError -> fieldError.get("field"),
-                fieldError -> fieldError.get("message")
-            ));
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        fieldError -> fieldError.get("field"),
+                        fieldError -> fieldError.get("message")
+                ));
     }
 
     private UserEntity saveUser(String username, String password, Role role, AccountStatus accountStatus) {

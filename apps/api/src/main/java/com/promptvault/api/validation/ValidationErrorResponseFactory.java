@@ -1,11 +1,11 @@
 package com.promptvault.api.validation;
 
-import java.util.List;
-
 import com.promptvault.contract.model.ValidationErrorResponse;
 import com.promptvault.contract.model.ValidationFieldError;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
+
+import java.util.List;
 
 @Component
 public class ValidationErrorResponseFactory {
@@ -48,9 +48,9 @@ public class ValidationErrorResponseFactory {
 
     private String messageFor(FieldError fieldError) {
         return messageResolvers.stream()
-            .filter(resolver -> resolver.supports(fieldError))
-            .findFirst()
-            .map(resolver -> resolver.messageFor(fieldError))
-            .orElseGet(fieldError::getDefaultMessage);
+                .filter(resolver -> resolver.supports(fieldError))
+                .findFirst()
+                .map(resolver -> resolver.messageFor(fieldError))
+                .orElseGet(fieldError::getDefaultMessage);
     }
 }

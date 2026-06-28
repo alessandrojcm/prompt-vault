@@ -1,24 +1,11 @@
 package com.promptvault.api.prompt;
 
-import java.time.Instant;
-
 import com.promptvault.api.promptcategory.PromptCategoryEntity;
 import com.promptvault.api.user.UserEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "prompts")
@@ -54,6 +41,18 @@ public class PromptEntity {
 
     @OneToOne(mappedBy = "prompt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private PromptFlagEntity flag;
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "prompt", cascade = CascadeType.ALL)
+    private List<PromptSubmissionHistoryEntity> submissions;
+
+    public List<PromptSubmissionHistoryEntity> getSubmissions() {
+        return submissions;
+    }
+
+    public void setSubmissions(PromptSubmissionHistoryEntity submissions) {
+        this.submissions.add(submissions);
+    }
 
     public Long getId() {
         return id;

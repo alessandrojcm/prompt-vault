@@ -26,6 +26,7 @@ import { TrashIcon } from "@phosphor-icons/react";
 import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { useDisclosure } from "@mantine/hooks";
 import { CreatePrompt } from "./create-or-edit-prompt";
+import { Link } from "@tanstack/react-router";
 
 type Props = (Prompt | PublicPrompt) & {
   categoryLabel: string;
@@ -154,6 +155,16 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
         <Text>{props.text}</Text>
         <Group>
           <Pill>{categoryLabel}</Pill>
+          <Button
+            size="sm"
+            ml="auto"
+            variant="outline"
+            component={Link}
+            to="/dashboard/prompts/$promptId/submit"
+            params={{ promptId: props.id }}
+          >
+            Submit to model
+          </Button>
         </Group>
       </Stack>
       <CreatePrompt

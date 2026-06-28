@@ -1,17 +1,5 @@
 package com.promptvault.api.admin;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.policykeyword.PolicyKeywordEntity;
@@ -29,6 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,27 +70,27 @@ class AdminFlaggedPromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient adminClient = authenticatedClient(admin);
 
         Map<String, Object> flaggedPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Needs review " + suffix,
-            "text", "This includes BETA LEAK " + suffix + " and alpha leak " + suffix + ".",
-            "categoryId", category.getId()
+                "title", "Needs review " + suffix,
+                "text", "This includes BETA LEAK " + suffix + " and alpha leak " + suffix + ".",
+                "categoryId", category.getId()
         )).body());
         readJson(createPrompt(ownerClient, Map.of(
-            "title", "Unflagged title " + suffix,
-            "text", "Safe prompt body",
-            "categoryId", category.getId()
+                "title", "Unflagged title " + suffix,
+                "text", "Safe prompt body",
+                "categoryId", category.getId()
         )).body());
         Map<String, Object> clearedPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Cleared flag " + suffix,
-            "text", "This initially contains clearable leak " + suffix + ".",
-            "categoryId", category.getId()
+                "title", "Cleared flag " + suffix,
+                "text", "This initially contains clearable leak " + suffix + ".",
+                "categoryId", category.getId()
         )).body());
         Long flaggedPromptId = ((Number) flaggedPrompt.get("id")).longValue();
         Long clearedPromptId = ((Number) clearedPrompt.get("id")).longValue();
         OffsetDateTime submittedAt = promptRepository.findById(flaggedPromptId).orElseThrow().getCreatedAt().atOffset(ZoneOffset.UTC);
         updatePrompt(ownerClient, clearedPromptId, Map.of(
-            "title", "Cleared flag " + suffix,
-            "text", "This body is safe now.",
-            "categoryId", category.getId()
+                "title", "Cleared flag " + suffix,
+                "text", "This body is safe now.",
+                "categoryId", category.getId()
         ));
         updatedKeyword.setKeyword("changed leak " + suffix);
         updatedKeyword.setKeywordNormalized(("changed leak " + suffix).toLowerCase(Locale.ROOT));
@@ -102,16 +102,16 @@ class AdminFlaggedPromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200);
         List<Map<String, Object>> prompts = readList(response.body());
         assertThat(prompts)
-            .filteredOn(prompt -> prompt.get("id").equals(flaggedPromptId.intValue()))
-            .singleElement()
-            .satisfies(prompt -> {
-                assertThat(prompt).containsEntry("title", "Needs review " + suffix)
-                    .containsEntry("ownerUsername", owner.entity().getUsername())
-                    .containsEntry("categoryLabel", category.getLabel());
-                assertThat(OffsetDateTime.parse((String) prompt.get("submittedAt"))).isEqualTo(submittedAt);
-                assertThat(matchedKeywordSnapshots(prompt))
-                    .containsExactly("alpha leak " + suffix, "beta leak " + suffix);
-            });
+                .filteredOn(prompt -> prompt.get("id").equals(flaggedPromptId.intValue()))
+                .singleElement()
+                .satisfies(prompt -> {
+                    assertThat(prompt).containsEntry("title", "Needs review " + suffix)
+                            .containsEntry("ownerUsername", owner.entity().getUsername())
+                            .containsEntry("categoryLabel", category.getLabel());
+                    assertThat(OffsetDateTime.parse((String) prompt.get("submittedAt"))).isEqualTo(submittedAt);
+                    assertThat(matchedKeywordSnapshots(prompt))
+                            .containsExactly("alpha leak " + suffix, "beta leak " + suffix);
+                });
         assertThat(prompts).noneSatisfy(prompt -> assertThat(prompt.get("id")).isEqualTo(clearedPromptId.intValue()));
     }
 
@@ -157,48 +157,50 @@ class AdminFlaggedPromptsApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(HttpClient client, TestUser user) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", user.entity().getUsername(),
-                "password", user.password()
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", user.entity().getUsername(),
+                        "password", user.password()
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> createPrompt(HttpClient client, Map<String, Object> payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updatePrompt(HttpClient client, Long promptId, Map<String, Object> payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listFlaggedPrompts(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/prompts/flagged"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private List<Map<String, Object>> readList(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")

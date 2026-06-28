@@ -1,8 +1,5 @@
 package com.promptvault.api.promptcategory;
 
-import java.util.List;
-import java.util.Locale;
-
 import com.promptvault.api.prompt.PromptRepository;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.model.CreatePromptCategoryRequest;
@@ -11,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Locale;
 
 @Service
 public class PromptCategoriesService {
@@ -54,7 +54,7 @@ public class PromptCategoriesService {
     @Transactional
     public PromptCategoryEntity updatePromptCategory(Long categoryId, UpdatePromptCategoryRequest request) {
         PromptCategoryEntity category = promptCategoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         String label = request.getLabel();
         String labelNormalized = label.toLowerCase(Locale.ROOT);
         String slug = toSnakeCaseSlug(label);
@@ -77,7 +77,7 @@ public class PromptCategoriesService {
     @Transactional
     public void deletePromptCategory(Long categoryId) {
         PromptCategoryEntity category = promptCategoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (promptRepository.existsByCategoryId(categoryId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Prompt Category is referenced by one or more prompts.");
@@ -88,8 +88,8 @@ public class PromptCategoriesService {
 
     private String toSnakeCaseSlug(String label) {
         return label.toLowerCase(Locale.ROOT)
-            .replaceAll("[^a-z0-9]+", "_")
-            .replaceAll("^_+|_+$", "");
+                .replaceAll("[^a-z0-9]+", "_")
+                .replaceAll("^_+|_+$", "");
     }
 
     private PromptCategoryValidationException labelValidationException(String message) {

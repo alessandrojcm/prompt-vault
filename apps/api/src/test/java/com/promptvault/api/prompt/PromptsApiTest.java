@@ -1,18 +1,5 @@
 package com.promptvault.api.prompt;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.policykeyword.PolicyKeywordEntity;
@@ -29,6 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,14 +68,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         String duplicateTitle = "Repeatable title";
         HttpResponse<String> response = createPrompt(client, Map.of(
-            "title", "  " + duplicateTitle + "  ",
-            "text", "  First line\n\n  Second line  ",
-            "categoryId", category.getId()
+                "title", "  " + duplicateTitle + "  ",
+                "text", "  First line\n\n  Second line  ",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> duplicateResponse = createPrompt(client, Map.of(
-            "title", duplicateTitle,
-            "text", "Different text",
-            "categoryId", category.getId()
+                "title", duplicateTitle,
+                "text", "Different text",
+                "categoryId", category.getId()
         ));
 
         assertThat(response.statusCode()).isEqualTo(201);
@@ -83,19 +83,19 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         Map<String, Object> body = readJson(response.body());
         assertThat(body).containsEntry("title", duplicateTitle)
-            .containsEntry("text", "First line\n\n  Second line")
-            .containsEntry("visibility", "PRIVATE")
-            .containsEntry("categoryId", category.getId().intValue())
-            .containsEntry("ownerUserId", user.entity().getId().intValue());
+                .containsEntry("text", "First line\n\n  Second line")
+                .containsEntry("visibility", "PRIVATE")
+                .containsEntry("categoryId", category.getId().intValue())
+                .containsEntry("ownerUserId", user.entity().getId().intValue());
         assertThat(OffsetDateTime.parse((String) body.get("createdAt"))).isNotNull();
         assertThat(OffsetDateTime.parse((String) body.get("updatedAt"))).isNotNull();
 
         Long promptId = ((Number) body.get("id")).longValue();
         PromptEntity persistedPrompt = promptRepository.findAllByOwnerIdOrderByCreatedAtDescIdDesc(user.entity().getId())
-            .stream()
-            .filter(prompt -> prompt.getId().equals(promptId))
-            .findFirst()
-            .orElseThrow();
+                .stream()
+                .filter(prompt -> prompt.getId().equals(promptId))
+                .findFirst()
+                .orElseThrow();
         assertThat(persistedPrompt.getTitle()).isEqualTo(duplicateTitle);
         assertThat(persistedPrompt.getText()).isEqualTo("First line\n\n  Second line");
         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
@@ -111,10 +111,10 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient client = authenticatedClient(user);
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         HttpResponse<String> response = createPrompt(client, Map.of(
-            "title", "Public Prompt",
-            "text", "This is a public prompt.",
-            "visibility", "PUBLIC",
-            "categoryId", category.getId()
+                "title", "Public Prompt",
+                "text", "This is a public prompt.",
+                "visibility", "PUBLIC",
+                "categoryId", category.getId()
         ));
         assertThat(response.statusCode()).isEqualTo(201);
         assertThat(response.body()).isNotBlank();
@@ -133,38 +133,38 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient client = authenticatedClient(createUser());
 
         HttpResponse<String> blankResponse = createPrompt(client, Map.of(
-            "title", "   ",
-            "text", "  ",
-            "categoryId", category.getId()
+                "title", "   ",
+                "text", "  ",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> oversizedResponse = createPrompt(client, Map.of(
-            "title", "t".repeat(121),
-            "text", "x".repeat(10001),
-            "categoryId", category.getId()
+                "title", "t".repeat(121),
+                "text", "x".repeat(10001),
+                "categoryId", category.getId()
         ));
         HttpResponse<String> missingCategoryResponse = createPromptJson(client, """
-            {"title":"Valid title","text":"Valid text"}
-            """);
+                {"title":"Valid title","text":"Valid text"}
+                """);
         HttpResponse<String> unknownCategoryResponse = createPrompt(client, Map.of(
-            "title", "Valid title",
-            "text", "Valid text",
-            "categoryId", 999_999_999
+                "title", "Valid title",
+                "text", "Valid text",
+                "categoryId", 999_999_999
         ));
 
         assertThat(blankResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(blankResponse.body())))
-            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+                .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+                .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
         assertThat(oversizedResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(oversizedResponse.body())))
-            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+                .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+                .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
         assertThat(missingCategoryResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(missingCategoryResponse.body())))
-            .containsEntry("categoryId", "Prompt Category is required.");
+                .containsEntry("categoryId", "Prompt Category is required.");
         assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
-            .containsEntry("categoryId", "Prompt Category must exist.");
+                .containsEntry("categoryId", "Prompt Category must exist.");
     }
 
     @Test
@@ -180,9 +180,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         HttpResponse<String> createResponse = createPrompt(ownerClient, Map.of(
-            "title", "title-only " + suffix + " should not be scanned",
-            "text", "This API SECRET " + suffix + " includes an Internal   Phrase " + suffix + ".",
-            "categoryId", category.getId()
+                "title", "title-only " + suffix + " should not be scanned",
+                "text", "This API SECRET " + suffix + " includes an Internal   Phrase " + suffix + ".",
+                "categoryId", category.getId()
         ));
 
         assertThat(createResponse.statusCode()).isEqualTo(201);
@@ -194,8 +194,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         PromptFlagEntity flag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
         assertThat(flag.getFlaggedAt()).isNotNull();
         assertThat(flag.getKeywordSnapshots())
-            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
-            .containsExactly("API secret " + suffix, "Internal   Phrase " + suffix, "secret " + suffix);
+                .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+                .containsExactly("API secret " + suffix, "Internal   Phrase " + suffix, "secret " + suffix);
     }
 
     @Test
@@ -208,14 +208,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Map<String, Object> unflaggedPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", keyword + " appears only in the title",
-            "text", "Public-safe body",
-            "categoryId", category.getId()
+                "title", keyword + " appears only in the title",
+                "text", "Public-safe body",
+                "categoryId", category.getId()
         )).body());
         Map<String, Object> flaggedPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Text match",
-            "text", "Body contains " + keyword.toUpperCase(Locale.ROOT) + " content",
-            "categoryId", category.getId()
+                "title", "Text match",
+                "text", "Body contains " + keyword.toUpperCase(Locale.ROOT) + " content",
+                "categoryId", category.getId()
         )).body());
         Long unflaggedPromptId = ((Number) unflaggedPrompt.get("id")).longValue();
         Long flaggedPromptId = ((Number) flaggedPrompt.get("id")).longValue();
@@ -228,25 +228,25 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(promptFlagRepository.findByPromptId(flaggedPromptId)).isPresent();
         assertThat(listResponse.statusCode()).isEqualTo(200);
         assertThat(readList(listResponse.body()))
-            .filteredOn(prompt -> prompt.get("id").equals(flaggedPromptId.intValue()))
-            .singleElement()
-            .satisfies(prompt -> {
-                assertThat(OffsetDateTime.parse((String) prompt.get("flaggedAt"))).isNotNull();
-                assertThat(prompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
-            });
+                .filteredOn(prompt -> prompt.get("id").equals(flaggedPromptId.intValue()))
+                .singleElement()
+                .satisfies(prompt -> {
+                    assertThat(OffsetDateTime.parse((String) prompt.get("flaggedAt"))).isNotNull();
+                    assertThat(prompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+                });
         assertThat(readList(listResponse.body()))
-            .filteredOn(prompt -> prompt.get("id").equals(unflaggedPromptId.intValue()))
-            .singleElement()
-            .satisfies(prompt -> assertThat(prompt).containsEntry("flaggedAt", null)
-                .doesNotContainKeys("matchedKeywords", "keywordSnapshots"));
+                .filteredOn(prompt -> prompt.get("id").equals(unflaggedPromptId.intValue()))
+                .singleElement()
+                .satisfies(prompt -> assertThat(prompt).containsEntry("flaggedAt", null)
+                        .doesNotContainKeys("matchedKeywords", "keywordSnapshots"));
 
         assertThat(flaggedDetailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(flaggedDetailResponse.body())).containsKey("flaggedAt")
-            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+                .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
         assertThat(unflaggedDetailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(unflaggedDetailResponse.body()))
-            .containsEntry("flaggedAt", null)
-            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+                .containsEntry("flaggedAt", null)
+                .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
     }
 
     @Test
@@ -264,33 +264,33 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Initially safe",
-            "text", "Safe body",
-            "categoryId", category.getId()
+                "title", "Initially safe",
+                "text", "Safe body",
+                "categoryId", category.getId()
         )).body());
         Long promptId = ((Number) createdPrompt.get("id")).longValue();
 
         HttpResponse<String> flagResponse = updatePrompt(ownerClient, promptId, Map.of(
-            "title", "Now flagged",
-            "text", "Contains " + alphaKeyword.toUpperCase(Locale.ROOT) + " and " + betaKeyword,
-            "categoryId", category.getId()
+                "title", "Now flagged",
+                "text", "Contains " + alphaKeyword.toUpperCase(Locale.ROOT) + " and " + betaKeyword,
+                "categoryId", category.getId()
         ));
         PromptFlagEntity firstFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
         Instant firstFlaggedAt = firstFlag.getFlaggedAt();
         Thread.sleep(1_100);
 
         HttpResponse<String> replaceResponse = updatePrompt(ownerClient, promptId, Map.of(
-            "title", "Still flagged",
-            "text", "Contains " + betaKeyword + " and " + gammaKeyword,
-            "categoryId", category.getId()
+                "title", "Still flagged",
+                "text", "Contains " + betaKeyword + " and " + gammaKeyword,
+                "categoryId", category.getId()
         ));
         PromptFlagEntity replacedFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
         Instant replacedFlaggedAt = replacedFlag.getFlaggedAt();
 
         HttpResponse<String> clearResponse = updatePrompt(ownerClient, promptId, Map.of(
-            "title", "Safe again",
-            "text", "No policy terms remain",
-            "categoryId", category.getId()
+                "title", "Safe again",
+                "text", "No policy terms remain",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
 
@@ -300,16 +300,16 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
             assertThat(prompt).doesNotContainKeys("matchedKeywords", "keywordSnapshots");
         });
         assertThat(firstFlag.getKeywordSnapshots())
-            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
-            .containsExactly(alphaKeyword, betaKeyword);
+                .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+                .containsExactly(alphaKeyword, betaKeyword);
 
         assertThat(replaceResponse.statusCode()).isEqualTo(200);
         assertThat(replacedFlaggedAt).isAfter(firstFlaggedAt);
         assertThat(replacedFlag.getKeywordSnapshots())
-            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
-            .containsExactly(betaKeyword, gammaKeyword);
+                .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+                .containsExactly(betaKeyword, gammaKeyword);
         assertThat(readJson(replaceResponse.body())).containsKey("flaggedAt")
-            .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
+                .doesNotContainKeys("matchedKeywords", "keywordSnapshots");
 
         assertThat(clearResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(clearResponse.body())).containsEntry("flaggedAt", null);
@@ -330,29 +330,29 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Original flagged title",
-            "text", "Text contains " + keyword,
-            "categoryId", originalCategory.getId()
+                "title", "Original flagged title",
+                "text", "Text contains " + keyword,
+                "categoryId", originalCategory.getId()
         )).body());
         Long promptId = ((Number) createdPrompt.get("id")).longValue();
         PromptFlagEntity originalFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
         Instant originalFlaggedAt = originalFlag.getFlaggedAt();
 
         HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
-            "title", "Renamed only",
-            "text", "Text contains " + keyword,
-            "categoryId", updatedCategory.getId()
+                "title", "Renamed only",
+                "text", "Text contains " + keyword,
+                "categoryId", updatedCategory.getId()
         ));
         PromptFlagEntity unchangedFlag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
 
         assertThat(updateResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(updateResponse.body())).containsEntry("title", "Renamed only")
-            .containsEntry("categoryId", updatedCategory.getId().intValue())
-            .containsKey("flaggedAt");
+                .containsEntry("categoryId", updatedCategory.getId().intValue())
+                .containsKey("flaggedAt");
         assertThat(unchangedFlag.getFlaggedAt()).isEqualTo(originalFlaggedAt);
         assertThat(unchangedFlag.getKeywordSnapshots())
-            .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
-            .containsExactly(keyword);
+                .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+                .containsExactly(keyword);
     }
 
     @Test
@@ -364,19 +364,19 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient otherClient = authenticatedClient(otherUser);
 
         Map<String, Object> firstPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Owner private one",
-            "text", "Owned text one",
-            "categoryId", category.getId()
+                "title", "Owner private one",
+                "text", "Owned text one",
+                "categoryId", category.getId()
         )).body());
         Map<String, Object> secondPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Owner private two",
-            "text", "Owned text two",
-            "categoryId", category.getId()
+                "title", "Owner private two",
+                "text", "Owned text two",
+                "categoryId", category.getId()
         )).body());
         createPrompt(otherClient, Map.of(
-            "title", "Other private prompt",
-            "text", "Other text",
-            "categoryId", category.getId()
+                "title", "Other private prompt",
+                "text", "Other text",
+                "categoryId", category.getId()
         ));
 
         HttpResponse<String> response = listMyPrompts(ownerClient, owner.entity().getId());
@@ -386,13 +386,13 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(otherUserListResponse.statusCode()).isEqualTo(403);
         List<Map<String, Object>> prompts = readList(response.body());
         assertThat(prompts).extracting(prompt -> prompt.get("id"))
-            .contains(((Number) firstPrompt.get("id")).intValue(), ((Number) secondPrompt.get("id")).intValue());
+                .contains(((Number) firstPrompt.get("id")).intValue(), ((Number) secondPrompt.get("id")).intValue());
         assertThat(prompts).allSatisfy(prompt -> {
             assertThat(prompt).containsEntry("ownerUserId", owner.entity().getId().intValue());
             assertThat(prompt).containsEntry("visibility", "PRIVATE");
         });
         assertThat(prompts).extracting(prompt -> prompt.get("title"))
-            .doesNotContain("Other private prompt");
+                .doesNotContain("Other private prompt");
     }
 
     @Test
@@ -402,9 +402,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Shareable prompt",
-            "text", "Shareable text",
-            "categoryId", category.getId()
+                "title", "Shareable prompt",
+                "text", "Shareable text",
+                "categoryId", category.getId()
         )).body());
         Long promptId = ((Number) createdPrompt.get("id")).longValue();
 
@@ -416,26 +416,26 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(shareResponse.statusCode()).isEqualTo(200);
         Map<String, Object> sharedPrompt = readJson(shareResponse.body());
         assertThat(sharedPrompt).containsEntry("id", promptId.intValue())
-            .containsEntry("visibility", "PUBLIC")
-            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+                .containsEntry("visibility", "PUBLIC")
+                .containsEntry("ownerUserId", owner.entity().getId().intValue());
         assertThat(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")))
-            .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
+                .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
         assertThat(readList(listSharedResponse.body()))
-            .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
-            .extracting(prompt -> prompt.get("visibility"))
-            .containsExactly("PUBLIC");
+                .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
+                .extracting(prompt -> prompt.get("visibility"))
+                .containsExactly("PUBLIC");
 
         assertThat(unshareResponse.statusCode()).isEqualTo(200);
         Map<String, Object> unsharedPrompt = readJson(unshareResponse.body());
         assertThat(unsharedPrompt).containsEntry("id", promptId.intValue())
-            .containsEntry("visibility", "PRIVATE")
-            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+                .containsEntry("visibility", "PRIVATE")
+                .containsEntry("ownerUserId", owner.entity().getId().intValue());
         assertThat(OffsetDateTime.parse((String) unsharedPrompt.get("updatedAt")))
-            .isAfter(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")));
+                .isAfter(OffsetDateTime.parse((String) sharedPrompt.get("updatedAt")));
         assertThat(readList(listUnsharedResponse.body()))
-            .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
-            .extracting(prompt -> prompt.get("visibility"))
-            .containsExactly("PRIVATE");
+                .filteredOn(prompt -> prompt.get("id").equals(promptId.intValue()))
+                .extracting(prompt -> prompt.get("visibility"))
+                .containsExactly("PRIVATE");
 
         PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
         assertThat(persistedPrompt.getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
@@ -451,14 +451,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Long flaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Flagged prompt",
-            "text", "Prompt text contains " + keyword,
-            "categoryId", category.getId()
+                "title", "Flagged prompt",
+                "text", "Prompt text contains " + keyword,
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         Long unflaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Unflagged prompt",
-            "text", "Share-safe text",
-            "categoryId", category.getId()
+                "title", "Unflagged prompt",
+                "text", "Share-safe text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> flaggedShareResponse = updatePromptVisibility(ownerClient, flaggedPromptId, "PUBLIC");
@@ -467,14 +467,14 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         assertThat(flaggedShareResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(flaggedShareResponse.body())))
-            .containsEntry("visibility", "Flagged Prompts cannot be public.");
+                .containsEntry("visibility", "Flagged Prompts cannot be public.");
         assertThat(unflaggedShareResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(unflaggedShareResponse.body())).containsEntry("visibility", "PUBLIC");
         assertThat(flaggedDetailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(flaggedDetailResponse.body()))
-            .containsEntry("id", flaggedPromptId.intValue())
-            .containsEntry("visibility", "PRIVATE")
-            .containsKey("flaggedAt");
+                .containsEntry("id", flaggedPromptId.intValue())
+                .containsEntry("visibility", "PRIVATE")
+                .containsKey("flaggedAt");
 
         assertThat(promptRepository.findById(flaggedPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
         assertThat(promptRepository.findById(unflaggedPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PUBLIC);
@@ -492,27 +492,27 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Long forcedPublicFlaggedPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Forced public flagged prompt",
-            "text", "Existing flagged text with " + keyword,
-            "categoryId", category.getId()
+                "title", "Forced public flagged prompt",
+                "text", "Existing flagged text with " + keyword,
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         PromptEntity forcedPublicFlaggedPrompt = promptRepository.findById(forcedPublicFlaggedPromptId).orElseThrow();
         forcedPublicFlaggedPrompt.setVisibility(PromptVisibility.PUBLIC);
         promptRepository.save(forcedPublicFlaggedPrompt);
 
         Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Initially public prompt",
-            "text", "Initially safe text",
-            "categoryId", category.getId()
+                "title", "Initially public prompt",
+                "text", "Initially safe text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         updatePromptVisibility(ownerClient, publicPromptId, "PUBLIC");
 
         HttpResponse<String> listBeforeUpdateResponse = listPublicPrompts(viewerClient);
         HttpResponse<String> forcedPublicFlaggedDetailResponse = getPublicPrompt(viewerClient, forcedPublicFlaggedPromptId);
         HttpResponse<String> flaggingUpdateResponse = updatePrompt(ownerClient, publicPromptId, Map.of(
-            "title", "Now flagged public prompt",
-            "text", "Updated text now contains " + keyword.toUpperCase(Locale.ROOT),
-            "categoryId", category.getId()
+                "title", "Now flagged public prompt",
+                "text", "Updated text now contains " + keyword.toUpperCase(Locale.ROOT),
+                "categoryId", category.getId()
         ));
         HttpResponse<String> listAfterUpdateResponse = listPublicPrompts(viewerClient);
         HttpResponse<String> detailAfterUpdateResponse = getPublicPrompt(viewerClient, publicPromptId);
@@ -520,24 +520,24 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         assertThat(listBeforeUpdateResponse.statusCode()).isEqualTo(200);
         assertThat(readList(listBeforeUpdateResponse.body())).extracting(prompt -> prompt.get("id"))
-            .contains(publicPromptId.intValue())
-            .doesNotContain(forcedPublicFlaggedPromptId.intValue());
+                .contains(publicPromptId.intValue())
+                .doesNotContain(forcedPublicFlaggedPromptId.intValue());
         assertThat(forcedPublicFlaggedDetailResponse.statusCode()).isEqualTo(404);
         assertThat(forcedPublicFlaggedDetailResponse.body()).doesNotContain("Forced public flagged prompt", keyword);
 
         assertThat(flaggingUpdateResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(flaggingUpdateResponse.body()))
-            .containsEntry("id", publicPromptId.intValue())
-            .containsEntry("visibility", "PRIVATE")
-            .containsKey("flaggedAt");
+                .containsEntry("id", publicPromptId.intValue())
+                .containsEntry("visibility", "PRIVATE")
+                .containsKey("flaggedAt");
         assertThat(readList(listAfterUpdateResponse.body())).extracting(prompt -> prompt.get("id"))
-            .doesNotContain(publicPromptId.intValue(), forcedPublicFlaggedPromptId.intValue());
+                .doesNotContain(publicPromptId.intValue(), forcedPublicFlaggedPromptId.intValue());
         assertThat(detailAfterUpdateResponse.statusCode()).isEqualTo(404);
         assertThat(ownerDetailAfterUpdateResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(ownerDetailAfterUpdateResponse.body()))
-            .containsEntry("id", publicPromptId.intValue())
-            .containsEntry("visibility", "PRIVATE")
-            .containsKey("flaggedAt");
+                .containsEntry("id", publicPromptId.intValue())
+                .containsEntry("visibility", "PRIVATE")
+                .containsKey("flaggedAt");
         assertThat(promptRepository.findById(publicPromptId).orElseThrow().getVisibility()).isEqualTo(PromptVisibility.PRIVATE);
     }
 
@@ -552,21 +552,21 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient privateOwnerClient = authenticatedClient(privateOwner);
 
         Long publicPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Visible public prompt",
-            "text", "Visible public text",
-            "categoryId", category.getId()
+                "title", "Visible public prompt",
+                "text", "Visible public text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         updatePromptVisibility(ownerClient, publicPromptId, "PUBLIC");
         Long ownPublicPromptId = ((Number) readJson(createPrompt(viewerClient, Map.of(
-            "title", "Viewer own public prompt",
-            "text", "Viewer own public text",
-            "categoryId", category.getId()
+                "title", "Viewer own public prompt",
+                "text", "Viewer own public text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         updatePromptVisibility(viewerClient, ownPublicPromptId, "PUBLIC");
         Long privatePromptId = ((Number) readJson(createPrompt(privateOwnerClient, Map.of(
-            "title", "Private other prompt",
-            "text", "Private other text",
-            "categoryId", category.getId()
+                "title", "Private other prompt",
+                "text", "Private other text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> listResponse = listPublicPrompts(viewerClient);
@@ -577,25 +577,25 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(listResponse.statusCode()).isEqualTo(200);
         List<Map<String, Object>> prompts = readList(listResponse.body());
         assertThat(prompts).filteredOn(prompt -> prompt.get("id").equals(publicPromptId.intValue()))
-            .singleElement()
-            .satisfies(prompt -> {
-                assertThat(prompt).containsEntry("title", "Visible public prompt")
-                    .containsEntry("text", "Visible public text")
-                    .containsEntry("visibility", "PUBLIC")
-                    .containsEntry("categoryId", category.getId().intValue())
-                    .containsEntry("ownerUsername", owner.entity().getUsername());
-                assertThat(prompt).doesNotContainKeys("ownerUserId", "emailAddress");
-                assertThat(prompt).doesNotContainValue(owner.entity().getEmailAddress());
-            });
+                .singleElement()
+                .satisfies(prompt -> {
+                    assertThat(prompt).containsEntry("title", "Visible public prompt")
+                            .containsEntry("text", "Visible public text")
+                            .containsEntry("visibility", "PUBLIC")
+                            .containsEntry("categoryId", category.getId().intValue())
+                            .containsEntry("ownerUsername", owner.entity().getUsername());
+                    assertThat(prompt).doesNotContainKeys("ownerUserId", "emailAddress");
+                    assertThat(prompt).doesNotContainValue(owner.entity().getEmailAddress());
+                });
         assertThat(prompts).extracting(prompt -> prompt.get("id"))
-            .doesNotContain(ownPublicPromptId.intValue(), privatePromptId.intValue());
+                .doesNotContain(ownPublicPromptId.intValue(), privatePromptId.intValue());
         assertThat(listResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
 
         assertThat(detailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(detailResponse.body()))
-            .containsEntry("id", publicPromptId.intValue())
-            .containsEntry("ownerUsername", owner.entity().getUsername())
-            .doesNotContainKeys("ownerUserId", "emailAddress");
+                .containsEntry("id", publicPromptId.intValue())
+                .containsEntry("ownerUsername", owner.entity().getUsername())
+                .doesNotContainKeys("ownerUserId", "emailAddress");
         assertThat(detailResponse.body()).doesNotContain(owner.entity().getEmailAddress(), "emailAddress");
         assertThat(ownPublicDetailResponse.statusCode()).isEqualTo(404);
         assertThat(privateDetailResponse.statusCode()).isEqualTo(404);
@@ -613,17 +613,17 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient adminClient = authenticatedClient(admin);
 
         Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Original public title",
-            "text", "Original public text",
-            "categoryId", category.getId()
+                "title", "Original public title",
+                "text", "Original public text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
         updatePromptVisibility(ownerClient, promptId, "PUBLIC");
         HttpResponse<String> initialDetailResponse = getPublicPrompt(viewerClient, promptId);
 
         updatePrompt(ownerClient, promptId, Map.of(
-            "title", "Updated public title",
-            "text", "Updated public text",
-            "categoryId", category.getId()
+                "title", "Updated public title",
+                "text", "Updated public text",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> updatedDetailResponse = getPublicPrompt(viewerClient, promptId);
 
@@ -636,13 +636,13 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(readJson(initialDetailResponse.body())).containsEntry("title", "Original public title");
         assertThat(updatedDetailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(updatedDetailResponse.body()))
-            .containsEntry("title", "Updated public title")
-            .containsEntry("text", "Updated public text");
+                .containsEntry("title", "Updated public title")
+                .containsEntry("text", "Updated public text");
 
         assertThat(disableOwnerResponse.statusCode()).isEqualTo(200);
         assertThat(listAfterDisableResponse.statusCode()).isEqualTo(200);
         assertThat(readList(listAfterDisableResponse.body())).extracting(prompt -> prompt.get("id"))
-            .doesNotContain(promptId.intValue());
+                .doesNotContain(promptId.intValue());
         assertThat(detailAfterDisableResponse.statusCode()).isEqualTo(404);
         assertThat(detailAfterDisableResponse.body()).doesNotContain("Updated public title", "Updated public text");
         assertThat(disabledOwnerPromptApiResponse.statusCode()).isEqualTo(401);
@@ -665,9 +665,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient adminClient = authenticatedClient(admin);
 
         Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Owner controlled prompt",
-            "text", "Private text",
-            "categoryId", category.getId()
+                "title", "Owner controlled prompt",
+                "text", "Private text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> otherUserShareResponse = updatePromptVisibility(otherClient, promptId, "PUBLIC");
@@ -702,31 +702,31 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient otherClient = authenticatedClient(otherUser);
 
         Map<String, Object> createdPrompt = readJson(createPrompt(ownerClient, Map.of(
-            "title", "Original title",
-            "text", "Original text",
-            "categoryId", originalCategory.getId()
+                "title", "Original title",
+                "text", "Original text",
+                "categoryId", originalCategory.getId()
         )).body());
         Long promptId = ((Number) createdPrompt.get("id")).longValue();
 
         HttpResponse<String> detailResponse = getPrompt(ownerClient, promptId);
         HttpResponse<String> otherUserDetailResponse = getPrompt(otherClient, promptId);
         HttpResponse<String> otherUserUpdateResponse = updatePrompt(otherClient, promptId, Map.of(
-            "title", "Other user title",
-            "text", "Other user text",
-            "categoryId", updatedCategory.getId()
+                "title", "Other user title",
+                "text", "Other user text",
+                "categoryId", updatedCategory.getId()
         ));
         HttpResponse<String> updateResponse = updatePrompt(ownerClient, promptId, Map.of(
-            "title", "  Updated title  ",
-            "text", "  Updated text\n\n  still here  ",
-            "categoryId", updatedCategory.getId()
+                "title", "  Updated title  ",
+                "text", "  Updated text\n\n  still here  ",
+                "categoryId", updatedCategory.getId()
         ));
 
         assertThat(detailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(detailResponse.body())).containsEntry("id", promptId.intValue())
-            .containsEntry("title", "Original title")
-            .containsEntry("text", "Original text")
-            .containsEntry("categoryId", originalCategory.getId().intValue())
-            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+                .containsEntry("title", "Original title")
+                .containsEntry("text", "Original text")
+                .containsEntry("categoryId", originalCategory.getId().intValue())
+                .containsEntry("ownerUserId", owner.entity().getId().intValue());
         assertThat(otherUserDetailResponse.statusCode()).isEqualTo(404);
         assertThat(otherUserDetailResponse.body()).doesNotContain("Original title", "Original text");
         assertThat(otherUserUpdateResponse.statusCode()).isEqualTo(404);
@@ -735,12 +735,12 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         Map<String, Object> updatedPrompt = readJson(updateResponse.body());
         assertThat(updatedPrompt).containsEntry("id", promptId.intValue())
-            .containsEntry("title", "Updated title")
-            .containsEntry("text", "Updated text\n\n  still here")
-            .containsEntry("categoryId", updatedCategory.getId().intValue())
-            .containsEntry("ownerUserId", owner.entity().getId().intValue());
+                .containsEntry("title", "Updated title")
+                .containsEntry("text", "Updated text\n\n  still here")
+                .containsEntry("categoryId", updatedCategory.getId().intValue())
+                .containsEntry("ownerUserId", owner.entity().getId().intValue());
         assertThat(OffsetDateTime.parse((String) updatedPrompt.get("updatedAt")))
-            .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
+                .isAfter(OffsetDateTime.parse((String) createdPrompt.get("updatedAt")));
 
         PromptEntity persistedPrompt = promptRepository.findById(promptId).orElseThrow();
         assertThat(persistedPrompt.getTitle()).isEqualTo("Updated title");
@@ -759,42 +759,42 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
 
         Long adminPromptId = ((Number) readJson(createPrompt(adminClient, Map.of(
-            "title", "Admin private title",
-            "text", "Admin private text",
-            "categoryId", originalCategory.getId()
+                "title", "Admin private title",
+                "text", "Admin private text",
+                "categoryId", originalCategory.getId()
         )).body()).get("id")).longValue();
         Long ownerPromptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Owner secret title",
-            "text", "Owner secret text",
-            "categoryId", originalCategory.getId()
+                "title", "Owner secret title",
+                "text", "Owner secret text",
+                "categoryId", originalCategory.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> adminOwnDetailResponse = getPrompt(adminClient, adminPromptId);
         HttpResponse<String> adminOwnUpdateResponse = updatePrompt(adminClient, adminPromptId, Map.of(
-            "title", "Admin updated title",
-            "text", "Admin updated text",
-            "categoryId", updatedCategory.getId()
+                "title", "Admin updated title",
+                "text", "Admin updated text",
+                "categoryId", updatedCategory.getId()
         ));
         HttpResponse<String> adminOtherDetailResponse = getPrompt(adminClient, ownerPromptId);
         HttpResponse<String> adminOtherUpdateResponse = updatePrompt(adminClient, ownerPromptId, Map.of(
-            "title", "Admin takeover title",
-            "text", "Admin takeover text",
-            "categoryId", updatedCategory.getId()
+                "title", "Admin takeover title",
+                "text", "Admin takeover text",
+                "categoryId", updatedCategory.getId()
         ));
         HttpResponse<String> adminOtherDeleteResponse = deletePrompt(adminClient, ownerPromptId);
         HttpResponse<String> adminOwnDeleteResponse = deletePrompt(adminClient, adminPromptId);
 
         assertThat(adminOwnDetailResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(adminOwnDetailResponse.body()))
-            .containsEntry("id", adminPromptId.intValue())
-            .containsEntry("ownerUserId", admin.entity().getId().intValue())
-            .containsEntry("text", "Admin private text");
+                .containsEntry("id", adminPromptId.intValue())
+                .containsEntry("ownerUserId", admin.entity().getId().intValue())
+                .containsEntry("text", "Admin private text");
         assertThat(adminOwnUpdateResponse.statusCode()).isEqualTo(200);
         assertThat(readJson(adminOwnUpdateResponse.body()))
-            .containsEntry("id", adminPromptId.intValue())
-            .containsEntry("title", "Admin updated title")
-            .containsEntry("text", "Admin updated text")
-            .containsEntry("ownerUserId", admin.entity().getId().intValue());
+                .containsEntry("id", adminPromptId.intValue())
+                .containsEntry("title", "Admin updated title")
+                .containsEntry("text", "Admin updated text")
+                .containsEntry("ownerUserId", admin.entity().getId().intValue());
         assertThat(adminOwnDeleteResponse.statusCode()).isEqualTo(204);
         assertThat(promptRepository.findById(adminPromptId)).isEmpty();
 
@@ -817,44 +817,44 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
         HttpClient client = authenticatedClient(createUser());
         Long promptId = ((Number) readJson(createPrompt(client, Map.of(
-            "title", "Valid title",
-            "text", "Valid text",
-            "categoryId", category.getId()
+                "title", "Valid title",
+                "text", "Valid text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> blankResponse = updatePrompt(client, promptId, Map.of(
-            "title", "   ",
-            "text", "  ",
-            "categoryId", category.getId()
+                "title", "   ",
+                "text", "  ",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> oversizedResponse = updatePrompt(client, promptId, Map.of(
-            "title", "t".repeat(121),
-            "text", "x".repeat(10001),
-            "categoryId", category.getId()
+                "title", "t".repeat(121),
+                "text", "x".repeat(10001),
+                "categoryId", category.getId()
         ));
         HttpResponse<String> missingCategoryResponse = updatePromptJson(client, promptId, """
-            {"title":"Valid title","text":"Valid text"}
-            """);
+                {"title":"Valid title","text":"Valid text"}
+                """);
         HttpResponse<String> unknownCategoryResponse = updatePrompt(client, promptId, Map.of(
-            "title", "Valid title",
-            "text", "Valid text",
-            "categoryId", 999_999_999
+                "title", "Valid title",
+                "text", "Valid text",
+                "categoryId", 999_999_999
         ));
 
         assertThat(blankResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(blankResponse.body())))
-            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+                .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+                .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
         assertThat(oversizedResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(oversizedResponse.body())))
-            .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
-            .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
+                .containsEntry("title", "Prompt Title must be 1 to 120 characters long.")
+                .containsEntry("text", "Prompt Text must be 1 to 10,000 characters long.");
         assertThat(missingCategoryResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(missingCategoryResponse.body())))
-            .containsEntry("categoryId", "Prompt Category is required.");
+                .containsEntry("categoryId", "Prompt Category is required.");
         assertThat(unknownCategoryResponse.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(unknownCategoryResponse.body())))
-            .containsEntry("categoryId", "Prompt Category must exist.");
+                .containsEntry("categoryId", "Prompt Category must exist.");
     }
 
     @Test
@@ -865,9 +865,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient ownerClient = authenticatedClient(owner);
         HttpClient otherClient = authenticatedClient(otherUser);
         Long promptId = ((Number) readJson(createPrompt(ownerClient, Map.of(
-            "title", "Delete me",
-            "text", "Delete text",
-            "categoryId", category.getId()
+                "title", "Delete me",
+                "text", "Delete text",
+                "categoryId", category.getId()
         )).body()).get("id")).longValue();
 
         HttpResponse<String> otherUserDeleteResponse = deletePrompt(otherClient, promptId);
@@ -879,8 +879,8 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(204);
         assertThat(detailAfterDeleteResponse.statusCode()).isEqualTo(404);
         assertThat(readList(listAfterDeleteResponse.body()))
-            .extracting(prompt -> prompt.get("id"))
-            .doesNotContain(promptId.intValue());
+                .extracting(prompt -> prompt.get("id"))
+                .doesNotContain(promptId.intValue());
         assertThat(promptRepository.findById(promptId)).isEmpty();
         assertThat(promptCategoryRepository.findById(category.getId())).isPresent();
         assertThat(userRepository.findById(owner.entity().getId())).isPresent();
@@ -894,9 +894,9 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         HttpResponse<String> detailResponse = getPrompt(client, missingPromptId);
         HttpResponse<String> updateResponse = updatePrompt(client, missingPromptId, Map.of(
-            "title", "Valid title",
-            "text", "Valid text",
-            "categoryId", category.getId()
+                "title", "Valid title",
+                "text", "Valid text",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, missingPromptId, "PUBLIC");
         HttpResponse<String> deleteResponse = deletePrompt(client, missingPromptId);
@@ -913,16 +913,16 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
 
         HttpResponse<String> createResponse = createPrompt(client, Map.of(
-            "title", "Blocked",
-            "text", "Blocked text",
-            "categoryId", category.getId()
+                "title", "Blocked",
+                "text", "Blocked text",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> listResponse = listMyPrompts(client, 1L);
         HttpResponse<String> detailResponse = getPrompt(client, 1L);
         HttpResponse<String> updateResponse = updatePrompt(client, 1L, Map.of(
-            "title", "Blocked",
-            "text", "Blocked text",
-            "categoryId", category.getId()
+                "title", "Blocked",
+                "text", "Blocked text",
+                "categoryId", category.getId()
         ));
         HttpResponse<String> visibilityResponse = updatePromptVisibility(client, 1L, "PUBLIC");
         HttpResponse<String> deleteResponse = deletePrompt(client, 1L);
@@ -937,6 +937,74 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(401);
         assertThat(publicListResponse.statusCode()).isEqualTo(401);
         assertThat(publicDetailResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void userCanSubmitPromptResponse() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser user = createUser();
+        HttpClient client = authenticatedClient(user);
+
+        Long promptId = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Delete me",
+                "text", "Delete text",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        HttpResponse<String> submissionResponse = createSubmission(client, Map.of("response", "this is a response"), promptId);
+        assertThat(submissionResponse.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void userCanSubmitMultipleResponsesForTheSamePrompt() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser user = createUser();
+        HttpClient client = authenticatedClient(user);
+
+        Long promptId = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Delete me",
+                "text", "Delete text",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        HttpResponse<String> submissionResponse1 = createSubmission(client, Map.of("response", "this is a response"), promptId);
+        HttpResponse<String> submissionResponse2 = createSubmission(client, Map.of("response", "this is a response"), promptId);
+        assertThat(submissionResponse1.statusCode()).isEqualTo(200);
+        assertThat(submissionResponse2.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void nonOwnersCannotSubmitToAnotherUsesPrompt() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser user = createUser();
+        TestUser otherUser = createUser();
+        HttpClient client = authenticatedClient(user);
+        HttpClient otherClient = authenticatedClient(otherUser);
+
+        Long promptId = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Delete me",
+                "text", "Delete text",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        HttpResponse<String> submissionResponse = createSubmission(otherClient, Map.of("response", "this is a response"), promptId);
+        assertThat(submissionResponse.statusCode()).isEqualTo(404);
+    }
+
+    @Test
+    void usersCanReadTheirOwnSubmissions() throws Exception {
+        PromptCategoryEntity category = promptCategoryRepository.findAllByOrderByLabelAsc().getFirst();
+        TestUser user = createUser();
+        HttpClient client = authenticatedClient(user);
+
+        Long promptId = ((Number) readJson(createPrompt(client, Map.of(
+                "title", "Delete me",
+                "text", "Delete text",
+                "categoryId", category.getId()
+        )).body()).get("id")).longValue();
+        createSubmission(client, Map.of("response", "this is a response"), promptId);
+        createSubmission(client, Map.of("response", "this is a response"), promptId);
+        HttpResponse<String> readRequest = readSubmissions(client, promptId);
+
+        assertThat(readRequest.statusCode()).isEqualTo(200);
+        assertThat(readList(readRequest.body())).hasSize(2);
     }
 
     private TestUser createUser() {
@@ -984,13 +1052,13 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(HttpClient client, TestUser user) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", user.entity().getUsername(),
-                "password", user.password()
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", user.entity().getUsername(),
+                        "password", user.password()
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
@@ -998,44 +1066,63 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
         return createPromptJson(client, objectMapper.writeValueAsString(payload));
     }
 
+    private HttpResponse<String> createSubmission(HttpClient client, Map<String, Object> payload, Long promptId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId.toString() + "/submissions"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> readSubmissions(HttpClient client, Long promptId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId.toString() + "/submissions"))
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     private HttpResponse<String> createPromptJson(HttpClient client, String payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listMyPrompts(HttpClient client, Long userId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/users/" + userId + "/prompts"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> getPrompt(HttpClient client, Long promptId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> listPublicPrompts(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> getPublicPrompt(HttpClient client, Long promptId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/public-prompts/" + promptId))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
@@ -1045,58 +1132,60 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> updatePromptJson(HttpClient client, Long promptId, String payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updatePromptVisibility(HttpClient client, Long promptId, String visibility) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId + "/visibility"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "visibility", visibility
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "visibility", visibility
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> deletePrompt(HttpClient client, Long promptId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompts/" + promptId))
-            .DELETE()
-            .build();
+                .DELETE()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updateUserStatus(HttpClient client, Long userId, String accountStatus) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/admin/users/" + userId + "/status"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "accountStatus", accountStatus
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "accountStatus", accountStatus
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private List<Map<String, Object>> readList(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
         return ((List<Map<String, String>>) body.get("fieldErrors"))
-            .stream()
-            .collect(Collectors.toMap(
-                fieldError -> fieldError.get("field"),
-                fieldError -> fieldError.get("message")
-            ));
+                .stream()
+                .collect(Collectors.toMap(
+                        fieldError -> fieldError.get("field"),
+                        fieldError -> fieldError.get("message")
+                ));
     }
 
     private record TestUser(UserEntity entity, String password) {

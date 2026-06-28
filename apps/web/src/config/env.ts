@@ -7,6 +7,7 @@ const envSchema = v.object({
 
 const clientEnvSchema = v.object({
   VITE_API_URL: v.optional(v.pipe(v.string(), v.url()), "http://localhost:8080"),
+  OPENROUTER_API_KEY: v.optional(v.pipe(v.string())),
 });
 
 export const serverEnv = v.parse(envSchema, process.env);

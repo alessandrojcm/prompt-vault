@@ -1,9 +1,10 @@
-CREATE TABLE prompt_submission_history (
-    id BIGINT NOT NULL PRIMARY KEY,
-    prompt_id UUID NOT NULL REFERENCES prompt(id),
-    submission_id UUID NOT NULL REFERENCES submission(id),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+CREATE TABLE prompt_submission_history
+(
+    id           BIGINT    NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    prompt_id    BIGINT    NOT NULL REFERENCES prompts (id) ON DELETE CASCADE,
+    created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    llm_response TEXT      NOT NULL,
 
-    PRIMARY KEY (id);
-    INDEX idx_prompt_submission (prompt_id, submission_id);
+    INDEX idx_prompt_submission (prompt_id, id),
+    CONSTRAINT unique_prompt_submission UNIQUE (prompt_id, id)
 );
