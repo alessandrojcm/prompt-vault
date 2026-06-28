@@ -1,10 +1,10 @@
-import { Button, Card, Container, Loader, ScrollArea, Stack, Text, Title } from '@mantine/core';
-import { getPromptOptions, submitPromptRequestMutation } from '@prompt-vault/api-client';
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { fetchServerSentEvents, useChat } from '@tanstack/ai-react';
-import { showNotification } from '@mantine/notifications';
+import { Button, Card, Container, Loader, ScrollArea, Stack, Text, Title } from "@mantine/core";
+import { getPromptOptions, submitPromptRequestMutation } from "@prompt-vault/api-client";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
+import { showNotification } from "@mantine/notifications";
 
 export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
   component: RouteComponent,

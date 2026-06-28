@@ -1,6 +1,6 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { requireCurrentUser } from '../features/auth/current-user';
+import { requireCurrentUser } from "../features/auth/current-user";
 
 export const Route = createFileRoute("/")({
   beforeLoad: redirectRootToAuthDestination,

@@ -1,17 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { Drawer, SimpleGrid, Text, Timeline, Title } from '@mantine/core';
+import { createFileRoute } from "@tanstack/react-router";
+import { Drawer, SimpleGrid, Text, Timeline, Title } from "@mantine/core";
 import {
   getAllSubmissionsOptions,
   listPromptCategoriesOptions,
   type ListPromptCategoriesResponse,
   listPromptsSubmissionOptions,
   Prompt,
-} from '@prompt-vault/api-client';
-import { PaperPlaneIcon } from '@phosphor-icons/react';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { PromptCard } from '../../../features/prompts/prompt-card';
-import { useDisclosure, UseDisclosureReturnValue } from '@mantine/hooks';
-import { useState } from 'react';
+} from "@prompt-vault/api-client";
+import { PaperPlaneIcon } from "@phosphor-icons/react";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { PromptCard } from "../../../features/prompts/prompt-card";
+import { useDisclosure, UseDisclosureReturnValue } from "@mantine/hooks";
+import { useState } from "react";
 
 export const Route = createFileRoute("/dashboard/prompts/my-submissions")({
   component: RouteComponent,

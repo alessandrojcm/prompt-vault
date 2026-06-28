@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { AdminFlaggedPrompt, ListAdminFlaggedPromptsResponse } from '@prompt-vault/api-client';
-import { Badge, Card, Pill, Stack, Table, Text, Title } from '@mantine/core';
+import { AdminFlaggedPrompt, ListAdminFlaggedPromptsResponse } from "@prompt-vault/api-client";
+import { Badge, Card, Pill, Stack, Table, Text, Title } from "@mantine/core";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
 const columnHelper = createColumnHelper<AdminFlaggedPrompt>();
 

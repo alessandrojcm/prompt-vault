@@ -1,8 +1,8 @@
-import { QueryClient } from '@tanstack/react-query';
-import { isRedirect } from '@tanstack/react-router';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { requireAdminUser, requireCurrentUser } from './current-user';
-import { redirectRootToAuthDestination } from '../../routes/index';
+import { QueryClient } from "@tanstack/react-query";
+import { isRedirect } from "@tanstack/react-router";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { requireAdminUser, requireCurrentUser } from "./current-user";
+import { redirectRootToAuthDestination } from "../../routes/index";
 
 let currentUser: unknown = { role: "USER", username: "alex" };
 let currentUserError: unknown;

@@ -11,8 +11,8 @@ import {
   Popover,
   Stack,
   Text,
-} from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
+} from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 import {
   deletePromptMutation,
   getCurrentUserOptions,
@@ -21,15 +21,15 @@ import {
   listPromptsOptions,
   Prompt,
   updatePromptVisibilityMutation,
-} from '@prompt-vault/api-client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { TrashIcon } from '@phosphor-icons/react';
-import { PencilIcon } from '@phosphor-icons/react/dist/ssr';
-import { useDisclosure } from '@mantine/hooks';
-import { CreatePrompt } from './create-or-edit-prompt';
-import { Link } from '@tanstack/react-router';
-import classes from './prompt-card.module.css';
+} from "@prompt-vault/api-client";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { FlagIcon, TrashIcon } from "@phosphor-icons/react";
+import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
+import { useDisclosure } from "@mantine/hooks";
+import { CreatePrompt } from "./create-or-edit-prompt";
+import { Link } from "@tanstack/react-router";
+import classes from "./prompt-card.module.css";
 
 type Props = Prompt & {
   categoryLabel: string;
@@ -107,57 +107,6 @@ export function PromptCard({
             <DataList.ItemValue>
               <Group wrap={"nowrap"}>
                 <Text>{props.title}</Text>
-                {isMyPrompt && enableEditing ? (
-                  <>
-                    <ActionIcon
-                      variant="subtle"
-                      aria-label="Edit"
-                      onClick={() => disclosure[1].open()}
-                    >
-                      <PencilIcon />
-                    </ActionIcon>
-                    <Popover
-                      opened={opened}
-                      width={300}
-                      trapFocus
-                      position="bottom"
-                      withArrow
-                      shadow="md"
-                      onDismiss={() => setOpened(false)}
-                    >
-                      <Popover.Target>
-                        <ActionIcon
-                          aria-label="Delete"
-                          color="red"
-                          variant="subtle"
-                          onClick={() => setOpened(true)}
-                        >
-                          <TrashIcon />
-                        </ActionIcon>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        <Text size="xs">Are you sure you want to deletet this prompt?</Text>
-                        <ButtonGroup>
-                          <Button variant="filled" onClick={() => setOpened(false)}>
-                            No
-                          </Button>
-                          <Button
-                            color="red"
-                            variant="outline"
-                            onClick={() => {
-                              deletePrompt.mutate({
-                                path: { promptId: props.id },
-                              });
-                              setOpened(false);
-                            }}
-                          >
-                            Yes
-                          </Button>
-                        </ButtonGroup>
-                      </Popover.Dropdown>
-                    </Popover>
-                  </>
-                ) : null}
               </Group>
             </DataList.ItemValue>
           </DataList.Item>
@@ -195,6 +144,68 @@ export function PromptCard({
             </DataList.Item>
           ) : null}
         </DataList>
+        {isMyPrompt && enableEditing ? (
+          <Group justify={"center"}>
+            <ActionIcon variant="subtle" aria-label="Edit" onClick={() => disclosure[1].open()}>
+              <PencilIcon />
+            </ActionIcon>
+            <Popover
+              opened={opened}
+              width={300}
+              trapFocus
+              position="bottom"
+              withArrow
+              shadow="md"
+              onDismiss={() => setOpened(false)}
+            >
+              <Popover.Target>
+                <ActionIcon
+                  aria-label="Delete"
+                  color="red"
+                  variant="subtle"
+                  onClick={() => setOpened(true)}
+                >
+                  <TrashIcon />
+                </ActionIcon>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Text size="xs">Are you sure you want to deletet this prompt?</Text>
+                <ButtonGroup>
+                  <Button variant="filled" onClick={() => setOpened(false)}>
+                    No
+                  </Button>
+                  <Button
+                    color="red"
+                    variant="outline"
+                    onClick={() => {
+                      deletePrompt.mutate({
+                        path: { promptId: props.id },
+                      });
+                      setOpened(false);
+                    }}
+                  >
+                    Yes
+                  </Button>
+                </ButtonGroup>
+              </Popover.Dropdown>
+            </Popover>
+            {props.flaggedAt ? (
+              <Popover width={200} position="bottom" withArrow shadow="md">
+                <Popover.Target>
+                  <ActionIcon aria-label="Prompt flagged" color="red" variant="subtle">
+                    <FlagIcon />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Text size="xs">
+                    This prompt was on {new Date(props.flaggedAt).toLocaleDateString()} because it
+                    contains sensitive terms
+                  </Text>
+                </Popover.Dropdown>
+              </Popover>
+            ) : null}
+          </Group>
+        ) : null}
       </Card.Section>
       <Card.Section inheritPadding p="xs" withBorder>
         <Stack align={"center"}>

@@ -1,5 +1,5 @@
 // src/config/env.ts
-import * as v from 'valibot';
+import * as v from "valibot";
 
 const envSchema = v.object({
   PROMPT_VAULT_API_BASE_URL: v.optional(v.pipe(v.string(), v.url()), "http://localhost:8080"),
