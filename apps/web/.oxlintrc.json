@@ -1,4 +1,15 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["dist/**", "src/routeTree.gen.ts"]
+  "ignorePatterns": ["dist/**", "src/routeTree.gen.ts"],
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "fix": {
+          "imports": "fix",
+          "variables": "suggestion"
+        }
+      }
+    ]
+  }
 }

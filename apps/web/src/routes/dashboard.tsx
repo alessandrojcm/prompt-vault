@@ -1,6 +1,16 @@
 import type { UserSummary } from "@prompt-vault/api-client";
 import { getCurrentUserOptions, listPromptCategoriesOptions } from "@prompt-vault/api-client";
-import { AppShell, Button, Container, Group, NavLink, Stack, Text, Title } from "@mantine/core";
+import {
+  AppShell,
+  Button,
+  Container,
+  Group,
+  NavLink,
+  NavLinkProps,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useSuspenseQuery, type QueryClient } from "@tanstack/react-query";
 import {
   createFileRoute,
@@ -16,8 +26,9 @@ import { useDisclosure } from "@mantine/hooks";
 
 type AppNavigationLink = {
   label: string;
-  to: NavigateOptions["href"];
+  to?: NavigateOptions["href"];
   roles: Array<UserSummary["role"]>;
+  children?: AppNavigationLink[];
 };
 
 const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
@@ -27,11 +38,26 @@ const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
     roles: ["ADMIN"],
     to: "/dashboard/admin/users",
   },
-  { label: "Prompts", roles: ["ADMIN", "USER"], to: "/dashboard/prompts" },
+  {
+    label: "Prompts",
+    roles: ["ADMIN", "USER"],
+    children: [
+      {
+        label: "My Prompts",
+        to: "/dashboard/my-prompts",
+        roles: ["ADMIN", "USER"],
+      },
+      {
+        label: "Prompts",
+        to: "/dashboard/prompts",
+        roles: ["ADMIN", "USER"],
+      },
+    ],
+  },
 ];
 
 type DashboardLoaderData = {
-  navigationLinks: Array<Pick<AppNavigationLink, "label" | "to">>;
+  navigationLinks: Array<Pick<AppNavigationLink, "label" | "to" | "children">>;
   currentUser: UserSummary;
 };
 
@@ -63,7 +89,7 @@ async function loadDashboardShell({ context, abortController }: DashboardRouteLo
 
 function navigationLinksFor(currentUser: UserSummary) {
   return APP_NAVIGATION_LINKS.filter((link) => link.roles.includes(currentUser.role)).map(
-    ({ label, to }) => ({ label, to }),
+    ({ label, to, children }) => ({ label, to, children }),
   );
 }
 
@@ -83,7 +109,7 @@ function DashboardLayout() {
       padding="md"
     >
       <AppShell.Header>
-        <Container h="100%" size="md">
+        <Container h="100%" size="xl">
           <Group align="center" h="100%" justify="space-between">
             <div>
               <Text c="dimmed" fw={700} size="xs" tt="uppercase">
@@ -107,7 +133,7 @@ function DashboardLayout() {
           currentUser={currentUser}
         />
 
-        <Container py="xl" size="md">
+        <Container py="xl" size="xl">
           <Outlet />
         </Container>
       </AppShell.Main>
@@ -120,26 +146,37 @@ function PromptVaultSidebar({
 }: {
   navigationLinks: DashboardLoaderData["navigationLinks"];
 }) {
-  const location = useLocation();
-
   return (
     <AppShell.Navbar p="md">
       <Stack gap="xs">
         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
           Sections
         </Text>
-        {navigationLinks.map((link) => (
-          <NavLink
-            key={link.to}
-            active={isActiveNavigationLink(location.pathname, link.to)}
-            component={Link}
-            label={link.label}
-            to={link.to}
-          />
-        ))}
+        {renderNavigationLinks(navigationLinks)}
       </Stack>
     </AppShell.Navbar>
   );
+}
+
+function renderNavigationLinks(links: DashboardLoaderData["navigationLinks"]) {
+  const location = useLocation();
+  return links.map((link) => {
+    const props: NavLinkProps = {
+      ...(link?.to && {
+        component: Link,
+        to: link.to,
+        active: isActiveNavigationLink(location.pathname, link.to),
+      }),
+      label: link.label,
+    };
+    return link?.children ? (
+      <NavLink key={link.label} {...props}>
+        {renderNavigationLinks(link.children)}
+      </NavLink>
+    ) : (
+      <NavLink key={link.label} {...props} />
+    );
+  });
 }
 
 function isActiveNavigationLink(pathname: string, linkPathname: string) {

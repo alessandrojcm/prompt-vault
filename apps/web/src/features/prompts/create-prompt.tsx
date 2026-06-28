@@ -13,11 +13,10 @@ import {
   createPromptMutation,
   CreatePromptRequest,
   GetCurrentUserResponse,
-  listMyPromptsQueryKey,
+  listMyPromptsOptions,
   ListPromptCategoriesResponse,
-  listPublicPromptsQueryKey,
+  listPublicPromptsOptions,
   ValidationErrorResponse,
-  vCreatePromptBody,
   vCreatePromptRequest,
 } from "@prompt-vault/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -25,7 +24,6 @@ import { showNotification } from "@mantine/notifications";
 import { useForm } from "@tanstack/react-form";
 import { FieldInfo } from "../../components/field-info";
 import { useMemo } from "react";
-import * as v from "valibot";
 
 type Props = {
   disclosure: UseDisclosureReturnValue;
@@ -37,7 +35,7 @@ const defaultValues = {
   title: "",
   text: "",
   categoryId: 0,
-  visibility: "PUBLIC",
+  visibility: "PRIVATE",
 } as CreatePromptRequest;
 
 export function CreatePrompt(props: Props) {
@@ -50,15 +48,16 @@ export function CreatePrompt(props: Props) {
   const client = useQueryClient();
   const createPrompt = useMutation({
     ...createPromptMutation(),
-    onSuccess: () => {
+    onSuccess: async (data) => {
       showNotification({
         message: "Prompt created successfully",
         position: "top-right",
       });
+      await client.invalidateQueries(listMyPromptsOptions({ path: { userId: id } }));
+      if (data.visibility === "PRIVATE") {
+        await client.invalidateQueries(listPublicPromptsOptions());
+      }
       close();
-      client.refetchQueries({
-        queryKey: [listPublicPromptsQueryKey(), listMyPromptsQueryKey({ path: { userId: id } })],
-      });
     },
     onError: (error) => {
       console.error(error);
@@ -71,7 +70,7 @@ export function CreatePrompt(props: Props) {
   });
 
   const categoriesMap = useMemo(
-    () => new Map(categories.map((c) => [c.id, c.label])),
+    () => new Map(categories?.map((c) => [c.id, c.label]) ?? []),
     [categories],
   );
 
@@ -82,7 +81,7 @@ export function CreatePrompt(props: Props) {
       onSubmitAsync: async ({ value, formApi }) => {
         try {
           await createPrompt.mutateAsync({ body: value });
-          await formApi.reset();
+          formApi.reset();
         } catch (error) {
           if (!(error instanceof Object && "fieldErrors" in error)) {
             showNotification({
@@ -172,8 +171,9 @@ export function CreatePrompt(props: Props) {
                   size="xl"
                   label="Visibility"
                   name={field.name}
-                  value={field.state.value === "PUBLIC" ? "on" : "off"}
+                  value={field.state.value}
                   onLabel={"Public"}
+                  defaultChecked={false}
                   offLabel={"Private"}
                   onChange={(event) => {
                     field.handleChange(event.currentTarget.checked ? "PUBLIC" : "PRIVATE");
