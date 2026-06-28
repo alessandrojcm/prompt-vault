@@ -78,7 +78,7 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
 
   return (
     <Card shadow="md" padding="xl">
-      <Stack gap={"md"}>
+      <Stack gap={"md"} h={"100%"} w={"100%"}>
         <Group w={"100%"}>
           <Text fw={500} size="lg">
             {props.title}
@@ -153,7 +153,7 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
           ) : null}
         </Group>
         <Text>{props.text}</Text>
-        <Group>
+        <Group mt={"auto"}>
           <Pill>{categoryLabel}</Pill>
           <Button
             size="sm"

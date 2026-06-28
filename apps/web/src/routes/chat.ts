@@ -1,4 +1,4 @@
-import { chat, toServerSentEventsResponse } from "@tanstack/ai";
+import { AGUIEvent, chat, EventType, toServerSentEventsResponse } from "@tanstack/ai";
 import { openRouterText } from "@tanstack/ai-openrouter";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -8,23 +8,48 @@ const SYSTEM_PROMPT = `
   Submission is one shot only, users cannot reply to you, and you will only receive a single prompt.
   You will reply to the best of your ability and will not ask follow up questions, do not use markdown.",`;
 
+const fakeResponse = "This is a fake response";
+
+async function* fakeResponseGenerator(): AsyncIterable<AGUIEvent> {
+  const fakeStream: AGUIEvent[] = [
+    {
+      model: "fake-model",
+      role: "assistant",
+      messageId: "1",
+      type: EventType.TEXT_MESSAGE_START,
+    },
+    {
+      model: "fake-model",
+      role: "assistant",
+      messageId: "2",
+      type: EventType.TEXT_MESSAGE_CONTENT,
+      content: fakeResponse,
+      delta: fakeResponse,
+    },
+    {
+      model: "fake-model",
+      role: "assistant",
+      messageId: "3",
+      type: EventType.TEXT_MESSAGE_END,
+      delta: "delta",
+    },
+  ];
+
+  for (const message of fakeStream) {
+    yield message;
+  }
+}
+
 export const Route = createFileRoute("/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        if (!process.env.OPENROUTER_API_KEY) {
-          return new Response(
-            JSON.stringify({
-              error: "OPEN_ROUTER not configured",
-            }),
-            {
-              status: 500,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-        }
-
         const body = await request.json();
+        if (!process.env.OPENROUTER_API_KEY) {
+          console.warn("OPENROUTER_API_KEY is not set, using fake response");
+
+          return toServerSentEventsResponse(fakeResponseGenerator());
+        }
 
         try {
           const stream = chat({

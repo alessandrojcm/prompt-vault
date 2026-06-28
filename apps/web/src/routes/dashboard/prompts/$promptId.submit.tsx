@@ -1,5 +1,5 @@
 import { Button, Card, Container, ScrollArea, Stack, Text, Title } from "@mantine/core";
-import { getPromptOptions, submitPromptRequestMutation } from "@prompt-vault/api-client";
+import { getPublicPromptOptions, submitPromptRequestMutation } from "@prompt-vault/api-client";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
   beforeLoad: async ({ params, context }) => {
     try {
       return await context.queryClient.ensureQueryData(
-        getPromptOptions({ path: { promptId: Number(params.promptId) } }),
+        getPublicPromptOptions({ path: { promptId: Number(params.promptId) } }),
       );
     } catch {
       throw redirect({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
   },
   loader: async ({ context, params }) => {
     const data = await context.queryClient.ensureQueryData(
-      getPromptOptions({ path: { promptId: Number(params.promptId) } }),
+      getPublicPromptOptions({ path: { promptId: Number(params.promptId) } }),
     );
 
     return {
