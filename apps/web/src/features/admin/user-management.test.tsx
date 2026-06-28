@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-quer
 import { describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
 
-import { UserManagementTable, accountStatusLabel } from "./user-management";
+import { accountStatusLabel, UserManagementTable } from "./user-management";
 
 describe("UserManagementTable", () => {
   it("shows normal-user management columns and hides internal ids and roles", async () => {

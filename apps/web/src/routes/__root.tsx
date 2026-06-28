@@ -17,6 +17,19 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { formDevtoolsPlugin } from "@tanstack/react-form-devtools";
+import { ModalsProvider } from "@mantine/modals";
+import { CategoriesModal } from "../features/categories/categories-modal";
+import { KeywordsModal } from "../features/keywords-modal/keywords-modal";
+
+const contextModals = {
+  categories: CategoriesModal,
+  keywords: KeywordsModal,
+};
+declare module "@mantine/modals" {
+  export interface MantineModalsOverride {
+    modals: typeof contextModals;
+  }
+}
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -41,8 +54,10 @@ function RootComponent() {
       <body>
         <MantineProvider>
           <Notifications />
-          <Outlet />
-          <PromptVaultDevtools />
+          <ModalsProvider modals={contextModals}>
+            <Outlet />
+            <PromptVaultDevtools />
+          </ModalsProvider>
         </MantineProvider>
         <Scripts />
       </body>

@@ -1,6 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import { isRedirect } from "@tanstack/react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { requireAdminUser, requireCurrentUser } from "./current-user";
+import { redirectRootToAuthDestination } from "../../routes/index";
 
 let currentUser: unknown = { role: "USER", username: "alex" };
 let currentUserError: unknown;
@@ -21,9 +23,6 @@ vi.mock("@prompt-vault/api-client", () => ({
     },
   }),
 }));
-
-import { requireAdminUser, requireCurrentUser } from "./current-user";
-import { redirectRootToAuthDestination } from "../../routes/index";
 
 describe("requireCurrentUser", () => {
   afterEach(() => {
@@ -113,7 +112,7 @@ describe("redirectRootToAuthDestination", () => {
     } catch (error) {
       expect(isRedirect(error)).toBe(true);
       expect(error).toMatchObject({
-        options: { replace: true, to: "/dashboard" },
+        options: { replace: true, to: "/dashboard/my-prompts" },
       });
     }
   });

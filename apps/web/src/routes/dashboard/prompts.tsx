@@ -1,11 +1,11 @@
 import {
   listPromptCategoriesOptions,
-  listPublicPromptsOptions,
   type ListPromptCategoriesResponse,
+  listPublicPromptsOptions,
 } from "@prompt-vault/api-client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { PromptList } from "../../components/prompt-list";
+import { PromptList } from "../../features/prompts/prompt-list";
 
 export const Route = createFileRoute("/dashboard/prompts")({
   component: RouteComponent,
