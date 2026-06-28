@@ -6,11 +6,13 @@ import com.promptvault.contract.api.PromptsApi;
 import com.promptvault.contract.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class PromptsController implements PromptsApi {
@@ -28,6 +30,16 @@ public class PromptsController implements PromptsApi {
     }
 
     @Override
+    public ResponseEntity<List<Prompt>> listPrompts(
+            @Nullable Set<com.promptvault.contract.model.PromptVisibility> visibility
+    ) {
+        return ResponseEntity.ok(promptsService.listVisiblePrompts(currentUser(), visibility)
+                .stream()
+                .map(PromptMapper::toContract)
+                .toList());
+    }
+
+    @Override
     public ResponseEntity<List<Prompt>> listMyPrompts(Long userId) {
         UserEntity currentUser = currentUser();
         if (!currentUser.getId().equals(userId)) {
@@ -42,20 +54,7 @@ public class PromptsController implements PromptsApi {
 
     @Override
     public ResponseEntity<Prompt> getPrompt(Long promptId) {
-        return ResponseEntity.ok(PromptMapper.toContract(promptsService.getOwnedPrompt(promptId, currentUser())));
-    }
-
-    @Override
-    public ResponseEntity<List<PublicPrompt>> listPublicPrompts() {
-        return ResponseEntity.ok(promptsService.listPublicPrompts(currentUser())
-                .stream()
-                .map(PromptMapper::toPublicContract)
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<PublicPrompt> getPublicPrompt(Long promptId) {
-        return ResponseEntity.ok(PromptMapper.toPublicContract(promptsService.getPublicPrompt(promptId, currentUser())));
+        return ResponseEntity.ok(PromptMapper.toContract(promptsService.getVisiblePrompt(promptId, currentUser())));
     }
 
     @Override
@@ -86,7 +85,23 @@ public class PromptsController implements PromptsApi {
     }
 
     @Override
-    public ResponseEntity<List<SubmitPromptResponse>> listPromptsSubmission(Long promptId) {
+    public ResponseEntity<List<Prompt>> getAllSubmissions(Long userId) {
+        if (userId != null && !userId.equals(currentUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(
+                promptsService.listAllSubmittedPrompts(currentUser())
+                        .stream()
+                        .map(PromptMapper::toContract)
+                        .toList()
+        );
+    }
+
+    @Override
+    public ResponseEntity<List<SubmitPromptResponse>> listPromptsSubmission(Long userId, Long promptId) {
+        if (userId != null && !userId.equals(currentUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(
                 promptsService.listPromptSubmissions(promptId, currentUser())
                         .stream()
@@ -96,7 +111,7 @@ public class PromptsController implements PromptsApi {
     }
 
     @Override
-    public ResponseEntity<SubmitPromptResponse> submitPromptRequest(Long promptId, SubmitPromptRequest submitPromptRequest) {
+    public ResponseEntity<SubmitPromptResponse> submitPromptRequest(Long userId, Long promptId, SubmitPromptRequest submitPromptRequest) {
         return ResponseEntity.ok(
                 PromptSubmissionHistoryMapper.toContract(
                         promptsService.submitPrompt(promptId, submitPromptRequest, currentUser())

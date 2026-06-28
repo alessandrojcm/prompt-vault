@@ -112,7 +112,7 @@ describe("redirectRootToAuthDestination", () => {
     } catch (error) {
       expect(isRedirect(error)).toBe(true);
       expect(error).toMatchObject({
-        options: { replace: true, to: "/dashboard/my-prompts" },
+        options: { replace: true, to: "/dashboard/prompts" },
       });
     }
   });

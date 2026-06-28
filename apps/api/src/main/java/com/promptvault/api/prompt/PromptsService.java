@@ -15,7 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -59,27 +61,48 @@ public class PromptsService {
     }
 
     @Transactional(readOnly = true)
-    public PromptEntity getOwnedPrompt(Long promptId, UserEntity owner) {
-        return requireOwnedPrompt(promptId, owner);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PromptEntity> listPublicPrompts(UserEntity currentUser) {
-        return promptRepository.findAllByVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNotOrderByCreatedAtDescIdDesc(
+    public List<PromptEntity> listVisiblePrompts(
+            UserEntity currentUser,
+            Set<com.promptvault.contract.model.PromptVisibility> visibilityFilter
+    ) {
+        Set<PromptVisibility> requestedVisibilities = requestedVisibilities(visibilityFilter);
+        return promptRepository.findVisiblePromptsOrderByCreatedAtDescIdDesc(
+                currentUser.getId(),
+                requestedVisibilities.contains(PromptVisibility.PUBLIC),
+                requestedVisibilities.contains(PromptVisibility.PRIVATE),
                 PromptVisibility.PUBLIC,
-                AccountStatus.ENABLED,
-                currentUser.getId()
+                PromptVisibility.PRIVATE,
+                AccountStatus.ENABLED
         );
     }
 
     @Transactional(readOnly = true)
-    public PromptEntity getPublicPrompt(Long promptId, UserEntity currentUser) {
-        return promptRepository.findByIdAndVisibilityAndFlagIsNullAndOwnerAccountStatusAndOwnerIdNot(
-                promptId,
-                PromptVisibility.PUBLIC,
-                AccountStatus.ENABLED,
-                currentUser.getId()
-        ).orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
+    public PromptEntity getVisiblePrompt(Long promptId, UserEntity currentUser) {
+        PromptEntity prompt = promptRepository.findById(promptId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
+        if (isPubliclyVisible(prompt) || prompt.getOwner().getId().equals(currentUser.getId())) {
+            return prompt;
+        }
+
+        throw new ResponseStatusException(FORBIDDEN);
+    }
+
+    private Set<PromptVisibility> requestedVisibilities(
+            Set<com.promptvault.contract.model.PromptVisibility> visibilityFilter
+    ) {
+        if (visibilityFilter == null || visibilityFilter.isEmpty()) {
+            return Set.of(PromptVisibility.PUBLIC, PromptVisibility.PRIVATE);
+        }
+
+        return visibilityFilter.stream()
+                .map(visibility -> PromptVisibility.valueOf(visibility.getValue()))
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    private boolean isPubliclyVisible(PromptEntity prompt) {
+        return prompt.getVisibility() == PromptVisibility.PUBLIC
+                && prompt.getFlag() == null
+                && prompt.getOwner().getAccountStatus() == AccountStatus.ENABLED;
     }
 
     @Transactional
@@ -121,7 +144,7 @@ public class PromptsService {
 
     @Transactional
     public PromptSubmissionHistoryEntity submitPrompt(Long promptId, SubmitPromptRequest request, UserEntity owner) {
-        PromptEntity prompt = requireOwnedPrompt(promptId, owner);
+        PromptEntity prompt = getVisiblePrompt(promptId, owner);
         PromptSubmissionHistoryEntity submission = new PromptSubmissionHistoryEntity();
         submission.setLlmResponse(request.getResponse());
         prompt.setSubmissions(submission);
@@ -131,8 +154,14 @@ public class PromptsService {
         return prompt.getSubmissions().getLast();
     }
 
+    @Transactional(readOnly = true)
     public List<PromptSubmissionHistoryEntity> listPromptSubmissions(Long promptId, UserEntity owner) {
         return promptSubmissionHistoryRepository.findAllByPromptIdAndPromptOwnerIdOrderByCreatedAtDescIdDesc(promptId, owner.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PromptEntity> listAllSubmittedPrompts(UserEntity owner) {
+        return promptRepository.findAllByOwnerIdWithSubmissionsOrderByCreatedAtDescIdDesc(owner.getId());
     }
 
     private PromptEntity requireOwnedPrompt(Long promptId, UserEntity owner) {

@@ -75,14 +75,14 @@ const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
     roles: ["ADMIN", "USER"],
     children: [
       {
-        label: "My prompts",
-        roles: ["ADMIN", "USER"],
-        to: "/dashboard/my-prompts",
-      },
-      {
-        label: "Public prompts",
+        label: "Prompts",
         to: "/dashboard/prompts",
         roles: ["ADMIN", "USER"],
+      },
+      {
+        label: "My submissions",
+        to: "/dashboard/prompts/my-submissions",
+        roles: ["USER"],
       },
     ],
   },
