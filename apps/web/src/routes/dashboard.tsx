@@ -1,24 +1,38 @@
 import type { UserSummary } from "@prompt-vault/api-client";
-import { getCurrentUserOptions } from "@prompt-vault/api-client";
-import { AppShell, Container, Group, NavLink, Stack, Text, Title } from "@mantine/core";
-import type { QueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { getCurrentUserOptions, listPromptCategoriesOptions } from "@prompt-vault/api-client";
+import { AppShell, Button, Container, Group, NavLink, Stack, Text, Title } from "@mantine/core";
+import { useSuspenseQuery, type QueryClient } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  Link,
+  NavigateOptions,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 
 import { requireCurrentUser } from "../features/auth/current-user";
+import { CreatePrompt } from "../features/prompts/create-prompt";
+import { useDisclosure } from "@mantine/hooks";
 
 type AppNavigationLink = {
   label: string;
-  to: "/dashboard" | "/dashboard/admin/users";
+  to: NavigateOptions["href"];
   roles: Array<UserSummary["role"]>;
 };
 
 const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
   { label: "Dashboard", roles: ["ADMIN", "USER"], to: "/dashboard" },
-  { label: "User management", roles: ["ADMIN"], to: "/dashboard/admin/users" },
+  {
+    label: "User management",
+    roles: ["ADMIN"],
+    to: "/dashboard/admin/users",
+  },
+  { label: "Prompts", roles: ["ADMIN", "USER"], to: "/dashboard/prompts" },
 ];
 
 type DashboardLoaderData = {
   navigationLinks: Array<Pick<AppNavigationLink, "label" | "to">>;
+  currentUser: UserSummary;
 };
 
 type DashboardRouteLoaderContext = {
@@ -38,9 +52,12 @@ async function loadDashboardShell({ context, abortController }: DashboardRouteLo
   const currentUser = (await context.queryClient.ensureQueryData(
     getCurrentUserOptions({ signal: abortController.signal }),
   )) as UserSummary;
-
+  context.queryClient.ensureQueryData(
+    listPromptCategoriesOptions({ signal: abortController.signal }),
+  );
   return {
     navigationLinks: navigationLinksFor(currentUser),
+    currentUser,
   } satisfies DashboardLoaderData;
 }
 
@@ -51,7 +68,9 @@ function navigationLinksFor(currentUser: UserSummary) {
 }
 
 function DashboardLayout() {
-  const { navigationLinks } = Route.useLoaderData();
+  const { navigationLinks, currentUser } = Route.useLoaderData();
+  const { data: promptCategories = [] } = useSuspenseQuery(listPromptCategoriesOptions());
+  const disclosure = useDisclosure();
 
   return (
     <AppShell
@@ -74,11 +93,20 @@ function DashboardLayout() {
                 Prompt Vault
               </Title>
             </div>
+            <Button onClick={disclosure[1].open} ml={"auto"}>
+              New prompt
+            </Button>
           </Group>
         </Container>
       </AppShell.Header>
       <PromptVaultSidebar navigationLinks={navigationLinks} />
       <AppShell.Main>
+        <CreatePrompt
+          disclosure={disclosure}
+          categories={promptCategories}
+          currentUser={currentUser}
+        />
+
         <Container py="xl" size="md">
           <Outlet />
         </Container>

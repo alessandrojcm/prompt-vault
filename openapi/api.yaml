@@ -818,6 +818,12 @@ components:
           type: integer
           format: int64
           minimum: 1
+        visibility:
+          type: string
+          default: PRIVATE
+          enum:
+            - PUBLIC
+            - PRIVATE
     UpdatePromptRequest:
       type: object
       additionalProperties: false
@@ -860,6 +866,7 @@ components:
         - ownerUserId
         - createdAt
         - updatedAt
+        - flaggedAt
       properties:
         id:
           type: integer
@@ -883,7 +890,7 @@ components:
           type: string
           format: date-time
         flaggedAt:
-          type: string
+          type: [ 'null', string ]
           format: date-time
           description: Present when the Prompt was flagged by Policy Keyword matching. Matched keyword snapshots are not exposed in owner-facing responses.
     PublicPrompt:

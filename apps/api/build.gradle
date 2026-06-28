@@ -59,6 +59,7 @@ openApiGenerate {
         interfaceOnly        : 'true',
         useSpringBoot4       : 'true',
         useJakartaEe         : 'true',
+        openApiNullable      : 'false',
         useResponseEntity    : 'true',
         useTags              : 'true',
         documentationProvider: 'source'

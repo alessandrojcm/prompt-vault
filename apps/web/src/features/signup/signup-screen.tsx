@@ -11,10 +11,10 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { FieldInfo } from "../../components/field-info";
 
 type SignupFormState = {
   username: string;
@@ -45,7 +45,10 @@ export function SignupScreen() {
           return {
             form: (error as SignupError)?.message,
             fields: (error as SignupError).fieldErrors.reduce(
-              (curr, prv) => ({ ...curr, [prv.field]: prv.message }),
+              (curr, prv) => ({
+                ...curr,
+                [prv.field]: prv.message,
+              }),
               {},
             ),
           };
@@ -143,16 +146,4 @@ export function SignupScreen() {
       </Stack>
     </Card>
   );
-}
-
-function FieldInfo({ field }: { field: AnyFieldApi }) {
-  if (field.state.meta.isTouched && !field.state.meta.isValid) {
-    return field.state.meta.errors.map((error) => error?.message ?? error).join(", ");
-  }
-
-  if (field.state.meta.isValidating) {
-    return "Validating...";
-  }
-
-  return null;
 }
