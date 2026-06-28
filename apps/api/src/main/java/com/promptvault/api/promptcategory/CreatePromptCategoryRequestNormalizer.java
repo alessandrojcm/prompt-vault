@@ -17,9 +17,11 @@ public class CreatePromptCategoryRequestNormalizer implements RequestBodyNormali
     public Object normalize(Object body) {
         if (body instanceof CreatePromptCategoryRequest createPromptCategoryRequest) {
             createPromptCategoryRequest.setLabel(trim(createPromptCategoryRequest.getLabel()));
+            createPromptCategoryRequest.setDescription(trim(createPromptCategoryRequest.getDescription()));
         }
         if (body instanceof UpdatePromptCategoryRequest updatePromptCategoryRequest) {
             updatePromptCategoryRequest.setLabel(trim(updatePromptCategoryRequest.getLabel()));
+            updatePromptCategoryRequest.setDescription(trim(updatePromptCategoryRequest.getDescription()));
         }
 
         return body;

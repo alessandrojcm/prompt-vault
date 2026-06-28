@@ -65,6 +65,8 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
                 .contains("Coding", "Cybersecurity", "HR", "Legal", "Personal Productivity", "Research");
         assertThat(categories).extracting(category -> category.get("slug"))
                 .contains("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research");
+        assertThat(categories).extracting(category -> category.get("description"))
+                .allSatisfy(description -> assertThat(description).isInstanceOf(String.class));
         assertThat(categories).allSatisfy(category -> assertCategoryShape(category, seededAdmin));
     }
 
@@ -83,12 +85,13 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         HttpClient adminClient = authenticatedClient();
         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
 
-        HttpResponse<String> response = createPromptCategory(adminClient, "  Ops / R&D " + suffix + "  ");
+        HttpResponse<String> response = createPromptCategory(adminClient, "  Ops / R&D " + suffix + "  ", "  Operational prompt category  ");
 
         assertThat(response.statusCode()).isEqualTo(201);
         Map<String, Object> category = readJson(response.body());
         assertThat(category).containsEntry("label", "Ops / R&D " + suffix);
         assertThat(category).containsEntry("slug", "ops_r_d_" + suffix);
+        assertThat(category).containsEntry("description", "Operational prompt category");
         assertThat(category).containsEntry("createdByUserId", seededAdmin.getId().intValue());
         assertCategoryShape(category, seededAdmin);
     }
@@ -167,13 +170,14 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         String newLabel = "Ops / R&D. " + uniqueSuffix();
         Thread.sleep(1100);
 
-        HttpResponse<String> response = updatePromptCategory(adminClient, categoryId, "  " + newLabel + "  ");
+        HttpResponse<String> response = updatePromptCategory(adminClient, categoryId, "  " + newLabel + "  ", "  Updated description  ");
 
         assertThat(response.statusCode()).isEqualTo(200);
         Map<String, Object> category = readJson(response.body());
         assertThat(category)
                 .containsEntry("id", categoryId)
                 .containsEntry("label", newLabel)
+                .containsEntry("description", "Updated description")
                 .containsEntry("createdByUserId", seededAdmin.getId().intValue());
         assertThat((String) category.get("label")).startsWith("Ops / R&D. ").doesNotStartWith(" ").doesNotEndWith(" ");
         assertThat((String) category.get("slug")).startsWith("ops_r_d_");
@@ -408,19 +412,33 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
     }
 
     private HttpResponse<String> createPromptCategory(HttpClient client, String label) throws Exception {
+        return createPromptCategory(client, label, "Description for " + label);
+    }
+
+    private HttpResponse<String> createPromptCategory(HttpClient client, String label, String description) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories"))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "label", label,
+                        "description", description
+                ))))
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> updatePromptCategory(HttpClient client, int categoryId, String label) throws Exception {
+        return updatePromptCategory(client, categoryId, label, "Updated description for " + label);
+    }
+
+    private HttpResponse<String> updatePromptCategory(HttpClient client, int categoryId, String label, String description) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/prompt/categories/" + categoryId))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("label", label))))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "label", label,
+                        "description", description
+                ))))
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
@@ -496,15 +514,17 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
         category.setLabel(label);
         category.setLabelNormalized(label.toLowerCase(java.util.Locale.ROOT));
         category.setSlug(slug);
+        category.setDescription("Restored seeded category.");
         category.setCreatedBy(seededAdmin);
         promptCategoryRepository.save(category);
     }
 
     private void assertCategoryShape(Map<String, Object> category, UserEntity seededAdmin) {
-        assertThat(category).containsOnlyKeys("id", "label", "slug", "createdAt", "createdByUserId", "updatedAt");
+        assertThat(category).containsOnlyKeys("id", "label", "slug", "description", "createdAt", "createdByUserId", "updatedAt");
         assertThat(category.get("id")).isInstanceOf(Integer.class);
         assertThat(category.get("label")).isInstanceOf(String.class);
         assertThat(category.get("slug")).isInstanceOf(String.class);
+        assertThat(category.get("description")).isInstanceOf(String.class);
         assertThat(category).containsEntry("createdByUserId", seededAdmin.getId().intValue());
         assertThat(OffsetDateTime.parse((String) category.get("createdAt"))).isNotNull();
         assertThat(OffsetDateTime.parse((String) category.get("updatedAt"))).isNotNull();

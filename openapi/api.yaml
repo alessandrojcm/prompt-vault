@@ -144,8 +144,8 @@ paths:
       tags:
         - PromptCategories
       operationId: updatePromptCategory
-      summary: Rename a prompt category
-      description: Renames an existing system-wide prompt category. Admin users only.
+      summary: Update a prompt category
+      description: Updates an existing system-wide prompt category label and description. Admin users only.
       parameters:
         - name: categoryId
           in: path
@@ -161,7 +161,7 @@ paths:
               $ref: '#/components/schemas/UpdatePromptCategoryRequest'
       responses:
         '200':
-          description: Prompt category renamed successfully.
+          description: Prompt category updated successfully.
           content:
             application/json:
               schema:
@@ -767,6 +767,7 @@ components:
         - id
         - label
         - slug
+        - description
         - createdAt
         - createdByUserId
         - updatedAt
@@ -779,6 +780,10 @@ components:
         slug:
           type: string
           description: Stable snake_case category identifier.
+        description:
+          type: string
+          maxLength: 255
+          description: Prompt category description.
         createdAt:
           type: string
           format: date-time
@@ -832,23 +837,33 @@ components:
       additionalProperties: false
       required:
         - label
+        - description
       properties:
         label:
           type: string
           minLength: 1
           maxLength: 100
           description: Prompt Category labels are edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
+        description:
+          type: string
+          maxLength: 255
+          description: Prompt category description is edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
     UpdatePromptCategoryRequest:
       type: object
       additionalProperties: false
       required:
         - label
+        - description
       properties:
         label:
           type: string
           minLength: 1
           maxLength: 100
           description: Prompt Category labels are edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
+        description:
+          type: string
+          maxLength: 255
+          description: Prompt category description is edge-trimmed before validation and persistence while preserving internal whitespace and punctuation.
     PromptVisibility:
       type: string
       enum:
