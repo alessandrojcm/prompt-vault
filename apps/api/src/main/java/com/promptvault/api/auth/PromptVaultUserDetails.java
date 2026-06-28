@@ -1,14 +1,14 @@
 package com.promptvault.api.auth;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-
 import com.promptvault.api.user.AccountStatus;
 import com.promptvault.api.user.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class PromptVaultUserDetails implements UserDetails {
 

@@ -1,11 +1,5 @@
 package com.promptvault.api.signup;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.support.AbstractMySqlIntegrationTest;
@@ -18,6 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,9 +42,9 @@ class SignupApiTest extends AbstractMySqlIntegrationTest {
     void signupCreatesAnEnabledNormalUserWithATrimmedIdentityAndHashedPassword() throws Exception {
         String password = "  pass word  ";
         HttpResponse<String> response = signup(Map.of(
-            "username", "  Alice.User  ",
-            "emailAddress", "  Alice@example.com  ",
-            "password", password
+                "username", "  Alice.User  ",
+                "emailAddress", "  Alice@example.com  ",
+                "password", password
         ));
 
         assertThat(response.statusCode()).isEqualTo(201);
@@ -71,21 +71,21 @@ class SignupApiTest extends AbstractMySqlIntegrationTest {
     @Test
     void signupReturnsAllDuplicateFieldErrorsCaseInsensitively() throws Exception {
         signup(Map.of(
-            "username", "Casey",
-            "emailAddress", "casey@example.com",
-            "password", "password123"
+                "username", "Casey",
+                "emailAddress", "casey@example.com",
+                "password", "password123"
         ));
 
         HttpResponse<String> response = signup(Map.of(
-            "username", "casey",
-            "emailAddress", "CASEY@example.com",
-            "password", "password456"
+                "username", "casey",
+                "emailAddress", "CASEY@example.com",
+                "password", "password456"
         ));
 
         assertThat(response.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(response.body())))
-            .containsEntry("username", "Username is already taken.")
-            .containsEntry("emailAddress", "Email Address is already taken.");
+                .containsEntry("username", "Username is already taken.")
+                .containsEntry("emailAddress", "Email Address is already taken.");
     }
 
     @Test
@@ -101,30 +101,30 @@ class SignupApiTest extends AbstractMySqlIntegrationTest {
         userRepository.save(disabledUser);
 
         HttpResponse<String> response = signup(Map.of(
-            "username", "DORMANT",
-            "emailAddress", "Dormant@example.com",
-            "password", "password456"
+                "username", "DORMANT",
+                "emailAddress", "Dormant@example.com",
+                "password", "password456"
         ));
 
         assertThat(response.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(response.body())))
-            .containsEntry("username", "Username is already taken.")
-            .containsEntry("emailAddress", "Email Address is already taken.");
+                .containsEntry("username", "Username is already taken.")
+                .containsEntry("emailAddress", "Email Address is already taken.");
     }
 
     @Test
     void signupReturnsAllBasicFieldValidationErrorsTogether() throws Exception {
         HttpResponse<String> response = signup(Map.of(
-            "username", " a ",
-            "emailAddress", " not-an-email ",
-            "password", "short"
+                "username", " a ",
+                "emailAddress", " not-an-email ",
+                "password", "short"
         ));
 
         assertThat(response.statusCode()).isEqualTo(400);
         assertThat(extractFieldMessages(readJson(response.body())))
-            .containsEntry("username", "Username must be 3 to 30 characters long.")
-            .containsEntry("emailAddress", "Email Address must be valid.")
-            .containsEntry("password", "Password must be at least 8 characters long.");
+                .containsEntry("username", "Username must be 3 to 30 characters long.")
+                .containsEntry("emailAddress", "Email Address must be valid.")
+                .containsEntry("password", "Password must be at least 8 characters long.");
     }
 
     @Test
@@ -138,24 +138,25 @@ class SignupApiTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> signup(Map<String, String> payload) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/signup"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                .build();
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, String> extractFieldMessages(Map<String, Object> body) {
         return ((java.util.List<Map<String, String>>) body.get("fieldErrors"))
-            .stream()
-            .collect(java.util.stream.Collectors.toMap(
-                fieldError -> fieldError.get("field"),
-                fieldError -> fieldError.get("message")
-            ));
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        fieldError -> fieldError.get("field"),
+                        fieldError -> fieldError.get("message")
+                ));
     }
 }

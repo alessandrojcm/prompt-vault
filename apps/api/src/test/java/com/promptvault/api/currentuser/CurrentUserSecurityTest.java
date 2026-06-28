@@ -1,13 +1,5 @@
 package com.promptvault.api.currentuser;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.promptvault.api.support.AbstractMySqlIntegrationTest;
@@ -20,6 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,7 +58,8 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
 
         assertThat(loginResponse.statusCode()).isEqualTo(200);
         assertThat(loginResponse.headers().allValues("set-cookie"))
-            .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID", "Lax"));;
+                .anySatisfy(cookie -> assertThat(cookie).contains("JSESSIONID", "Lax"));
+        ;
         assertSafeUserSummary(loginResponse.body(), user, Role.USER);
 
         HttpResponse<String> currentUserResponse = getCurrentUser(httpClient);
@@ -89,7 +90,7 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
 
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(readJson(response.body()))
-            .containsEntry("message", "Your account is disabled. Contact an administrator.");
+                .containsEntry("message", "Your account is disabled. Contact an administrator.");
         assertThat(response.headers().allValues("set-cookie")).noneSatisfy(cookie -> assertThat(cookie).contains("JSESSIONID"));
         assertThat(getCurrentUser(httpClient).statusCode()).isEqualTo(401);
     }
@@ -156,28 +157,28 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
 
     private HttpResponse<String> login(String username, String password, HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/login"))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
-                "username", username,
-                "password", password
-            ))))
-            .build();
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                ))))
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> getCurrentUser(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/user"))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+                .header("Accept", "application/json")
+                .GET()
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<Void> logout(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(baseUri.resolve("/api/logout"))
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build();
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
         return client.send(request, HttpResponse.BodyHandlers.discarding());
     }
 
@@ -208,7 +209,8 @@ class CurrentUserSecurityTest extends AbstractMySqlIntegrationTest {
     }
 
     private Map<String, Object> readJson(String body) throws Exception {
-        return objectMapper.readValue(body, new TypeReference<>() { });
+        return objectMapper.readValue(body, new TypeReference<>() {
+        });
     }
 
     private String uniqueUsername(String prefix) {

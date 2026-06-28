@@ -1,7 +1,5 @@
 package com.promptvault.api.promptcategory;
 
-import java.util.List;
-
 import com.promptvault.api.auth.PromptVaultUserDetails;
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.api.PromptCategoriesApi;
@@ -13,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class PromptCategoriesController implements PromptCategoriesApi {
@@ -26,16 +26,16 @@ public class PromptCategoriesController implements PromptCategoriesApi {
     @Override
     public ResponseEntity<List<PromptCategory>> listPromptCategories() {
         return ResponseEntity.ok(promptCategoriesService.listPromptCategories()
-            .stream()
-            .map(PromptCategoryMapper::toContract)
-            .toList());
+                .stream()
+                .map(PromptCategoryMapper::toContract)
+                .toList());
     }
 
     @Override
     public ResponseEntity<PromptCategory> createPromptCategory(CreatePromptCategoryRequest createPromptCategoryRequest) {
         PromptCategory category = PromptCategoryMapper.toContract(promptCategoriesService.createPromptCategory(
-            createPromptCategoryRequest,
-            currentUser()
+                createPromptCategoryRequest,
+                currentUser()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
@@ -43,8 +43,8 @@ public class PromptCategoriesController implements PromptCategoriesApi {
     @Override
     public ResponseEntity<PromptCategory> updatePromptCategory(Long categoryId, UpdatePromptCategoryRequest updatePromptCategoryRequest) {
         return ResponseEntity.ok(PromptCategoryMapper.toContract(promptCategoriesService.updatePromptCategory(
-            categoryId,
-            updatePromptCategoryRequest
+                categoryId,
+                updatePromptCategoryRequest
         )));
     }
 

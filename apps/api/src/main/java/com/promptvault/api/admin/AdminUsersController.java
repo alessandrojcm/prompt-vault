@@ -1,14 +1,14 @@
 package com.promptvault.api.admin;
 
-import java.util.List;
-
-import com.promptvault.contract.model.AdminUserStatusUpdateRequest;
 import com.promptvault.contract.api.AdminUsersApi;
+import com.promptvault.contract.model.AdminUserStatusUpdateRequest;
 import com.promptvault.contract.model.UserRole;
 import com.promptvault.contract.model.UserSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class AdminUsersController implements AdminUsersApi {

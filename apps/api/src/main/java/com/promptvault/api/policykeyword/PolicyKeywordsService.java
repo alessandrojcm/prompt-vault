@@ -1,14 +1,14 @@
 package com.promptvault.api.policykeyword;
 
-import java.util.List;
-import java.util.Locale;
-
 import com.promptvault.api.user.UserEntity;
 import com.promptvault.contract.model.PolicyKeywordRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Locale;
 
 @Service
 public class PolicyKeywordsService {
@@ -41,7 +41,7 @@ public class PolicyKeywordsService {
     @Transactional
     public PolicyKeywordEntity updatePolicyKeyword(Long keywordId, PolicyKeywordRequest request) {
         PolicyKeywordEntity policyKeyword = policyKeywordRepository.findById(keywordId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         String keyword = request.getKeyword();
         String keywordNormalized = normalizeKeyword(keyword);
         if (policyKeywordRepository.existsByKeywordNormalizedAndIdNot(keywordNormalized, keywordId)) {
@@ -55,7 +55,7 @@ public class PolicyKeywordsService {
     @Transactional
     public void deletePolicyKeyword(Long keywordId) {
         PolicyKeywordEntity policyKeyword = policyKeywordRepository.findById(keywordId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         policyKeywordRepository.delete(policyKeyword);
     }
 
