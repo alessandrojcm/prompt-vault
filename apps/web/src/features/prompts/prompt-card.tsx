@@ -4,6 +4,7 @@ import {
   ButtonGroup,
   Card,
   Chip,
+  DataList,
   Group,
   Pill,
   Popover,
@@ -30,9 +31,10 @@ import { Link } from "@tanstack/react-router";
 
 type Props = Prompt & {
   categoryLabel: string;
+  enableEditing?: boolean;
 };
 
-export function PromptCard({ categoryLabel, ...props }: Props) {
+export function PromptCard({ categoryLabel, enableEditing = true, ...props }: Props) {
   const currentUser = useSuspenseQuery(getCurrentUserOptions());
   const client = useQueryClient();
   const isMyPrompt = props.ownerUserId === currentUser.data.id;
@@ -79,87 +81,113 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
   });
 
   return (
-    <Card shadow="md" padding="xl">
-      <Stack gap={"md"} h={"100%"} w={"100%"}>
-        <Group w={"100%"}>
-          <Text fw={500} size="lg">
-            {props.title}
-          </Text>
-
-          {isMyPrompt ? (
-            <Group ml={"auto"} gap={"xs"}>
-              <Chip
-                mr="auto"
-                color="blue"
-                aria-label={`Make ${props.visibility === "PUBLIC" ? "PRIVATE" : "PUBLIC"}`}
-                style={{ textTransform: "capitalize" }}
-                checked={props.visibility === "PUBLIC"}
-                disabled={changeVisibility.isPending}
-                onChange={() =>
-                  changeVisibility.mutate({
-                    path: {
-                      promptId: props.id,
-                    },
-                    body: {
-                      visibility: props.visibility === "PUBLIC" ? "PRIVATE" : "PUBLIC",
-                    },
-                  })
-                }
-              >
-                {props.visibility.toLowerCase()}
-              </Chip>
-              <ActionIcon variant="subtle" aria-label="Edit" onClick={() => disclosure[1].open()}>
-                <PencilIcon />
-              </ActionIcon>
-              <Popover
-                opened={opened}
-                width={300}
-                trapFocus
-                position="bottom"
-                withArrow
-                shadow="md"
-                onDismiss={() => setOpened(false)}
-              >
-                <Popover.Target>
-                  <ActionIcon
-                    aria-label="Delete"
-                    color="red"
-                    variant="subtle"
-                    onClick={() => setOpened(true)}
-                  >
-                    <TrashIcon />
-                  </ActionIcon>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <Text size="xs">Are you sure you want to deletet this prompt?</Text>
-                  <ButtonGroup>
-                    <Button variant="filled" onClick={() => setOpened(false)}>
-                      No
-                    </Button>
-                    <Button
-                      color="red"
-                      variant="outline"
-                      onClick={() => {
-                        deletePrompt.mutate({
-                          path: { promptId: props.id },
-                        });
-                        setOpened(false);
-                      }}
+    <Card shadow="md" withBorder w={"min-content"}>
+      <Card.Section inheritPadding p="xs" withBorder>
+        <DataList>
+          <DataList.Item>
+            <DataList.ItemLabel>Title</DataList.ItemLabel>
+            <DataList.ItemValue>
+              <Group wrap={"nowrap"}>
+                <Text>{props.title}</Text>
+                {isMyPrompt && enableEditing ? (
+                  <>
+                    <ActionIcon
+                      variant="subtle"
+                      aria-label="Edit"
+                      onClick={() => disclosure[1].open()}
                     >
-                      Yes
-                    </Button>
-                  </ButtonGroup>
-                </Popover.Dropdown>
-              </Popover>
-            </Group>
+                      <PencilIcon />
+                    </ActionIcon>
+                    <Popover
+                      opened={opened}
+                      width={300}
+                      trapFocus
+                      position="bottom"
+                      withArrow
+                      shadow="md"
+                      onDismiss={() => setOpened(false)}
+                    >
+                      <Popover.Target>
+                        <ActionIcon
+                          aria-label="Delete"
+                          color="red"
+                          variant="subtle"
+                          onClick={() => setOpened(true)}
+                        >
+                          <TrashIcon />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Text size="xs">Are you sure you want to deletet this prompt?</Text>
+                        <ButtonGroup>
+                          <Button variant="filled" onClick={() => setOpened(false)}>
+                            No
+                          </Button>
+                          <Button
+                            color="red"
+                            variant="outline"
+                            onClick={() => {
+                              deletePrompt.mutate({
+                                path: { promptId: props.id },
+                              });
+                              setOpened(false);
+                            }}
+                          >
+                            Yes
+                          </Button>
+                        </ButtonGroup>
+                      </Popover.Dropdown>
+                    </Popover>
+                  </>
+                ) : null}
+              </Group>
+            </DataList.ItemValue>
+          </DataList.Item>
+          <DataList.Item>
+            <DataList.ItemLabel>Category</DataList.ItemLabel>
+            <DataList.ItemValue>
+              <Pill>{categoryLabel}</Pill>
+            </DataList.ItemValue>
+          </DataList.Item>
+          {isMyPrompt && enableEditing ? (
+            <DataList.Item>
+              <DataList.ItemLabel>Visibility</DataList.ItemLabel>
+              <DataList.ItemValue>
+                <Chip
+                  mr="auto"
+                  color="blue"
+                  aria-label={`Make ${props.visibility === "PUBLIC" ? "PRIVATE" : "PUBLIC"}`}
+                  style={{ textTransform: "capitalize" }}
+                  checked={props.visibility === "PUBLIC"}
+                  disabled={changeVisibility.isPending}
+                  onChange={() =>
+                    changeVisibility.mutate({
+                      path: {
+                        promptId: props.id,
+                      },
+                      body: {
+                        visibility: props.visibility === "PUBLIC" ? "PRIVATE" : "PUBLIC",
+                      },
+                    })
+                  }
+                >
+                  {props.visibility.toLowerCase()}
+                </Chip>
+              </DataList.ItemValue>
+            </DataList.Item>
           ) : null}
-        </Group>
-        <Text>{props.text}</Text>
-        <Group mt={"auto"}>
-          <Pill>{categoryLabel}</Pill>
+        </DataList>
+      </Card.Section>
+      <Card.Section inheritPadding p="xs" withBorder>
+        <Stack align={"center"}>
+          <Text fw={500}>Content</Text>
+          <Text size={"sm"}>{props.text}</Text>
+        </Stack>
+      </Card.Section>
+      <Card.Section inheritPadding p="xs" withBorder>
+        <Group justify={"center"}>
           <Button
             size="sm"
-            ml="auto"
             variant="outline"
             component={Link}
             to="/dashboard/prompts/$promptId/submit"
@@ -168,7 +196,7 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
             Submit to model
           </Button>
         </Group>
-      </Stack>
+      </Card.Section>
       <CreatePrompt
         categories={categories.data}
         currentUser={currentUser.data}

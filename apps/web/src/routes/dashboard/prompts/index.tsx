@@ -41,7 +41,7 @@ function RouteComponent() {
         </Tabs.List>
 
         <Tabs.Panel value="public">
-          <SimpleGrid mt={3} cols={3}>
+          <SimpleGrid mt={3} cols={2}>
             {publicPrompts.data.map((p) => (
               <PromptCard categoryLabel={categories.data.get(p.categoryId)!} key={p.id} {...p} />
             ))}

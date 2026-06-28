@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   ActionIcon,
   Button,
+  ButtonGroup,
   Card,
+  DataList,
   Group,
   SimpleGrid,
   Stack,
@@ -12,6 +14,7 @@ import {
   Title,
 } from "@mantine/core";
 import {
+  deletePromptCategoryMutation,
   listPromptCategoriesOptions,
   listPromptCategoriesQueryKey,
   ListPromptCategoriesResponse,
@@ -25,6 +28,8 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { showNotification } from "@mantine/notifications";
 import { FieldInfo } from "../../../components/field-info";
+import { getHotkeyHandler, useClickOutside, useFocusTrap, useMergedRef } from "@mantine/hooks";
+import { TrashIcon } from "@phosphor-icons/react";
 
 export const Route = createFileRoute("/dashboard/admin/categories")({
   component: RouteComponent,
@@ -35,7 +40,10 @@ export const Route = createFileRoute("/dashboard/admin/categories")({
 
 function CategoryCard(props: PromptCategory) {
   const { label, description, id } = props;
-  const [edit, setEdit] = useState(false);
+  const [edit, setEdit] = useState({
+    label: false,
+    description: false,
+  });
   const client = useQueryClient();
   const updateCategory = useMutation({
     ...updatePromptCategoryMutation(),
@@ -61,6 +69,28 @@ function CategoryCard(props: PromptCategory) {
     },
   });
 
+  const deleteCategory = useMutation({
+    ...deletePromptCategoryMutation(),
+    onSuccess: () => {
+      client.invalidateQueries(listPromptCategoriesOptions());
+    },
+    onError: (error) => {
+      if ("status" in error && error.status === 409) {
+        showNotification({
+          color: "red",
+          position: "top-right",
+          message: "This category cannot be deleted because is in use",
+        });
+        return;
+      }
+      showNotification({
+        color: "red",
+        position: "top-right",
+        message: "There was an error deleting this category",
+      });
+    },
+  });
+
   const form = useForm({
     defaultValues: {
       label,
@@ -77,83 +107,126 @@ function CategoryCard(props: PromptCategory) {
             ...value,
           },
         });
-        setEdit(false);
+        setEdit({
+          label: false,
+          description: false,
+        });
       },
     },
   });
+  const focusTrapRef = useFocusTrap();
+  const clickOutside = useClickOutside(() =>
+    setEdit((cur) => ({
+      label: cur.label ? false : cur.label,
+      description: cur.description ? false : cur.description,
+    })),
+  );
+  const mergedRefs = useMergedRef(focusTrapRef, clickOutside);
+  const submission = getHotkeyHandler([["Enter", () => form.handleSubmit()]]);
 
   return (
-    <Card shadow="md" padding="xl">
-      {edit ? (
-        <form
-          noValidate
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            form.handleSubmit();
-          }}
-        >
-          <form.Field
-            name="label"
-            children={(field) => (
-              <TextInput
-                disabled={form.state.isSubmitting}
-                error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
-                label="Category name"
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
-              />
-            )}
-          />
-          <form.Field
-            name="description"
-            children={(field) => (
-              <Textarea
-                disabled={form.state.isSubmitting}
-                autosize
-                resize="vertical"
-                minRows={3}
-                error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
-                label="Category description"
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
-              />
-            )}
-          />
-
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <Group justify={"space-between"}>
-                <Button mt={4} onClick={() => setEdit(false)} variant="outline" color="red">
-                  Cancel
-                </Button>
-                <Button mt={4} disabled={!canSubmit || isSubmitting} type="submit">
-                  {isSubmitting ? "Updating category..." : "Update category"}
-                </Button>
+    <Card shadow="md" withBorder h={"auto"}>
+      <form
+        style={{ width: "100%" }}
+        noValidate
+        onSubmit={(event) => {
+          if (!edit) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+      >
+        <DataList orientation={"vertical"}>
+          <DataList.Item>
+            <DataList.ItemLabel>
+              <Group>
+                Name
+                <ActionIcon variant={"subtle"} aria-label={"edit category name"}>
+                  <PencilIcon
+                    size={16}
+                    onClick={() => {
+                      setEdit((cur) => ({
+                        ...cur,
+                        label: true,
+                      }));
+                    }}
+                  />
+                </ActionIcon>
+                <ActionIcon
+                  aria-label={"delete category"}
+                  ml={"auto"}
+                  color={"red"}
+                  variant={"subtle"}
+                  onClick={() => deleteCategory.mutate({ path: { categoryId: id } })}
+                >
+                  <TrashIcon size={16} />
+                </ActionIcon>
               </Group>
-            )}
-          </form.Subscribe>
-        </form>
-      ) : (
-        <Stack justify={"space-between"} h={"100%"}>
-          <Group>
-            {" "}
-            <Title order={2}>{label}</Title>
-            <ActionIcon
-              aria-label={"Edit category"}
-              variant={"subtle"}
-              onClick={() => setEdit(true)}
-            >
-              <PencilIcon />
-            </ActionIcon>
-          </Group>
-          <Text>{description}</Text>
-        </Stack>
-      )}
+            </DataList.ItemLabel>
+            <DataList.ItemValue>
+              {edit.label ? (
+                <form.Field
+                  name="label"
+                  children={(field) => (
+                    <TextInput
+                      onKeyDown={submission}
+                      ref={mergedRefs}
+                      disabled={form.state.isSubmitting}
+                      error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                    />
+                  )}
+                />
+              ) : (
+                <Text size={"sm"}>{form.getFieldValue("label")}</Text>
+              )}
+            </DataList.ItemValue>
+          </DataList.Item>
+          <DataList.Item>
+            <DataList.ItemLabel>
+              Description
+              <ActionIcon variant={"subtle"} aria-label={"edit category description"}>
+                <PencilIcon
+                  size={16}
+                  onClick={() => {
+                    setEdit((cur) => ({
+                      ...cur,
+                      description: true,
+                    }));
+                  }}
+                />
+              </ActionIcon>
+            </DataList.ItemLabel>
+            <DataList.ItemValue>
+              {edit.description ? (
+                <form.Field
+                  name="description"
+                  children={(field) => (
+                    <Textarea
+                      onKeyDown={submission}
+                      ref={mergedRefs}
+                      disabled={form.state.isSubmitting}
+                      resize="vertical"
+                      rows={3}
+                      error={!field.state.meta.isValid ? <FieldInfo field={field} /> : null}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                    />
+                  )}
+                />
+              ) : (
+                <Text>{form.getFieldValue("description")}</Text>
+              )}
+            </DataList.ItemValue>
+          </DataList.Item>
+        </DataList>
+      </form>
     </Card>
   );
 }
