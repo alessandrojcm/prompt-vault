@@ -1,5 +1,5 @@
-import { Anchor, Card, Text, Title } from "@mantine/core";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Anchor, Card, Text, Title } from '@mantine/core';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute("/signup/success")({
   component: SignupSuccessPage,

@@ -1,20 +1,9 @@
-import { SignupError, signupMutation, vSignupRequest } from "@prompt-vault/api-client";
-import {
-  Alert,
-  Anchor,
-  Button,
-  Card,
-  Fieldset,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { FieldInfo } from "../../components/field-info";
+import { SignupError, signupMutation, vSignupRequest } from '@prompt-vault/api-client';
+import { Alert, Anchor, Button, Card, Fieldset, PasswordInput, Stack, Text, TextInput, Title, } from '@mantine/core';
+import { useForm } from '@tanstack/react-form';
+import { useMutation } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { FieldInfo } from '../../components/field-info';
 
 type SignupFormState = {
   username: string;

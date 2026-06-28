@@ -3,11 +3,11 @@ import {
   listPromptCategoriesOptions,
   type ListPromptCategoriesResponse,
   listPromptsOptions,
-} from "@prompt-vault/api-client";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { SimpleGrid, Tabs, Title } from "@mantine/core";
-import { PromptCard } from "../../../features/prompts/prompt-card";
+} from '@prompt-vault/api-client';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { SimpleGrid, Tabs, Title } from '@mantine/core';
+import { PromptCard } from '../../../features/prompts/prompt-card';
 
 export const Route = createFileRoute("/dashboard/prompts/")({
   component: RouteComponent,
@@ -41,7 +41,7 @@ function RouteComponent() {
         </Tabs.List>
 
         <Tabs.Panel value="public">
-          <SimpleGrid mt={3} cols={2}>
+          <SimpleGrid mt={3} cols={3}>
             {publicPrompts.data.map((p) => (
               <PromptCard categoryLabel={categories.data.get(p.categoryId)!} key={p.id} {...p} />
             ))}

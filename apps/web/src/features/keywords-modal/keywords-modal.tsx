@@ -1,14 +1,14 @@
-import { Pill, PillsInput, Text } from "@mantine/core";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Pill, PillsInput, Text } from '@mantine/core';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createPolicyKeywordMutation,
   deletePolicyKeywordMutation,
   listPolicyKeywordsOptions,
   listPolicyKeywordsQueryKey,
   ListPolicyKeywordsResponse,
-} from "@prompt-vault/api-client";
-import { getHotkeyHandler } from "@mantine/hooks";
-import { useState } from "react";
+} from '@prompt-vault/api-client';
+import { getHotkeyHandler } from '@mantine/hooks';
+import { useState } from 'react';
 
 export function KeywordsModal() {
   const client = useQueryClient();

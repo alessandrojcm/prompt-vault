@@ -1,10 +1,10 @@
-import { Button, Card, Container, ScrollArea, Stack, Text, Title } from "@mantine/core";
-import { getPromptOptions, submitPromptRequestMutation } from "@prompt-vault/api-client";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { fetchServerSentEvents, useChat } from "@tanstack/ai-react";
-import { showNotification } from "@mantine/notifications";
+import { Button, Card, Container, Loader, ScrollArea, Stack, Text, Title } from '@mantine/core';
+import { getPromptOptions, submitPromptRequestMutation } from '@prompt-vault/api-client';
+import { useMutation } from '@tanstack/react-query';
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { fetchServerSentEvents, useChat } from '@tanstack/ai-react';
+import { showNotification } from '@mantine/notifications';
 
 export const Route = createFileRoute("/dashboard/prompts/$promptId/submit")({
   component: RouteComponent,
@@ -49,7 +49,7 @@ function RouteComponent() {
       });
     },
   });
-  const { messages, sendMessage, reload } = useChat({
+  const { messages, sendMessage, reload, isLoading } = useChat({
     connection: fetchServerSentEvents("/chat"),
     onFinish: () => {
       messages.filter((r) => r.role === "assistant");
@@ -94,6 +94,9 @@ function RouteComponent() {
               >
                 <Text key={message.id} mb={4}>
                   <Text fw={250}>{message.role === "assistant" ? "Assistant" : "You"}</Text>
+                  {message.role === "assistant" && isLoading ? (
+                    <Loader size={"sm"} color={"dark"} />
+                  ) : null}
                   <div>
                     {message.parts.map((part, idx) => {
                       if (part.type === "text") {
@@ -108,7 +111,7 @@ function RouteComponent() {
           </ScrollArea>
         </Stack>
       </Container>
-      <Button variant="outline" mr="auto" mt={4} onClick={() => reload()}>
+      <Button disabled={isLoading} variant="outline" mr="auto" mt={4} onClick={() => reload()}>
         Restart
       </Button>
     </Card>

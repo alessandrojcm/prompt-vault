@@ -3,6 +3,7 @@ import {
   Button,
   ButtonGroup,
   Card,
+  CardProps,
   Chip,
   DataList,
   Group,
@@ -10,8 +11,8 @@ import {
   Popover,
   Stack,
   Text,
-} from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
+} from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import {
   deletePromptMutation,
   getCurrentUserOptions,
@@ -20,21 +21,30 @@ import {
   listPromptsOptions,
   Prompt,
   updatePromptVisibilityMutation,
-} from "@prompt-vault/api-client";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { TrashIcon } from "@phosphor-icons/react";
-import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
-import { useDisclosure } from "@mantine/hooks";
-import { CreatePrompt } from "./create-or-edit-prompt";
-import { Link } from "@tanstack/react-router";
+} from '@prompt-vault/api-client';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { TrashIcon } from '@phosphor-icons/react';
+import { PencilIcon } from '@phosphor-icons/react/dist/ssr';
+import { useDisclosure } from '@mantine/hooks';
+import { CreatePrompt } from './create-or-edit-prompt';
+import { Link } from '@tanstack/react-router';
+import classes from './prompt-card.module.css';
 
 type Props = Prompt & {
   categoryLabel: string;
   enableEditing?: boolean;
+  enableSubmission?: boolean;
+  onClick?: () => void;
 };
 
-export function PromptCard({ categoryLabel, enableEditing = true, ...props }: Props) {
+export function PromptCard({
+  categoryLabel,
+  enableEditing = true,
+  enableSubmission = true,
+  onClick,
+  ...props
+}: Props) {
   const currentUser = useSuspenseQuery(getCurrentUserOptions());
   const client = useQueryClient();
   const isMyPrompt = props.ownerUserId === currentUser.data.id;
@@ -80,8 +90,16 @@ export function PromptCard({ categoryLabel, enableEditing = true, ...props }: Pr
     },
   });
 
+  const clickProps: CardProps = onClick
+    ? {
+        // @ts-ignore
+        onClick,
+        component: "button",
+        className: classes["hover-on-float"],
+      }
+    : {};
   return (
-    <Card shadow="md" withBorder w={"min-content"}>
+    <Card shadow="md" withBorder w={"min-content"} {...clickProps}>
       <Card.Section inheritPadding p="xs" withBorder>
         <DataList>
           <DataList.Item>
@@ -184,19 +202,21 @@ export function PromptCard({ categoryLabel, enableEditing = true, ...props }: Pr
           <Text size={"sm"}>{props.text}</Text>
         </Stack>
       </Card.Section>
-      <Card.Section inheritPadding p="xs" withBorder>
-        <Group justify={"center"}>
-          <Button
-            size="sm"
-            variant="outline"
-            component={Link}
-            to="/dashboard/prompts/$promptId/submit"
-            params={{ promptId: props.id }}
-          >
-            Submit to model
-          </Button>
-        </Group>
-      </Card.Section>
+      {enableSubmission ? (
+        <Card.Section inheritPadding p="xs" withBorder>
+          <Group justify={"center"}>
+            <Button
+              size="sm"
+              variant="outline"
+              component={Link}
+              to="/dashboard/prompts/$promptId/submit"
+              params={{ promptId: props.id }}
+            >
+              Submit to model
+            </Button>
+          </Group>
+        </Card.Section>
+      ) : null}
       <CreatePrompt
         categories={categories.data}
         currentUser={currentUser.data}
