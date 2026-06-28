@@ -22,6 +22,9 @@ public class PromptCategoryEntity {
     @Column(nullable = false, length = 100)
     private String slug;
 
+    @Column(length = 255)
+    private String description;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -58,6 +61,14 @@ public class PromptCategoryEntity {
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Instant getCreatedAt() {

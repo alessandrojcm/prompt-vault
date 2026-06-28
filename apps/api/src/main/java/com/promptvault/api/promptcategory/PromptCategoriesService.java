@@ -46,6 +46,7 @@ public class PromptCategoriesService {
         category.setLabel(label);
         category.setLabelNormalized(labelNormalized);
         category.setSlug(slug);
+        category.setDescription(request.getDescription());
         category.setCreatedBy(creator);
 
         return promptCategoryRepository.save(category);
@@ -70,6 +71,7 @@ public class PromptCategoriesService {
         category.setLabel(label);
         category.setLabelNormalized(labelNormalized);
         category.setSlug(slug);
+        category.setDescription(request.getDescription());
 
         return promptCategoryRepository.save(category);
     }

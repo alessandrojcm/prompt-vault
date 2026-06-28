@@ -63,6 +63,11 @@ const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
         roles: ["ADMIN"],
         to: "/dashboard/admin/flagged-prompts",
       },
+      {
+        label: "Prompt categories",
+        roles: ["ADMIN"],
+        to: "/dashboard/admin/categories",
+      },
     ],
   },
   {
@@ -130,15 +135,6 @@ function DashboardLayout() {
   const queryClient = useQueryClient();
   const logout = useMutation(logoutMutation());
 
-  function openCategoriesManager() {
-    modals.openContextModal({
-      title: "Manage categories",
-      modal: "categories",
-      innerProps: {},
-      centered: true,
-    });
-  }
-
   function openKeywordsManager() {
     modals.openContextModal({
       title: "Manage policy keywords",
@@ -199,7 +195,6 @@ function DashboardLayout() {
                     <Menu.Item onClick={() => openKeywordsManager()}>
                       Manage policy keywords
                     </Menu.Item>
-                    <Menu.Item onClick={() => openCategoriesManager()}>Manage categories</Menu.Item>
                   </>
                 ) : null}
               </Menu.Dropdown>

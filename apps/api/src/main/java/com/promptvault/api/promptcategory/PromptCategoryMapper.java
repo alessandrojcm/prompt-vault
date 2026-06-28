@@ -14,6 +14,7 @@ public final class PromptCategoryMapper {
                 category.getId(),
                 category.getLabel(),
                 category.getSlug(),
+                category.getDescription(),
                 category.getCreatedAt().atOffset(ZoneOffset.UTC),
                 category.getCreatedBy().getId(),
                 category.getUpdatedAt().atOffset(ZoneOffset.UTC)
