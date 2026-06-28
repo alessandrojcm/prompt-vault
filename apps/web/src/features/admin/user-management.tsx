@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 import {
   type AccountStatus,
@@ -7,17 +7,17 @@ import {
   type UpdateAdminUserStatusData,
   updateAdminUserStatusMutation,
   type UserSummary,
-} from '@prompt-vault/api-client';
-import { Badge, Button, Card, Popover, Stack, Table, Text, Title } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import { MutationFunction, useMutation, useQueryClient } from '@tanstack/react-query';
+} from "@prompt-vault/api-client";
+import { Badge, Button, Card, Popover, Stack, Table, Text, Title } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { MutationFunction, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
 const columnHelper = createColumnHelper<UserSummary>();
 

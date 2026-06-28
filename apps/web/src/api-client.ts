@@ -1,6 +1,6 @@
-import { client } from '@prompt-vault/api-client';
-import { createIsomorphicFn } from '@tanstack/react-start';
-import { getRequest } from '@tanstack/react-start/server';
+import { client } from "@prompt-vault/api-client";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
 export function configureApiClient() {
   client.setConfig({

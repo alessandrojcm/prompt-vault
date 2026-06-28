@@ -1,4 +1,4 @@
-import type { UserSessionViewState } from '../../lib/current-user';
+import type { UserSessionViewState } from "../../lib/current-user";
 
 type UserSessionShellProps = {
   state: UserSessionViewState;

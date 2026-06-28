@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import { loginErrorMessage } from './login-screen';
+import { loginErrorMessage } from "./login-screen";
 
 describe("loginErrorMessage", () => {
   it("shows disabled account failures distinctly", () => {

@@ -1,30 +1,41 @@
-import { ActionIcon, Button, ButtonGroup, Card, Chip, Group, Pill, Popover, Stack, Text, } from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
+import {
+  ActionIcon,
+  Button,
+  ButtonGroup,
+  Card,
+  Chip,
+  Group,
+  Pill,
+  Popover,
+  Stack,
+  Text,
+} from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 import {
   deletePromptMutation,
   getCurrentUserOptions,
   listMyPromptsOptions,
   listPromptCategoriesOptions,
+  listPromptsOptions,
   Prompt,
-  PublicPrompt,
   updatePromptVisibilityMutation,
-} from '@prompt-vault/api-client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { TrashIcon } from '@phosphor-icons/react';
-import { PencilIcon } from '@phosphor-icons/react/dist/ssr';
-import { useDisclosure } from '@mantine/hooks';
-import { CreatePrompt } from './create-or-edit-prompt';
-import { Link } from '@tanstack/react-router';
+} from "@prompt-vault/api-client";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { TrashIcon } from "@phosphor-icons/react";
+import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
+import { useDisclosure } from "@mantine/hooks";
+import { CreatePrompt } from "./create-or-edit-prompt";
+import { Link } from "@tanstack/react-router";
 
-type Props = (Prompt | PublicPrompt) & {
+type Props = Prompt & {
   categoryLabel: string;
 };
 
 export function PromptCard({ categoryLabel, ...props }: Props) {
   const currentUser = useSuspenseQuery(getCurrentUserOptions());
   const client = useQueryClient();
-  const isMyPrompt = "ownerUserId" in props && props.ownerUserId === currentUser.data.id;
+  const isMyPrompt = props.ownerUserId === currentUser.data.id;
   const [opened, setOpened] = useState(false);
   const disclosure = useDisclosure();
   const categories = useSuspenseQuery(listPromptCategoriesOptions());
@@ -44,6 +55,7 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
         position: "top-right",
       });
       client.invalidateQueries(listMyPromptsOptions({ path: { userId: currentUser.data.id } }));
+      client.invalidateQueries(listPromptsOptions({ query: { visibility: ["PUBLIC"] } }));
     },
   });
 
@@ -62,6 +74,7 @@ export function PromptCard({ categoryLabel, ...props }: Props) {
         position: "top-right",
       });
       client.invalidateQueries(listMyPromptsOptions({ path: { userId: currentUser.data.id } }));
+      client.invalidateQueries(listPromptsOptions({ query: { visibility: ["PUBLIC"] } }));
     },
   });
 

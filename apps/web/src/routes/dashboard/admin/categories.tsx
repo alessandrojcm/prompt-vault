@@ -1,5 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ActionIcon, Button, Card, Group, SimpleGrid, Stack, Text, Textarea, TextInput, Title, } from '@mantine/core';
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  ActionIcon,
+  Button,
+  Card,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import {
   listPromptCategoriesOptions,
   listPromptCategoriesQueryKey,
@@ -7,13 +18,13 @@ import {
   PromptCategory,
   updatePromptCategoryMutation,
   vUpdatePromptCategoryBody,
-} from '@prompt-vault/api-client';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { PencilIcon } from '@phosphor-icons/react/dist/ssr';
-import { useState } from 'react';
-import { useForm } from '@tanstack/react-form';
-import { showNotification } from '@mantine/notifications';
-import { FieldInfo } from '../../../components/field-info';
+} from "@prompt-vault/api-client";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { PencilIcon } from "@phosphor-icons/react/dist/ssr";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { showNotification } from "@mantine/notifications";
+import { FieldInfo } from "../../../components/field-info";
 
 export const Route = createFileRoute("/dashboard/admin/categories")({
   component: RouteComponent,

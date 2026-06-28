@@ -1,11 +1,11 @@
-import type { UserSummary } from '@prompt-vault/api-client';
+import type { UserSummary } from "@prompt-vault/api-client";
 import {
   getCurrentUserOptions,
   getCurrentUserQueryKey,
   listPolicyKeywordsOptions,
   listPromptCategoriesOptions,
   logoutMutation,
-} from '@prompt-vault/api-client';
+} from "@prompt-vault/api-client";
 import {
   ActionIcon,
   AppShell,
@@ -18,8 +18,13 @@ import {
   Stack,
   Text,
   Title,
-} from '@mantine/core';
-import { type QueryClient, useMutation, useQueryClient, useSuspenseQuery, } from '@tanstack/react-query';
+} from "@mantine/core";
+import {
+  type QueryClient,
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import {
   createFileRoute,
   Link,
@@ -28,13 +33,13 @@ import {
   useLocation,
   useNavigate,
   useRouter,
-} from '@tanstack/react-router';
-import { modals } from '@mantine/modals';
+} from "@tanstack/react-router";
+import { modals } from "@mantine/modals";
 
-import { requireCurrentUser } from '../features/auth/current-user';
-import { CreatePrompt } from '../features/prompts/create-or-edit-prompt';
-import { useDisclosure } from '@mantine/hooks';
-import { GearIcon } from '@phosphor-icons/react';
+import { requireCurrentUser } from "../features/auth/current-user";
+import { CreatePrompt } from "../features/prompts/create-or-edit-prompt";
+import { useDisclosure } from "@mantine/hooks";
+import { GearIcon } from "@phosphor-icons/react";
 
 type AppNavigationLink = {
   label: string;
@@ -69,11 +74,6 @@ const APP_NAVIGATION_LINKS: Array<AppNavigationLink> = [
     label: "Prompts",
     roles: ["ADMIN", "USER"],
     children: [
-      {
-        label: "My prompts",
-        roles: ["ADMIN", "USER"],
-        to: "/dashboard/my-prompts",
-      },
       {
         label: "Public prompts",
         to: "/dashboard/prompts",

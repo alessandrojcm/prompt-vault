@@ -1,11 +1,11 @@
-import { listAdminUsersOptions, type UserSummary } from '@prompt-vault/api-client';
-import { MantineProvider } from '@mantine/core';
-import { Notifications, notifications } from '@mantine/notifications';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { describe, expect, it, vi } from 'vitest';
-import { render } from 'vitest-browser-react';
+import { listAdminUsersOptions, type UserSummary } from "@prompt-vault/api-client";
+import { MantineProvider } from "@mantine/core";
+import { Notifications, notifications } from "@mantine/notifications";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { describe, expect, it, vi } from "vitest";
+import { render } from "vitest-browser-react";
 
-import { accountStatusLabel, UserManagementTable } from './user-management';
+import { accountStatusLabel, UserManagementTable } from "./user-management";
 
 describe("UserManagementTable", () => {
   it("shows normal-user management columns and hides internal ids and roles", async () => {
