@@ -23,3 +23,7 @@ server:
 prompt-vault:
   cors:
     allowed-origins: ${PROMPT_VAULT_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://192.168.0.124:3000,http://192.168.0.123:3000}
+  security:
+    # Unset outside production: Swagger UI assets break under a restrictive CSP during local dev.
+    # application-prod.yaml sets a real policy; see there before changing this key.
+    csp-directives: ${PROMPT_VAULT_SECURITY_CSP_DIRECTIVES:}

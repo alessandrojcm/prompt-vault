@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.7'
+    id 'org.springframework.boot' version '4.0.8'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.openapi.generator' version '7.23.0'
 }
@@ -36,7 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
     implementation 'org.flywaydb:flyway-mysql'
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.8'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.11'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -64,6 +64,27 @@ openApiGenerate {
         useTags              : 'true',
         documentationProvider: 'source'
     ])
+}
+
+// The generator still emits a standalone pom.xml/README.md alongside the API
+// interfaces; the pom pins stale template dependency versions that Snyk flags
+// and the Gradle build never consumes it, so strip both after generation.
+def genOpenApiDir = layout.buildDirectory.dir('generated/openapi')
+def stripOpenApiSupportingFiles = tasks.register('openApiStripSupportingFiles') {
+    def genDir = genOpenApiDir.get().asFile
+    doLast {
+        ['pom.xml', 'README.md'].each { name ->
+            def f = new File(genDir, name)
+            if (f.exists()) {
+                logger.lifecycle("Removed generated ${name} (unused by Gradle build)")
+                f.delete()
+            }
+        }
+    }
+}
+
+tasks.named('openApiGenerate') {
+    finalizedBy stripOpenApiSupportingFiles
 }
 
 tasks.named('compileJava') {

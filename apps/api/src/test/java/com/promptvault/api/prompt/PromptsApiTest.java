@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "prompt-vault.security.csrf-enabled=false")
 class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
     @Autowired
@@ -193,8 +193,11 @@ class PromptsApiTest extends AbstractMySqlIntegrationTest {
 
         PromptFlagEntity flag = promptFlagRepository.findByPromptId(promptId).orElseThrow();
         assertThat(flag.getFlaggedAt()).isNotNull();
+        // Seed data (and other tests) can contribute baseline keywords such as "Secret" that
+        // also match this text; scope the assertion to the keywords this test created.
         assertThat(flag.getKeywordSnapshots())
                 .extracting(PromptFlagKeywordSnapshotEntity::getKeywordText)
+                .filteredOn(keywordText -> keywordText.endsWith(suffix))
                 .containsExactly("API secret " + suffix, "Internal   Phrase " + suffix, "secret " + suffix);
     }
 

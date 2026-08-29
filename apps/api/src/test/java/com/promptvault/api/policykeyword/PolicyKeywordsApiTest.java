@@ -25,7 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "prompt-vault.security.csrf-enabled=false")
 class PolicyKeywordsApiTest extends AbstractMySqlIntegrationTest {
 
     private static final String SEEDED_ADMIN_USERNAME = "admin";

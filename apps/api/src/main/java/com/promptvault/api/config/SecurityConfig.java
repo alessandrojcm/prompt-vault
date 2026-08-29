@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,16 +33,24 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CorsProperties corsProperties;
+    private final Environment environment;
 
-    SecurityConfig(CorsProperties corsProperties) {
+    SecurityConfig(CorsProperties corsProperties, Environment environment) {
         this.corsProperties = corsProperties;
+        this.environment = environment;
     }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> {
+                    if (!csrfEnabled()) {
+                        csrf.disable();
+                    } else {
+                        csrf.spa();
+                    }
+                })
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/signup", "/api/login").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -58,7 +67,17 @@ public class SecurityConfig {
                         .expiredSessionStrategy(event -> event.getResponse().sendError(HttpStatus.UNAUTHORIZED.value())))
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
+        String cspDirectives = environment.getProperty("prompt-vault.security.csp-directives");
+        if (cspDirectives != null && !cspDirectives.isBlank()) {
+            http.headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives(cspDirectives)));
+        }
+
         return http.build();
+    }
+
+    private boolean csrfEnabled() {
+        String property = environment.getProperty("prompt-vault.security.csrf-enabled", "true");
+        return !"false".equals(property);
     }
 
     @Bean
@@ -91,7 +110,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(corsProperties.allowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "X-CSRF-TOKEN"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "X-XSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(Duration.ofHours(1));
 
