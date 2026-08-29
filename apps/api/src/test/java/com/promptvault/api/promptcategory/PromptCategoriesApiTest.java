@@ -27,7 +27,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "prompt-vault.security.csrf-enabled=false")
 class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
 
     private static final String SEEDED_ADMIN_USERNAME = "admin";
@@ -305,15 +305,20 @@ class PromptCategoriesApiTest extends AbstractMySqlIntegrationTest {
     @Test
     void adminsCanDeleteUnusedSeededBaselinePromptCategories() throws Exception {
         HttpClient adminClient = authenticatedClient();
+        // V9 seeds one prompt into every baseline category and earlier tests may have
+        // attached more, so no baseline category is reliably unused; make one unused by
+        // removing the prompts that reference it (tests run sequentially in a shared DB).
         PromptCategoryEntity seededCategory = promptCategoryRepository.findAllByOrderByLabelAsc()
                 .stream()
                 .filter(category -> List.of("coding", "cybersecurity", "hr", "legal", "personal_productivity", "research").contains(category.getSlug()))
-                .filter(category -> !promptRepository.existsByCategoryId(category.getId()))
                 .findFirst()
                 .orElseThrow();
         long categoryId = seededCategory.getId();
         String label = seededCategory.getLabel();
         String slug = seededCategory.getSlug();
+        promptRepository.findAll().stream()
+                .filter(prompt -> prompt.getCategory().getId() == categoryId)
+                .forEach(promptRepository::delete);
 
         try {
             HttpResponse<String> response = deletePromptCategory(adminClient, Math.toIntExact(categoryId));

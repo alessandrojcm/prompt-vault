@@ -13,7 +13,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.101.1",
     "ky": "^1.14.0",
-    "valibot": "^1.4.1"
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",

@@ -10,7 +10,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 - Generate the TypeScript API client with Hey API in `packages/api-client`; generated output lives under `packages/api-client/src/generated` and must not be committed.
 - Keep `packages/api-client/src/index.ts` as a thin re-export surface for Hey API generated SDK, types, TanStack Query helpers, and Valibot schemas.
 - Put UI-specific response mapping and client configuration in consuming apps, not `packages/api-client`.
-- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: use `credentials: "include"` so browser calls send the session cookie when the API runs on a different origin; SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback and must forward the incoming request's `Cookie` header through a TanStack Start `createIsomorphicFn` server implementation.
+- Configure the web app's Hey API client in `apps/web/src/api-client.ts`: use `credentials: "include"` so browser calls send the session cookie when the API runs on a different origin; SSR/server calls use `PROMPT_VAULT_API_BASE_URL` with a localhost API fallback and must forward the incoming request's `Cookie` header through a TanStack Start `createIsomorphicFn` server implementation. The same client attaches the CSRF header (`X-XSRF-TOKEN` from the `XSRF-TOKEN` cookie) on non-GET requests; keep the SSR guard because `document` does not exist server-side.
 
 ## Web app patterns
 
@@ -40,7 +40,10 @@ Use this document before broad codebase exploration. The stack and core seams ar
 
 ## API and auth patterns
 
-- Use Spring Security session-cookie authentication for the initial auth slice; CSRF hardening is deferred to later OWASP-focused work.
+- CSRF is enabled with Spring Security 7's native SPA support (`csrf.spa()` in `SecurityConfig`): the token rides the `XSRF-TOKEN` cookie and must be returned in the `X-XSRF-TOKEN` header on state-changing requests. Authenticated GETs render the cookie, so a client can bootstrap with any read before mutating.
+- Suppress CSRF only in business integration tests via `@SpringBootTest(properties = "prompt-vault.security.csrf-enabled=false")`; `CsrfSecurityTest` owns the real contract, and `CsrfAwareTestClient` exists for CSRF-aware security tests.
+- CSP is opt-in via `prompt-vault.security.csp-directives` (unset = no header); `application-prod.yaml` sets it together with springdoc disabled (`springdoc.api-docs.enabled=false`, `springdoc.swagger-ui.enabled=false`) and `server.servlet.session.cookie.secure=true`. Keep those keys out of the default profile: local dev runs plain HTTP (including LAN origins) and Swagger drives client generation.
+- Use Spring Security session-cookie authentication with cookie-backed sessions and role-based authorization rules in `SecurityConfig`.
 - API CORS is configured in Spring Security with a `CorsConfigurationSource` for `/api/**`; keep allowed browser origins explicit via `prompt-vault.cors.allowed-origins` / `PROMPT_VAULT_CORS_ALLOWED_ORIGINS` because session-cookie credentials cannot use wildcard origins.
 - Signup is `POST /api/signup`: it trims username/email address, preserves password spaces, creates `USER` + `ENABLED`, and returns `400` with `ValidationErrorResponse.fieldErrors[]` for form-friendly validation failures.
 - Keep SignupRequest's basic constraints in OpenAPI, including `emailAddress` as `format: email`, so generated frontend Valibot schemas and backend Bean Validation agree on basic shape.
@@ -86,6 +89,7 @@ Use this document before broad codebase exploration. The stack and core seams ar
 
 - Run the standard verification with `mise run check`.
 - API integration tests should prefer real MySQL coverage via Testcontainers.
+- Stop the dev Compose MySQL (`mise run db:down`) before running API tests: the Testcontainers Compose environment binds host port 3306 and collides with the dev DB otherwise; stale testcontainers projects holding 3306 need `docker rm -f` before a rerun.
 - The shared Compose environment in `AbstractMySqlIntegrationTest` is a manually-started JVM singleton so Spring's cached contexts do not outlive a per-class JUnit container lifecycle.
 - Frontend route/auth behavior should be covered at the route/component seam with focused Vitest tests rather than end-to-end browser tests unless browser behavior is the subject of the task.
 - Web tests use Vitest 4 Browser Mode with the Playwright Chromium provider; prefer `vitest-browser-react` locators/assertions for component tests instead of jsdom or Testing Library shims.
